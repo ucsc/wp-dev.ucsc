@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  theme_npm_start:
+    depends_on:
+      - wp_activate_plugin_and_theme
+    image: node:16.18.0-alpine3.15
+    volumes:
+      - "./public/:/var/www/html"
+    working_dir: /var/www/html/wp-content/themes/ucsc-2022
+    command: npm run start
+    networks:
+      - wpsite
+  plugin_npm_start:
+    depends_on:
+      - wp_activate_plugin_and_theme
+    image: node:16.18.0-alpine3.15
+    volumes:
+      - "./public/:/var/www/html"
+    working_dir: /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks
+    command: npm run start
+    networks:
+      - wpsite
+
+networks:
+  wpsite: null

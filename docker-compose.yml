@@ -16,7 +16,6 @@ services:
   wordpress:
     build: .
     restart: always
-    user: xfs
     ports:
       - 8080:80
     environment:
@@ -26,15 +25,15 @@ services:
       WORDPRESS_DB_NAME: exampledb
       WORDPRESS_CONFIG_EXTRA: define('WP_ALLOW_MULTISITE', true);
     volumes: [ './public/:/var/www/html' ]
-    hostname: ucsc-gutenberg-blocks.local
+    hostname: wp-dev.ucsc
     labels:
-      com.ucsc.expose.domain: "ucsc-gutenberg-blocks.local"
+      com.ucsc.expose.domain: "wp-dev.ucsc"
       com.ucsc.expose.domainIsHost: "true"
       com.ucsc.expose.subdomainHosts: "site1 site2 site3"
     networks:
       wpsite:
         aliases:
-          - ucsc-gutenberg-blocks.local
+          - wp-dev.ucsc
     depends_on:
       - db
   db:
@@ -47,26 +46,6 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
       - db:/var/lib/mysql
-    networks:
-      - wpsite
-  wordpresscli:
-    depends_on:
-      - db
-      - wordpress
-    image: wordpress:cli
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: exampleuser
-      WORDPRESS_DB_PASSWORD: examplepass
-      WORDPRESS_DB_NAME: exampledb
-    user: xfs
-    command: >
-      /bin/sh -c '
-      sleep 15;
-      wp core install --path="/var/www/html" --url="https://ucsc-gutenberg-blocks.local" --title="Local Wordpress W/ HTTPS & LDAP" --admin_user=user --admin_password=password --admin_email=sammytheslug@ucsc.edu
-      '
-    volumes:
-      - ./public/:/var/www/html
     networks:
       - wpsite
 
