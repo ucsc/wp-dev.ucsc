@@ -24,6 +24,7 @@ services:
       WORDPRESS_DB_PASSWORD: examplepass
       WORDPRESS_DB_NAME: exampledb
       WORDPRESS_CONFIG_EXTRA: define('WP_ALLOW_MULTISITE', true);
+      DOCKER_DEV: docker_dev
     volumes: [ './public/:/var/www/html' ]
     hostname: wp-dev.ucsc
     labels:
