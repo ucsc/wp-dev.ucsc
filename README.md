@@ -29,3 +29,30 @@ At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a brow
 
 * The theme is located at `public/wp-content/themes/ucsc-2022`
 * The theme is located at `public/wp-content/plugins/ucsc-gutenberg-blocks`
+
+### Vscode/Xdebug setup
+
+The PHP Debug plugin is required: https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+
+On the debug tab click `Create a launch.json file` and select type `php`.
+
+You can replace the contents of `launch.json` with the following:
+
+```
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/var/www/html/wp-content/plugins/ucsc-gutenberg-blocks": "${workspaceRoot}"
+      },
+      "hostname": "wp-dev.ucsc"
+    }
+  ]
+}
+
+```
