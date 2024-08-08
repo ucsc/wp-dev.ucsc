@@ -15,7 +15,7 @@ The instructions assume you have git and docker installed. https://www.docker.co
 * Check that a `wp-config.php` file exists in the `public/` folder that was generated before proceeding
 * The following script will clone the theme and plugin to the correct directory.
   * `./gitclone.sh`
-* next we will install WordPress, activate the theme & plugin, run `composer install` on the theme as well as `npm install` on both the plugin and the theme
+* next we will install WordPress, activate the theme & plugin, run composer install on the theme as well as npm install on both the plugin and the theme
   * `docker compose -f docker-compose-build.yml run theme_composer`
   * `docker compose -f docker-compose-build.yml run theme_npm_install`
   * `docker compose -f docker-compose-build.yml run plugin_npm_install`
