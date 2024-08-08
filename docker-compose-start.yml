@@ -2,8 +2,6 @@ version: '3.9'
 
 services:
   theme_npm_start:
-    depends_on:
-      - wp_activate_plugin_and_theme
     image: node:16.18.0-alpine3.15
     volumes:
       - "./public/:/var/www/html"
@@ -12,8 +10,6 @@ services:
     networks:
       - wpsite
   plugin_npm_start:
-    depends_on:
-      - wp_activate_plugin_and_theme
     image: node:16.18.0-alpine3.15
     volumes:
       - "./public/:/var/www/html"
