@@ -13,6 +13,7 @@ services:
       - wpsite
     depends_on:
       - wordpress
+    platform: linux/amd64
   wordpress:
     build: .
     restart: always
@@ -37,6 +38,7 @@ services:
           - wp-dev.ucsc
     depends_on:
       - db
+    platform: linux/amd64
   db:
     image: mysql:5.7.34
     restart: always
@@ -49,6 +51,7 @@ services:
       - db:/var/lib/mysql
     networks:
       - wpsite
+    platform: linux/amd64
 
 networks:
   wpsite: null
