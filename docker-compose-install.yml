@@ -1,25 +1,25 @@
-version: '3.9'
-
 services:
   wordpress_install:
     image: wordpress:cli
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: exampleuser
-      WORDPRESS_DB_PASSWORD: examplepass
-      WORDPRESS_DB_NAME: exampledb
+      WORDPRESS_DB_HOST: ${NAME}-db:3306
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
     command: >
       /bin/sh -c '
-      wp core install --path="/var/www/html" --url="https://wp-dev.ucsc" --title="Local Wordpress W/ HTTPS & LDAP" --admin_user=user --admin_password=password --admin_email=sammytheslug@ucsc.edu;
+      wp core install --path="/var/www/html" --url="https://wp-dev.ucsc" --title="Local Wordpress with HTTPS & LDAP" --admin_user=admin --admin_password=password --admin_email=raknight@ucsc.edu;
       wp theme activate ucsc-2022;
       wp plugin activate ucsc-gutenberg-blocks;
+      wp plugin activate ucsc-custom-functionality;
+      wp rewrite structure '/%year%/%monthnum%/%postname%/';
       '
     volumes:
       - ./public/:/var/www/html
     networks:
       - wpsite
     platform: linux/amd64
-  theme_composer:
+  theme_composer_install:
     image: composer/composer
     volumes:
       - "./public/:/var/www/html"

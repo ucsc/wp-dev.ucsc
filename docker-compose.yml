@@ -1,29 +1,49 @@
-version: '3.9'
-
 services:
-  proxy:
+  server:
+    platform: linux/amd64
     image: nginx:1.19.10-alpine
+    container_name: ${NAME}-server
+    depends_on:
+      - wp
     ports:
       - 80:80
       - 443:443
     volumes:
+      - ./public:/var/www/html
       - ./proxy/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./proxy/certs:/etc/nginx/certs
     networks:
       - wpsite
-    depends_on:
-      - wordpress
+  
+  db:
     platform: linux/amd64
-  wordpress:
+    image: mysql:8.0
+    container_name: ${NAME}-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - wpsite
+  
+  wp:
+    platform: linux/amd64
+    container_name: ${NAME}-wp
+    depends_on:
+      - db
     build: .
     restart: always
     ports:
       - 8080:80
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: exampleuser
-      WORDPRESS_DB_PASSWORD: examplepass
-      WORDPRESS_DB_NAME: exampledb
+      WORDPRESS_DB_HOST: ${NAME}-db:3306
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
       WORDPRESS_CONFIG_EXTRA: define('WP_ALLOW_MULTISITE', true);
       DOCKER_DEV: docker_dev
     volumes: [ './public/:/var/www/html' ]
@@ -36,25 +56,26 @@ services:
       wpsite:
         aliases:
           - wp-dev.ucsc
-    depends_on:
-      - db
+  wpcli:
     platform: linux/amd64
-  db:
-    image: mysql:5.7.34
-    restart: always
+    image: wordpress:cli-php8.1
+    container_name: ${NAME}-cli
+    depends_on:
+      - wp
+    user: 1000:1000
+    command: tail -f /dev/null
+    volumes: [ './public/:/var/www/html' ]
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
-    volumes:
-      - db:/var/lib/mysql
+      WORDPRESS_DB_HOST: ${NAME}-db:3306
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
     networks:
       - wpsite
-    platform: linux/amd64
 
 networks:
-  wpsite: null
+  wpsite:
+    driver: bridge
 volumes:
-  wordpress: null
+  wp: null
   db: null
