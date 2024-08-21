@@ -40,13 +40,18 @@ Now that WordPress is installed and the plugins and theme are built, we can star
 * Starts the Node development environments for the theme and blocks plugin
   * `docker compose -f docker-compose-start.yml up -d`
 
-> [!NOTE]  
+> [!TIP]  
 > Swap `up` with `down` in the commands above to stop your containers. You must run both commands to start and stop the development environments.
 
 At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a browser. In Google Chrome you will get a error saying "Your connection is not private", this is due to the local certificates. You can click Advanced -> proceed to wp-dev.ucsc. To login:
 
 * username: `admin`
 * password `password`
+
+> [!TIP]
+> 
+> * You can run WP-CLI commands with `docker exec ${NAME}-cli wp <COMMAND>`
+> * `${NAME}` is what you used in your `.env` file
 
 
 ## VScode/Xdebug setup
