@@ -2,7 +2,8 @@
 
 ## Prerequisites
 
-The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed.
+1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed.
+2. You need a [UCSC VPN connection](https://its.ucsc.edu/vpn/) to use the *Campus Directory* block in the [UCSC Gutenberg Blocks plugin](https://github.com/ucsc/ucsc-gutenberg-blocks).
 
 ## Setup
 
