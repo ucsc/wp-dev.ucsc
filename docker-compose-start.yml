@@ -1,7 +1,6 @@
-version: '3.9'
-
 services:
   theme_npm_start:
+    container_name: ${NAME}-theme-build
     image: node:16.18.0-alpine3.15
     volumes:
       - "./public/:/var/www/html"
@@ -11,6 +10,7 @@ services:
       - wpsite
     platform: linux/amd64
   plugin_npm_start:
+    container_name: ${NAME}-plugin-build
     image: node:16.18.0-alpine3.15
     volumes:
       - "./public/:/var/www/html"
