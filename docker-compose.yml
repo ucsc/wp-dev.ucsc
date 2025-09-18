@@ -54,7 +54,7 @@ services:
         aliases:
           - wp-dev.ucsc
   wpcli:
-    image: wordpress:cli
+    image: wordpress:cli-php8.1
     container_name: ${NAME}-cli
     depends_on:
       - wp
