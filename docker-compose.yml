@@ -1,6 +1,6 @@
 services:
   server:
-    image: nginx:stable
+    image: nginx:1.19.10-alpine
     container_name: ${NAME}-server
     depends_on:
       - wp
