@@ -7,14 +7,21 @@
 
 ## Setup
 
-1. Clone this repo
-      * `git clone https://github.com/ucsc/wp-dev.ucsc.git && cd wp-dev.ucsc`
+1. Go to your terminal and run this command to clone this repo
+      * `git clone https://github.com/ucsc/wp-dev.ucsc.git`
+      * cd into the folder `cd wp-dev.ucsc`
 
-2. Edit your hosts file and add `127.0.0.1  wp-dev.ucsc` or use the command below
-     * `sudo echo "127.0.0.1  wp-dev.ucsc" >> /etc/hosts`
-  
-3. Change `.env.example.txt` to `.env` and update the variables if you like.
-
+2. Edit your hosts file by running `sudo nano /etc/hosts` in your terminal and add `127.0.0.1  wp-dev.ucsc`
+    * On Mac OS do ctrl+O to writeout and hit enter on your keyboard
+    * Then hit ctrl+X to exit
+    * You have now successfully edited you host file.
+      
+3. Change `.env.example.txt` to `.env` by following these steps:
+      * cd into the folder `cd wp-dev.ucsc` if you are not in it already
+      * Run the command `ls -a` to see hidden files and verify there is a file called `.env.example.txt`
+      * Run this command to change the name to .env `mv .env.example.txt .env`
+      * Run ls -a to verify the name of the file has changed to `.env`
+     
 4. Build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
      * `docker compose up -d`
 
