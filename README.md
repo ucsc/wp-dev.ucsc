@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed.
+1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed. Have the docker app open while going through the steps. 
 2. You need a [UCSC VPN connection](https://its.ucsc.edu/vpn/) to use the *Campus Directory* block in the [UCSC Gutenberg Blocks plugin](https://github.com/ucsc/ucsc-gutenberg-blocks).
 
 ## Setup
@@ -22,8 +22,13 @@
       * Run this command to change the name to .env `mv .env.example.txt .env`
       * Run ls -a to verify the name of the file has changed to `.env`
      
-4. Build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
+4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
      * `docker compose up -d`
+     * Once this is finished running you should have a total of 5 docker containers up and running.
+       You can verify this by opening up the docker app and making sure there is a green dot next to each container.
+       If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
+       delete them. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
+       This should solve the issue and have all 5 containers up and running succesfully. 
 
 > [!IMPORTANT]  
 > Check that a `wp-config.php` file exists in the `./public/` folder before proceeding
