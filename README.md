@@ -24,11 +24,13 @@
      
 4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
      * `docker compose up -d`
-     * Once this is finished running you should have a total of 5 docker containers up and running.
-       You can verify this by opening up the docker app and making sure there is a green dot next to each container.
-       If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
-       delete them. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
-       This should solve the issue and have all 5 containers up and running succesfully. 
+     * Once this is finished running you should have a total of 5 docker containers up and running. You can verify this by opening up the docker app and
+       making sure there is a green dot next to each container.
+     * Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
+       delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
+       This should solve the issue and have all 5 containers up and running succesfully.
+       
+       
 
 > [!IMPORTANT]  
 > Check that a `wp-config.php` file exists in the `./public/` folder before proceeding
@@ -44,6 +46,10 @@
 
 Your installation is now complete.
 
+Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
+delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
+This should solve the issue and have all 5 containers up and running succesfully.
+
 ## Running the Docker services for development
 
 Now that WordPress is installed and the plugins and theme are built, we can start watching for changes to code and rebuild when necessary
@@ -56,6 +62,7 @@ Now that WordPress is installed and the plugins and theme are built, we can star
 > [!TIP]  
 > Swap `up` with `down` in the commands above to stop your containers. You must run both commands to start and stop the development environments.
 
+## In Your Browser
 At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a browser. In Google Chrome you will get a error saying "Your connection is not private", this is due to the local certificates. You can click Advanced -> proceed to wp-dev.ucsc. To login:
 
 * username: `admin`
