@@ -2,21 +2,35 @@
 
 ## Prerequisites
 
-1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed.
+1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed. Have the docker app open while going through the steps. 
 2. You need a [UCSC VPN connection](https://its.ucsc.edu/vpn/) to use the *Campus Directory* block in the [UCSC Gutenberg Blocks plugin](https://github.com/ucsc/ucsc-gutenberg-blocks).
 
 ## Setup
 
-1. Clone this repo
-      * `git clone https://github.com/ucsc/wp-dev.ucsc.git && cd wp-dev.ucsc`
+1. Go to your terminal and run this command to clone this repo
+      * `git clone https://github.com/ucsc/wp-dev.ucsc.git`
+      * cd into the folder `cd wp-dev.ucsc`
 
-2. Edit your hosts file and add `127.0.0.1  wp-dev.ucsc` or use the command below
-     * `sudo echo "127.0.0.1  wp-dev.ucsc" >> /etc/hosts`
-  
-3. Change `.env.example.txt` to `.env` and update the variables if you like.
-
-4. Build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
+2. Edit your hosts file by running `sudo nano /etc/hosts` in your terminal and add `127.0.0.1  wp-dev.ucsc`
+    * On Mac OS do ctrl+O to writeout and hit enter on your keyboard
+    * Then hit ctrl+X to exit
+    * You have now successfully edited you host file.
+      
+3. Change `.env.example.txt` to `.env` by following these steps:
+      * cd into the folder `cd wp-dev.ucsc` if you are not in it already
+      * Run the command `ls -a` to see hidden files and verify there is a file called `.env.example.txt`
+      * Run this command to change the name to .env `mv .env.example.txt .env`
+      * Run ls -a to verify the name of the file has changed to `.env`
+     
+4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
      * `docker compose up -d`
+     * Once this is finished running you should have a total of 5 docker containers up and running. You can verify this by opening up the docker app and
+       making sure there is a green dot next to each container.
+     * Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
+       delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
+       This should solve the issue and have all 5 containers up and running succesfully.
+       
+       
 
 > [!IMPORTANT]  
 > Check that a `wp-config.php` file exists in the `./public/` folder before proceeding
@@ -32,6 +46,10 @@
 
 Your installation is now complete.
 
+Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
+delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
+This should solve the issue and have all 5 containers up and running succesfully.
+
 ## Running the Docker services for development
 
 Now that WordPress is installed and the plugins and theme are built, we can start watching for changes to code and rebuild when necessary
@@ -44,6 +62,7 @@ Now that WordPress is installed and the plugins and theme are built, we can star
 > [!TIP]  
 > Swap `up` with `down` in the commands above to stop your containers. You must run both commands to start and stop the development environments.
 
+## In Your Browser
 At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a browser. In Google Chrome you will get a error saying "Your connection is not private", this is due to the local certificates. You can click Advanced -> proceed to wp-dev.ucsc. To login:
 
 * username: `admin`
