@@ -1,6 +1,5 @@
 services:
   server:
-    platform: linux/amd64
     image: nginx:1.19.10-alpine
     container_name: ${NAME}-server
     depends_on:
@@ -16,7 +15,6 @@ services:
       - wpsite
   
   db:
-    platform: linux/amd64
     image: mysql:8.0
     container_name: ${NAME}-db
     restart: always
@@ -31,7 +29,6 @@ services:
       - wpsite
   
   wp:
-    platform: linux/amd64
     container_name: ${NAME}-wp
     depends_on:
       - db
@@ -57,7 +54,6 @@ services:
         aliases:
           - wp-dev.ucsc
   wpcli:
-    platform: linux/amd64
     image: wordpress:cli-php8.1
     container_name: ${NAME}-cli
     depends_on:
