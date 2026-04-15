@@ -24,6 +24,10 @@
      
 4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
      * `docker compose up -d`
+     to start the WordPress server environment
+     OR
+     * `docker compose -f docker-compose.yml -f docker-compose-start.yml up -d`
+     to start the WordPress server environment AND the Node development environments for the theme and blocks plugin
      * Once this is finished running you should have a total of 5 docker containers up and running. You can verify this by opening up the docker app and
        making sure there is a green dot next to each container.
      * Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
@@ -54,10 +58,12 @@ This should solve the issue and have all 5 containers up and running succesfully
 
 Now that WordPress is installed and the plugins and theme are built, we can start watching for changes to code and rebuild when necessary
 
-* Starts the WordPress server environment
+* Start the WordPress server environment
   * `docker compose up -d`
-* Starts the Node development environments for the theme and blocks plugin
-  * `docker compose -f docker-compose-start.yml up -d`
+OR
+* Start the WordPress server environment AND the Node development environments for the theme and blocks plugin
+  * `docker compose -f docker-compose.yml -f docker-compose-start.yml up -d`
+
 
 > [!TIP]  
 > Swap `up` with `down` in the commands above to stop your containers. You must run both commands to start and stop the development environments.
