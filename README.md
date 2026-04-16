@@ -79,6 +79,11 @@ At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a brow
 > * You can run WP-CLI commands with `docker exec ${NAME}-cli wp <COMMAND>`
 > * `${NAME}` is what you used in your `.env` file
 
+## Troubleshooting 
+
+If the error WARN[0000] Found orphan containers is encountered, use the --remove orphans flag on startup. 
+
+docker compose -f docker-compose.yml -f docker-compose-start.yml up -d --remove-orphans
 
 ## VScode/Xdebug setup
 
