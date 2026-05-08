@@ -2,109 +2,95 @@
 
 ## Prerequisites
 
-1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed. Have the docker app open while going through the steps. 
-2. You need a [UCSC VPN connection](https://its.ucsc.edu/vpn/) to use the *Campus Directory* block in the [UCSC Gutenberg Blocks plugin](https://github.com/ucsc/ucsc-gutenberg-blocks).
+1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed. Have Docker Desktop running while going through the steps.
+2. **Apple Silicon Macs (M1/M2/M3/M4):** This project uses `platform: linux/amd64` images. In Docker Desktop, go to **Settings > General** and enable **"Use Rosetta for x86_64/amd64 emulation on Apple Silicon"**, then click **Apply & restart**.
+3. You need a [UCSC VPN connection](https://its.ucsc.edu/vpn/) to use the *Campus Directory* block in the [UCSC Gutenberg Blocks plugin](https://github.com/ucsc/ucsc-gutenberg-blocks).
 
-## Setup
+## One time setup for local development
 
-1. Go to your terminal and run this command to clone this repo
+1. Clone this repo and enter the project directory:
       * `git clone https://github.com/ucsc/wp-dev.ucsc.git`
-      * cd into the folder `cd wp-dev.ucsc`
+      * change to project folder `cd wp-dev.ucsc`
 
-2. Edit your hosts file by running `sudo nano /etc/hosts` in your terminal and add `127.0.0.1  wp-dev.ucsc`
-    * On Mac OS do ctrl+O to writeout and hit enter on your keyboard
-    * Then hit ctrl+X to exit
-    * You have now successfully edited you host file.
+2. Add `127.0.0.1  wp-dev.ucsc` to your hosts file:
+    * **macOS/Linux:** Run `sudo nano /etc/hosts`, add the line, then press ctrl+O, Enter, ctrl+X to save and exit
+    * **Windows:** Open Notepad as Administrator, open `C:\Windows\System32\drivers\etc\hosts`, and add the line
       
-3. Change `.env.example.txt` to `.env` by following these steps:
-      * cd into the folder `cd wp-dev.ucsc` if you are not in it already
-      * Run the command `ls -a` to see hidden files and verify there is a file called `.env.example.txt`
-      * Run this command to change the name to .env `mv .env.example.txt .env`
-      * Run ls -a to verify the name of the file has changed to `.env`
+3. Copy `.env.example.txt` to `.env`. The default values in `.env` (including `DB_PASSWORD`) work as-is for local development — no changes needed
      
-4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
+4. Build and start the containers (allow time for this command to finish):
      * `docker compose up -d`
-     to start the WordPress server environment
-     OR
-     * `docker compose -f docker-compose.yml -f docker-compose-start.yml up -d`
-     to start the WordPress server environment AND the Node development environments for the theme and blocks plugin
-     * Once this is finished running you should have a total of 5 docker containers up and running. You can verify this by opening up the docker app and
-       making sure there is a green dot next to each container.
-     * Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
-       delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
-       This should solve the issue and have all 5 containers up and running succesfully.
+     * Once this is finished running you should have all docker containers up and running. You can verify this by opening up the docker app and making sure there is a green dot next to each container.
+     * Troubleshooting: If there is not a green dot next to each container: select all the containers in your docker app and delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run the command above again. This should solve the issue and have all containers up and running successfully.
        
        
 
 > [!IMPORTANT]  
 > Check that a `wp-config.php` file exists in the `./public/` folder before proceeding
 
-5. Run the following script to clone the theme and plugins to the correct project directories.
-      * `./setup.sh`
+5. Run `./setup.sh` to clone the theme and plugin repos ([ucsc-2022](https://github.com/ucsc/ucsc-2022), [ucsc-gutenberg-blocks](https://github.com/ucsc/ucsc-gutenberg-blocks), and [ucsc-custom-functionality](https://github.com/ucsc/ucsc-custom-functionality)) into the correct project directories.
 
-6. Next we install WordPress, activate the theme & plugin, run composer install on the theme as well as npm install on both the plugin and the theme
+6. Run the following commands to install dependencies, set up WordPress, and activate the theme and plugins (messages about orphan containers are ok).
      * `docker compose -f docker-compose-install.yml run theme_composer_install`
      * `docker compose -f docker-compose-install.yml run theme_npm_install`
      * `docker compose -f docker-compose-install.yml run plugin_npm_install` (may take up to 2 minutes to complete)
      * `docker compose -f docker-compose-install.yml run wordpress_install`
 
-Your installation is now complete.
+7. Start the Node development watchers for the theme and blocks plugin. These will do the initial build and then watch for file changes, automatically rebuilding assets when you edit source files.
+     * `docker compose -f docker-compose.yml -f docker-compose-start.yml up -d`
 
-Troubleshooting: If there is not a green dot next to each container then here is what you should do: select all the containers in your docker app and
-delete them all. Once all the containers have been deleted go to your terminal in the wp-dev.ucsc directory and run `docker compose up -d` again.
-This should solve the issue and have all 5 containers up and running succesfully.
+Your installation is now complete. See "In Your Browser" below for how to login.
 
 ## Running the Docker services for development
 
-Now that WordPress is installed and the plugins and theme are built, we can start watching for changes to code and rebuild when necessary
+After the initial setup is complete, start everything with:
 
-* Start the WordPress server environment
-  * `docker compose up -d`
-OR
-* Start the WordPress server environment AND the Node development environments for the theme and blocks plugin
-  * `docker compose -f docker-compose.yml -f docker-compose-start.yml up -d`
+```
+docker compose -f docker-compose.yml -f docker-compose-start.yml up -d
+```
 
+This starts the WordPress server and the Node file watchers.
 
-> [!TIP]  
-> Swap `up` with `down` in the commands above to stop your containers. You must run both commands to start and stop the development environments.
+> [!TIP]
+> To stop all containers: `docker compose -f docker-compose.yml -f docker-compose-start.yml down`
 
 ## In Your Browser
-At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a browser. In Google Chrome you will get a error saying "Your connection is not private", this is due to the local certificates. You can click Advanced -> proceed to wp-dev.ucsc. To login:
+At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a browser. In Google Chrome you will get an error saying "Your connection is not private", this is due to the local certificates. You can click Advanced -> proceed to wp-dev.ucsc. To login:
 
 * username: `admin`
-* password `password`
+* password: `password`
 
 > [!TIP]
 > 
 > * You can run WP-CLI commands with `docker exec ${NAME}-cli wp <COMMAND>`
 > * `${NAME}` is what you used in your `.env` file
 
-## Troubleshooting 
-
-If the error WARN[0000] Found orphan containers is encountered, use the --remove orphans flag on startup. 
-
+## Troubleshooting
+### "Found orphan containers" warning
+If you see `WARN[0000] Found orphan containers`, add the `--remove-orphans` flag:
+```
 docker compose -f docker-compose.yml -f docker-compose-start.yml up -d --remove-orphans
+```
 
-## VScode/Xdebug setup
+### Problem logging in and getting "The password you entered for the username admin is incorrect"
+If you had to redo the setup (e.g. re-ran `./setup.sh` and the install commands), the database volume may still have the old WordPress install. The `wordpress_install` command will say "WordPress is already installed" and skip setting the password. Reset it with:
 
-The [PHP Debug plugin](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug) is required. On the debug tab click `Create a launch.json file` and select type `php`.
+```
+docker exec ucsc-wordpress-cli wp user update admin --user_pass=password --path=/var/www/html
+```
 
-You can replace the contents of `launch.json` with the following:
+To fully start over with a clean database, stop everything and remove the volume first:
 
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Listen for Xdebug",
-      "type": "php",
-      "request": "launch",
-      "port": 9003,
-      "pathMappings": {
-        "/var/www/html/wp-content/plugins/ucsc-gutenberg-blocks": "${workspaceRoot}"
-      },
-      "hostname": "wp-dev.ucsc"
-    }
-  ]
-}
+```
+docker compose down -v
+```
+
+Then re-run the setup from step 4.
+
+### Nginx server container crashes on startup
+
+The `server` (nginx) container may briefly show as unhealthy with the error `host not found in upstream "wp"`. This happens when nginx starts before the WordPress container is ready on the Docker network. The server container has `restart: always` set, so it will automatically recover once WordPress is ready. If it doesn't come back after a minute, restart it manually:
+
+```
+docker compose up -d server
 ```
