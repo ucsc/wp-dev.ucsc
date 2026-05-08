@@ -1,7 +1,25 @@
 ---
 name: gutenberg-blocks
-description: Use when the user mentions "class schedule", "campus directory", or "course catalog" Gutenberg blocks. Provides file locations and architecture context for the ucsc-gutenberg-blocks plugin.
+description: Use when the user mentions "class schedule", "campus directory", "course catalog", "gutenberg blocks", or "custom functionality" plugin. Provides file locations, architecture context, and repo structure.
 user-invocable: false
+---
+
+# Repository Structure
+
+This project has **nested git repos**. The outer repo (`wp-dev.ucsc`) is the WordPress environment, but most active development happens in two plugin repos nested inside it:
+
+| Repo | Path | Purpose |
+|------|------|---------|
+| **ucsc-gutenberg-blocks** | `public/wp-content/plugins/ucsc-gutenberg-blocks/` | Class Schedule, Campus Directory, Course Catalog blocks |
+| **ucsc-custom-functionality** | `public/wp-content/plugins/ucsc-custom-functionality/` | Custom WordPress functionality plugin |
+
+**Important — all git operations must target the correct repo:**
+
+- **Any git command** (`git log`, `git diff`, `git status`, `git blame`, `git commit`, etc.) related to these plugins must use `-C` to target the nested repo, or be run from within the plugin directory. The outer `wp-dev.ucsc` repo will NOT contain the plugin commit history.
+- Use `git -C public/wp-content/plugins/ucsc-gutenberg-blocks log` (not `git log`) when investigating block changes.
+- Use `git -C public/wp-content/plugins/ucsc-custom-functionality log` for custom functionality changes.
+- Each plugin has its own `.git`, branches, and remotes completely independent of the outer repo.
+
 ---
 
 # UCSC Gutenberg Blocks Plugin
