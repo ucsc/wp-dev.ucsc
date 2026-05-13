@@ -13,6 +13,10 @@ services:
       - ./public:/var/www/html
       - ./proxy/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./proxy/certs:/etc/nginx/certs
+    user: $DOCKER_UID:$DOCKER_GID
+    tmpfs:
+      - /var/cache/nginx:uid=${DOCKER_UID},gid=${DOCKER_GID}
+      - /var/run:uid=${DOCKER_UID},gid=${DOCKER_GID}
     networks:
       - wpsite
   
@@ -48,6 +52,7 @@ services:
       WORDPRESS_CONFIG_EXTRA: define('WP_ALLOW_MULTISITE', true);
       DOCKER_DEV: docker_dev
     volumes: [ './public/:/var/www/html' ]
+    user: $DOCKER_UID:$DOCKER_GID
     hostname: wp-dev.ucsc
     labels:
       com.ucsc.expose.domain: "wp-dev.ucsc"
@@ -63,7 +68,7 @@ services:
     container_name: ${NAME}-cli
     depends_on:
       - wp
-    user: 1000:1000
+    user: $DOCKER_UID:$DOCKER_GID
     command: tail -f /dev/null
     volumes: [ './public/:/var/www/html' ]
     environment:
