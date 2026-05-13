@@ -21,4 +21,6 @@ services:
     platform: linux/amd64
 
 networks:
-  wpsite: null
+  wpsite:
+    external: true
+    name: wp-devucsc_wpsite
