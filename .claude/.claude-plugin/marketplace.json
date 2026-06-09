@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ucsc-wordpress",
+  "description": "Internal Claude Code plugins for UCSC WordPress development workflows.",
+  "owner": {
+    "name": "UCSC ITS"
+  },
+  "plugins": [
+    {
+      "name": "ucsc-wp-block-dev",
+      "description": "Development toolkit for the ucsc-gutenberg-blocks WordPress plugin.",
+      "author": {
+        "name": "UCSC ITS"
+      },
+      "category": "development",
+      "source": "./plugins/ucsc-wp-block-dev"
+    }
+  ]
+}

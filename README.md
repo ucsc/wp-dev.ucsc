@@ -1,5 +1,45 @@
 # Docker Environment for UCSC WordPress theme and plugins
 
+## How this environment works
+
+This is a **home-rolled Docker Compose** environment for local development. It is
+**not** [`@wordpress/env` (wp-env)](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/),
+**not** [Local (LocalWP)](https://localwp.com/), **not** ddev, and **not** WP
+Engine's local tooling. There is no framework CLI — the whole lifecycle is plain
+`docker compose` against the compose files in this repo, with WP-CLI run inside a
+container.
+
+**Why home-rolled:** the *Campus Directory* block needs the PHP **LDAP**
+extension (and a UCSC VPN connection to reach the LDAP server). Off-the-shelf
+runtimes did not cleanly support a custom LDAP-enabled PHP image, so this repo
+ships its own image and compose set instead.
+
+What's in the repo:
+
+| File | Role |
+| --- | --- |
+| `Dockerfile` | Builds the `wp` service from `wordpress:6.5.5-php8.1-apache`, adding the PHP **LDAP** extension and **Xdebug**. |
+| `docker-compose.yml` | Base stack: `server` (nginx 1.19), `db` (mysql 8.0), `wp` (built from `Dockerfile`), `wpcli` (`wordpress:cli-php8.1`). |
+| `docker-compose-start.yml` | Dev/watch overlay — adds the Node build/watch services for the theme and the blocks plugin. |
+| `docker-compose-install.yml` | One-shot bootstrap jobs: `theme_composer_install`, `theme_npm_install`, `plugin_npm_install`, `wordpress_install`. |
+| `setup.sh` | Clones the theme and product plugins into `public/wp-content/`. |
+| `.env.example.txt` | Copied to `.env` during first-time setup. |
+
+```bash
+# base WordPress stack only
+docker compose up -d
+# base stack + Node dev/watch environments (theme + blocks plugin)
+docker compose -f docker-compose.yml -f docker-compose-start.yml up -d
+```
+
+> [!IMPORTANT]
+> This Docker stack is the **local development environment only**. The real
+> WordPress site is production and is **not** this stack. Run all builds, tests,
+> and PHP through the containers (e.g. `docker compose exec wpcli wp <command>`)
+> — not host Node/PHP/Composer.
+
+The step-by-step setup below walks through this from a clean checkout.
+
 ## Prerequisites
 
 1. The instructions assume you have git and [Docker](https://www.docker.com/products/docker-desktop/) installed. Have the docker app open while going through the steps. 
@@ -19,7 +59,7 @@
 3. Change `.env.example.txt` to `.env` by following these steps:
       * cd into the folder `cd wp-dev.ucsc` if you are not in it already
       * Run the command `ls -a` to see hidden files and verify there is a file called `.env.example.txt`
-      * Run this command to change the name to .env `mv .env.example.txt .env`
+      * Run this command to change the name to .env `cp .env.example.txt .env`
       * Run ls -a to verify the name of the file has changed to `.env`
      
 4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)

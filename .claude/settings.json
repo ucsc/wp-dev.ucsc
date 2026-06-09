@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "ucsc-wp-block-dev@ucsc-wordpress": true
+  }
+}

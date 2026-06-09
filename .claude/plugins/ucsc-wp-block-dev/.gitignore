@@ -1,0 +1,11 @@
+# Build / runtime artifacts — never distribute via the marketplace
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+
+# Google API credentials — never commit
+scripts/service_account.json
+scripts/credentials.json
+scripts/token.json

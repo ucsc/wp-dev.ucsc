@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Create venv and install deps
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r .claude/plugins/ucsc-wp-block-dev/requirements-dev.txt
+
+      - name: Secret scan (grep)
+        run: |
+          set -euo pipefail
+          matches=$(git ls-files | xargs grep -I -n -E "-----BEGIN (RSA|PRIVATE) KEY|aws_secret_access_key|aws_access_key_id|BEGIN RSA PRIVATE KEY|token.json|APP_PASS|PASSWORD|PRIVATE_KEY" || true)
+          if [ -n "$matches" ]; then
+            echo "Secret-like strings found in repository:"
+            echo "$matches"
+            exit 1
+          fi
+
+      - name: Run tests
+        env:
+          CLAUDE_AVAILABLE: ${{ secrets.CLAUDE_AVAILABLE }}
+        run: |
+          source venv/bin/activate
+          cd .claude/plugins/ucsc-wp-block-dev
+          python -m pytest -q
