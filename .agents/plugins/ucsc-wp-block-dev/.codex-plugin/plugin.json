@@ -1,0 +1,22 @@
+{
+  "name": "ucsc-wp-block-dev",
+  "version": "0.2.0+codex.20260609232935",
+  "description": "Development toolkit for the ucsc-gutenberg-blocks WordPress plugin \u2014 block authoring, debugging, and local environment workflow",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "UCSC WordPress Block Development",
+    "shortDescription": "Build, debug, run, and maintain UCSC Gutenberg blocks.",
+    "longDescription": "Development toolkit for the ucsc-gutenberg-blocks WordPress plugin \u2014 block authoring, debugging, and local environment workflow.",
+    "developerName": "UCSC ITS",
+    "category": "Development",
+    "capabilities": [
+      "Write"
+    ],
+    "websiteURL": "https://developers.openai.com/codex/plugins",
+    "defaultPrompt": [
+      "Build a new Gutenberg block.",
+      "Debug this WordPress block issue.",
+      "Run and smoke-test the blocks plugin."
+    ]
+  }
+}

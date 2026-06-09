@@ -1,0 +1,113 @@
+# ucsc-wp-block-dev
+
+Claude Code plugin for developing the `ucsc-gutenberg-blocks` WordPress plugin at UCSC ITS.
+
+## Naming
+
+The canonical machine-facing plugin ID is `ucsc-wp-block-dev` for both Claude
+Code and Codex. Use that ID in manifests, directory names, marketplace entries,
+and slash commands. Use “WordPress” only in human-facing names and prose.
+
+## Skills
+
+The plugin uses the same interaction model as `ucsc-laravel-vue-dev`: start with a target, describe the goal in ordinary language, and optionally include a Jira key or URL. `/ucsc-wp-block-dev:start` is the primary entry point and `/ucsc-wp-block-dev:setup` gives a short capability overview.
+
+**On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
+
+| Skill | Purpose |
+|---|---|
+| `/ucsc-wp-block-dev:start` | Detect the active app and route the request |
+| `/ucsc-wp-block-dev:setup` | Show a concise capability overview |
+| `/ucsc-wp-block-dev:develop` | Add a described feature to a specified target block, GUI, or app |
+| `/ucsc-wp-block-dev:fix` | Fix a described problem in a specified target block, GUI, or app |
+| `/ucsc-wp-block-dev:test` | Add or run focused PHP, Jest, build, or browser checks |
+| `/ucsc-wp-block-dev:review` | Review a diff, branch, file, block, or Jira-scoped change |
+| `/ucsc-wp-block-dev:run` | Build, launch, and smoke-test blocks via the wp-dev.ucsc Docker environment |
+| `blocks` | Auto-loaded domain reference (not a slash command) — pulled in automatically when working on plugin files |
+
+**On this plugin itself (the tooling):**
+
+| Skill | Purpose |
+|---|---|
+| `/ucsc-wp-block-dev:maintainer` | Validate structure, run the test suite, and verify ADR index consistency |
+
+## Plugin location
+
+`wp-dev.ucsc/public/wp-content/plugins/ucsc-gutenberg-blocks/`
+
+## Local development
+
+See `/ucsc-wp-block-dev:run` for the full build/run/test workflow. Quick reference:
+
+```bash
+# Build
+cd public/wp-content/plugins/ucsc-gutenberg-blocks && npm run build
+
+# Start wp-dev.ucsc
+docker compose up -d
+
+# Run Jest tests
+docker compose run --rm -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks plugin_npm_start npm test
+```
+
+## Maintainer setup
+
+Install Claude Code:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Install this plugin:
+
+```bash
+claude plugin marketplace add ./.claude --scope project
+claude plugin install ucsc-wp-block-dev@ucsc-wordpress --scope project
+```
+
+Restart Claude Code after installation so the plugin skills are loaded. For
+local development without installing, launch Claude Code with:
+
+```bash
+claude --plugin-dir .claude/plugins/ucsc-wp-block-dev
+```
+
+### Validate the plugin
+
+Maintenance and validation run through the `maintainer` skill (see ADR-004). It launches Anthropic's `plugin-dev:plugin-validator` agent and runs the test suite.
+
+Install the validator dependency:
+
+```
+/plugin install plugin-dev@claude-plugins-official
+```
+
+Then run validation from Claude Code:
+
+```
+/ucsc-wp-block-dev:maintainer validate
+```
+
+Or run the full check (tests + validation):
+
+```
+/ucsc-wp-block-dev:maintainer all
+```
+
+To validate without the skill, ask Claude to "validate the plugin at `.claude/plugins/ucsc-wp-block-dev`" — it will launch the `plugin-dev:plugin-validator` agent. Run the bundled tests directly with:
+
+```bash
+cd .claude/plugins/ucsc-wp-block-dev && python3 -m pytest -q
+```
+
+The only test dependency is `pytest` (see `requirements-dev.txt`). Keep the virtualenv outside the plugin tree so the plugin root stays lean:
+
+```bash
+python3 -m venv ../ucsc-wp-block-dev-venv
+../ucsc-wp-block-dev-venv/bin/pip install -r requirements-dev.txt
+../ucsc-wp-block-dev-venv/bin/python -m pytest -q
+```
+
+## ADRs
+
+Architecture decisions live in `docs/adr/`. See `docs/adr/index.md`.

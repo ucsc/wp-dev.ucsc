@@ -19,7 +19,7 @@
 3. Change `.env.example.txt` to `.env` by following these steps:
       * cd into the folder `cd wp-dev.ucsc` if you are not in it already
       * Run the command `ls -a` to see hidden files and verify there is a file called `.env.example.txt`
-      * Run this command to change the name to .env `mv .env.example.txt .env`
+      * Run this command to change the name to .env `cp .env.example.txt .env`
       * Run ls -a to verify the name of the file has changed to `.env`
      
 4. In the wp-dev.ucsc directory build and start the WordPress server with HTTPS & PHP LDAP module (Allow time for this command to finish)
