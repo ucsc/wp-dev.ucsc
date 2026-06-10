@@ -244,6 +244,17 @@ class TestSkillFrontmatter:
             assert "do not repeat the prompt when an id is already known" in text
             assert "do not treat a missing id as incomplete work" in text
 
+    def test_atlassian_mcp_reminder_is_optional_and_requires_approval(self):
+        """ADR-025 must keep Atlassian setup reminders restrained and user-controlled."""
+        for skill_name in ["issue-context", "review"]:
+            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+            assert "atlassian mcp tools are unavailable" in text
+            assert "mention once" in text
+            assert "non-blocking" in text
+            assert "continue with available context" in text
+            assert "do not repeat it later" in text
+            assert "without explicit user approval" in text
+
     def test_code_blocks_specify_language(self, skill_files):
         """Every fenced code block in SKILL.md must specify a language for syntax highlighting."""
         for path in skill_files:

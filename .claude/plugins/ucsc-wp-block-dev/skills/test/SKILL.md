@@ -22,3 +22,12 @@ Choose the narrowest useful layer:
 | Browser/Docker | Editor insertion, frontend rendering, integration smoke tests |
 
 Read the nearest existing test pattern before adding coverage. Run focused checks first, then broaden only when risk requires it. Jira acceptance criteria may define the assertions but Jira is optional.
+
+## Check-in text (ADR-019)
+
+When you add or meaningfully change coverage, finish by emitting ready-to-paste check-in text:
+
+1. A **Jira title** — short imperative summary of the test work.
+2. A **description** as a [Conventional Commit](https://www.conventionalcommits.org/): a `type(scope): subject` header plus a body.
+
+`type` is normally `test` (use `fix`/`feat` only if block behavior also changed); `scope` is the kebab-case target block. The body names the layer (PHP/Jest/Docker/Browser), the behaviors covered, and any runtime caveats. Reference a Jira key in the footer when known. Skip this step for a plain test run that changed no coverage.

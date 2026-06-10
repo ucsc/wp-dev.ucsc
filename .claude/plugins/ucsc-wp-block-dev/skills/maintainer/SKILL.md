@@ -15,7 +15,9 @@ Keep token use low: run the validator and tests rather than reading every file b
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context. A bare `maintainer` command implies the `all` health check. Ask one concise question only when the requested scope is ambiguous enough to change the operation.
+Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
+
+Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `publish-slides`, and `all`. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 ## Anthropic plugin-dev tools
 

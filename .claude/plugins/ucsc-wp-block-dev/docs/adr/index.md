@@ -24,3 +24,10 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-016](ADR-016-avoid-bundling-python-in-plugin.md) | Avoid bundling Python dependencies in the plugin | Accepted | 2026-06-10 |
 | [ADR-017](ADR-017-agents-uses-symlinks-not-copies.md) | .agents uses symlinks to .claude, not file copies | Accepted | 2026-06-10 |
 | [ADR-018](ADR-018-maintainer-owns-slide-deck.md) | Maintainer skill owns the canonical slide deck | Accepted | 2026-06-10 |
+| [ADR-019](ADR-019-test-emits-conventional-commit-checkin-text.md) | Test mode emits a Jira title and conventional-commit description for check-in | Accepted | 2026-06-10 |
+| [ADR-020](ADR-020-maintainer-prompts-for-operation.md) | Maintainer mode prompts for the operation instead of auto-running | Accepted | 2026-06-10 |
+| [ADR-021](ADR-021-accept-jira-id-or-url-in-arguments.md) | Command handlers accept a Jira ID or a full Jira URL in arguments | Accepted | 2026-06-10 |
+| [ADR-022](ADR-022-accept-github-and-bitbucket-pr-references.md) | Command handlers accept a GitHub or Bitbucket pull-request reference | Accepted | 2026-06-10 |
+| [ADR-023](ADR-023-always-favor-conventional-commits.md) | Always favor Conventional Commits for commit messages | Accepted | 2026-06-10 |
+| [ADR-024](ADR-024-block-target-registry.md) | Command arguments may name a block target, resolved against a block registry | Accepted | 2026-06-10 |
+| [ADR-025](ADR-025-suggest-atlassian-mcp-for-atlassian-references.md) | Suggest Atlassian MCP when Atlassian references are in use | Accepted | 2026-06-10 |
