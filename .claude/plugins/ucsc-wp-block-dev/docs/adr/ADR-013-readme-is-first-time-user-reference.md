@@ -1,3 +1,9 @@
+---
+title: "ADR-013: README is the canonical first-time user reference"
+status: Accepted
+date: 2026-06-10
+---
+
 # ADR-013: README is the canonical first-time user reference
 
 **Status:** Accepted

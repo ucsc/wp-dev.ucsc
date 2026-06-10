@@ -23,3 +23,4 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-015](ADR-015-slide-deck-generated-date.md) | Slide deck always includes a generated date | Accepted | 2026-06-10 |
 | [ADR-016](ADR-016-avoid-bundling-python-in-plugin.md) | Avoid bundling Python dependencies in the plugin | Accepted | 2026-06-10 |
 | [ADR-017](ADR-017-agents-uses-symlinks-not-copies.md) | .agents uses symlinks to .claude, not file copies | Accepted | 2026-06-10 |
+| [ADR-018](ADR-018-maintainer-owns-slide-deck.md) | Maintainer skill owns the canonical slide deck | Accepted | 2026-06-10 |

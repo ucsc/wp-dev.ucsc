@@ -1,3 +1,9 @@
+---
+title: "ADR-014: Slide deck documents all top-level skills and commands"
+status: Accepted
+date: 2026-06-10
+---
+
 # ADR-014: Slide deck documents all top-level skills and commands
 
 **Status:** Accepted

@@ -1,3 +1,9 @@
+---
+title: "ADR-015: Slide deck always includes a generated date"
+status: Accepted
+date: 2026-06-10
+---
+
 # ADR-015: Slide deck always includes a generated date
 
 **Status:** Accepted

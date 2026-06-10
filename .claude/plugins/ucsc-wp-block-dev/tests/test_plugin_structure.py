@@ -13,6 +13,8 @@ PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = PLUGIN_ROOT.parents[2]
 SKILLS_DIR = PLUGIN_ROOT / "skills"
 ADR_DIR = PLUGIN_ROOT / "docs" / "adr"
+SLIDE_DECK = SKILLS_DIR / "maintainer" / "assets" / "ucsc_wp_block_dev_presentation.md"
+PUBLISHER = PROJECT_ROOT / ".claude" / "scripts" / "publish_to_gdoc.py"
 PLUGIN_NAME = "ucsc-wp-block-dev"
 FORBIDDEN_PLUGIN_NAME = "ucsc-" + "wordpress-block-dev"
 
@@ -258,6 +260,33 @@ class TestSkillFrontmatter:
                         in_code_block = True
                     else:
                         in_code_block = False
+
+
+class TestMaintainerSlideDeck:
+    def test_canonical_deck_is_maintainer_owned(self):
+        assert SLIDE_DECK.exists()
+        assert not (PROJECT_ROOT / "ucsc_wp_block_dev_presentation.md").exists()
+
+    def test_deck_lists_every_top_level_skill(self):
+        text = SLIDE_DECK.read_text()
+        skill_names = sorted(path.name for path in SKILLS_DIR.iterdir() if path.is_dir())
+        for skill_name in skill_names:
+            assert f"`{skill_name}`" in text, f"Slide deck is missing skill '{skill_name}'"
+
+    def test_deck_has_current_generated_date_format(self):
+        text = SLIDE_DECK.read_text()
+        assert re.search(r"\*\*Generated:\*\* \d{4}-\d{2}-\d{2}<br />", text)
+
+    def test_publisher_uses_maintainer_deck(self):
+        text = PUBLISHER.read_text()
+        for path_part in [
+            '"ucsc-wp-block-dev"',
+            '"skills"',
+            '"maintainer"',
+            '"assets"',
+            '"ucsc_wp_block_dev_presentation.md"',
+        ]:
+            assert path_part in text
 
 
 class TestAdrIndex:

@@ -1,6 +1,6 @@
 ---
 name: maintainer
-description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run the test suite, and verify ADR index consistency. Use when asked to validate, lint, or health-check this plugin, after editing skills or the manifest, or before publishing a new version.
+description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, slide publishing, or release readiness.
 argument-hint: "[target | maintenance request | Jira key/URL]"
 arguments: [input]
 ---
@@ -9,7 +9,7 @@ arguments: [input]
 
 Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code — use `develop`/`fix`/`run` for that).
 
-**Usage:** `/ucsc-wp-block-dev:maintainer [validate | test | all]`. Run all commands below from the repo root — the validate prompt path and the test `cd` are both relative to it.
+**Usage:** `/ucsc-wp-block-dev:maintainer [validate | test | review-skills | publish-slides | all]`. Run all commands below from the repo root.
 
 Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003.
 
@@ -21,7 +21,7 @@ Apply ADR-011: resolve the plugin target, natural-language maintenance request, 
 
 These are the built-in `plugin-dev:*` agents and skills available for delegating maintenance work. Install the plugin-dev plugin if not already present:
 
-```
+```text
 /plugin install plugin-dev@claude-plugins-official
 ```
 
@@ -82,9 +82,31 @@ Use the Skill tool:
 
 Consult this before writing a new `SKILL.md` or refactoring an existing one to ensure correct frontmatter fields, argument patterns, and triggering descriptions.
 
+## publish-slides
+
+The canonical Marp source is maintainer-owned:
+
+`skills/maintainer/assets/ucsc_wp_block_dev_presentation.md`
+
+Before publishing:
+
+1. Compare the deck's skill inventory with every top-level directory under `skills/`.
+2. Compare its command table with the modes in `start/SKILL.md` and `menu/SKILL.md`.
+3. Compare its ADR summary with `docs/adr/index.md`.
+4. Refresh the title slide's `Generated:` value to the current date.
+5. Run the plugin tests, which enforce the deck path and inventory contract.
+
+Publish the verified source to the existing Google Doc:
+
+```bash
+python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
+```
+
+The publisher reads only the maintainer asset path. Do not restore a second deck at the repository root (ADR-018).
+
 ## all
 
-Run `test` first (fast, deterministic), then `validate`, then `review-skills`. Report a single combined summary.
+Run `test` first (fast, deterministic), then `validate`, then `review-skills`. Publishing remains explicit through `publish-slides`. Report a single combined summary.
 
 ## When the manifest or skills change
 

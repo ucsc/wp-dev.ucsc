@@ -1,3 +1,9 @@
+---
+title: "ADR-016: Avoid bundling Python dependencies in the plugin"
+status: Accepted
+date: 2026-06-10
+---
+
 # ADR-016: Avoid bundling Python dependencies in the plugin
 
 **Status:** Accepted

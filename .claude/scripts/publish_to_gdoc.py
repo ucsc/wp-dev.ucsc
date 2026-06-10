@@ -13,7 +13,16 @@ from pathlib import Path
 # Target paths
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
-SLIDES_PATH = PROJECT_ROOT / "ucsc_wp_block_dev_presentation.md"
+SLIDES_PATH = (
+    PROJECT_ROOT
+    / ".claude"
+    / "plugins"
+    / "ucsc-wp-block-dev"
+    / "skills"
+    / "maintainer"
+    / "assets"
+    / "ucsc_wp_block_dev_presentation.md"
+)
 SERVICE_ACCOUNT_FILE = SCRIPT_DIR / "service_account.json"
 CREDENTIALS_FILE = SCRIPT_DIR / "credentials.json"
 TOKEN_FILE = SCRIPT_DIR / "token.json"

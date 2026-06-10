@@ -1,3 +1,9 @@
+---
+title: "ADR-017: .agents uses symlinks to .claude, not file copies"
+status: Accepted
+date: 2026-06-10
+---
+
 # ADR-017: .agents uses symlinks to .claude, not file copies
 
 **Status:** Accepted

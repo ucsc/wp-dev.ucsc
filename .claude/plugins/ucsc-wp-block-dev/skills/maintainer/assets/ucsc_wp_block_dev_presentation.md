@@ -147,6 +147,23 @@ The plugin features **14 skills** — user-invocable commands, block-specific gu
 
 ---
 
+## **Command Menu: 6 Routed Modes**
+
+`/ucsc-wp-block-dev:start` identifies the active WordPress app and routes targets, natural-language requests, and optional Jira context into the current command set (ADR-011):
+
+| # | Mode | Command | Outcome |
+| :--- | :--- | :--- | :--- |
+| 1 | **Develop** | `/ucsc-wp-block-dev:develop` | Add or change Gutenberg block behavior. |
+| 2 | **Fix** | `/ucsc-wp-block-dev:fix` | Diagnose and repair a block problem. |
+| 3 | **Test** | `/ucsc-wp-block-dev:test` | Add or run PHP, Jest, Docker, or browser checks. |
+| 4 | **Review** | `/ucsc-wp-block-dev:review` | Review a diff, branch, file, block, or Jira change. |
+| 5 | **Run** | `/ucsc-wp-block-dev:run` | Build, launch, and smoke-test `wp-dev.ucsc`. |
+| 6 | **Maintainer** | `/ucsc-wp-block-dev:maintainer` | Validate, test, review, and publish this plugin. |
+
+Use `/ucsc-wp-block-dev:menu` to return to the lightweight mode table without repeating app discovery.
+
+---
+
 ## **Skill: Develop (`/ucsc-wp-block-dev:develop`)**
 
 Provides a guided developer experience for introducing new Gutenberg blocks:
@@ -238,8 +255,15 @@ Commands driving block compilation, container health, and unit tests:
 * **Architecture Decision Records (ADRs):**
   * Live in `docs/adr/` with an index at `docs/adr/index.md`.
   * Each ADR captures a design decision, its context, and consequences.
-  * Current ADRs cover plugin scope, token efficiency, validation workflow, frontmatter conventions, command intake patterns, and more.
-  * Create new ADRs via the maintainer skill or by adding files directly to `docs/adr/`.
+  * Current ADRs cover plugin scope, token efficiency, validation, command intake, slide governance, dependency policy, and cross-agent packaging.
+  * Update the ADR index whenever a decision is added or superseded.
+* **Recent deck and distribution decisions:**
+  * **ADR-013:** README is the canonical first-time user reference.
+  * **ADR-014:** The deck documents every top-level skill and command.
+  * **ADR-015:** Refresh the `Generated:` date before publishing.
+  * **ADR-016:** Do not bundle Python environments or dependencies in the plugin.
+  * **ADR-017:** `.agents` links to `.claude` skill source instead of maintaining copies.
+  * **ADR-018:** The deck is a maintainer-owned asset with one canonical source path.
 
 ---
 
@@ -271,7 +295,7 @@ Commands driving block compilation, container health, and unit tests:
 
 Automated pipeline to compile and deploy these presentation slides to Google Docs:
 
-* **Source:** `ucsc_wp_block_dev_presentation.md` (Marp Markdown, this file) in the project root.
+* **Source:** `.claude/plugins/ucsc-wp-block-dev/skills/maintainer/assets/ucsc_wp_block_dev_presentation.md` (Marp Markdown, this file).
 * **Script:** `.claude/scripts/publish_to_gdoc.py` — converts Marp Markdown to styled HTML and uploads to Google Drive.
 * **How it works:**
   1. Strips Marp frontmatter (theme, style, pagination config).
@@ -289,6 +313,7 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
   ```bash
   python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
   ```
+  This is also the implementation behind `/ucsc-wp-block-dev:maintainer publish-slides`.
 * **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
 
 ---
@@ -299,8 +324,8 @@ Integrates the Claude Code plugin with the OpenAI Codex agent environment:
 
 * **Why it is needed:** Claude Code and Codex consume plugins differently. The wrapper automates packaging the same source files for both systems.
 * **What `codex.sh` performs:**
-  1. **Syncs Skills:** Copies all skills from `.claude/plugins/ucsc-wp-block-dev/skills/` to `.agents/plugins/ucsc-wp-block-dev/skills/` via `rsync`.
-  2. **Translates Manifests:** Reads Claude's `plugin.json` and writes a Codex-compatible version containing fields like `capabilities`, `displayName`, and `defaultPrompt`.
-  3. **Local Registration:** Adds the local marketplace defined in `.agents/plugins/marketplace.json` and installs the plugin in Codex:
+  1. **Links Skills:** Creates `.agents/plugins/ucsc-wp-block-dev/skills` as a symlink to the canonical `.claude` skill source (ADR-017).
+  2. **Validates Manifests:** Confirms Claude and Codex plugin names and base versions match.
+  3. **Local Registration:** With `--install`, adds the local marketplace and installs the plugin in Codex:
      * `codex plugin marketplace add`
      * `codex plugin add ucsc-wp-block-dev@ucsc-wordpress-local`
