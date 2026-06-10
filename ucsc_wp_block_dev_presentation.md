@@ -36,6 +36,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
+**Generated:** 2026-06-10<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -43,16 +44,18 @@ style: |
 
 ## **How to Get Started**
 
+> **Full reference:** See the plugin [README](.claude/plugins/ucsc-wp-block-dev/README.md) for complete install, uninstall, reload, and launch-from-source instructions (ADR-013).
+
 * **Installation (Project Scope):**
   ```bash
-  claude plugin marketplace add ./.claude --scope project
   claude plugin install ucsc-wp-block-dev@ucsc-wordpress --scope project
   ```
 * **Uninstallation:**
   ```bash
   claude plugin uninstall ucsc-wp-block-dev --scope project
   ```
-* **Reloading Plugins:** Run `/reload-plugins` inside Claude Code to apply updates and reload skills.
+* **Reloading Plugins:** Run `/reload-plugins` inside Claude Code to apply updates and reload skills. Use `/reload-plugins --force` if MCP tools changed.
+* **Launch from Source:** `claude --plugin-dir .claude/plugins/ucsc-wp-block-dev`
 * **Workspace Context:**
   * You can run `claude` from **any directory inside the project tree** (including subdirectories).
   * Claude Code automatically traverses parent directories to locate the `.claude/` configuration folder and load the project-scoped plugin.
@@ -111,18 +114,36 @@ style: |
 
 ## **The Plugin Skills Landscape**
 
-The plugin features **8 skills** (5 tool commands, 3 custom block guides, and 1 auto-loaded context):
+The plugin features **14 skills** — user-invocable commands, block-specific guides, and auto-loaded context:
+
+**User-invocable commands:**
 
 | Skill | Call Trigger | Purpose |
 | :--- | :--- | :--- |
+| **`start`** | `/ucsc-wp-block-dev:start` | Entry point — identifies the app and routes to the right mode. |
+| **`setup`** | `/ucsc-wp-block-dev:setup` | First-time capability overview. |
 | **`develop`** | `/ucsc-wp-block-dev:develop` | Guided block creation from scaffold to registration. |
 | **`fix`** | `/ucsc-wp-block-dev:fix` | Debugs JS, PHP, REST API, or transient caching bugs. |
+| **`test`** | `/ucsc-wp-block-dev:test` | Add or run PHP, Jest, Docker, and browser tests. |
+| **`review`** | `/ucsc-wp-block-dev:review` | Review a diff, branch, file, or Jira-scoped change. |
 | **`run`** | `/ucsc-wp-block-dev:run` | Handles Docker lifecycle, builds assets, and runs tests. |
-| **`blocks`** | *Auto-loaded context* | Loaded automatically when editing files in the WP plugin. |
-| **`maintainer`**| `/ucsc-wp-block-dev:maintainer`| Validates plugin manifest structure and runs tests. |
-| **`campus-directory`**| `/ucsc-wp-block-dev:campus-directory`| Guides the LDAP-backed Campus Directory block. |
-| **`class-schedule`**| `/ucsc-wp-block-dev:class-schedule`| Guides WCSI app embedding and testing server toggles. |
-| **`course-catalog`**| `/ucsc-wp-block-dev:course-catalog`| Guides AIS PeopleSoft XML integration and caching. |
+| **`menu`** | `/ucsc-wp-block-dev:menu` | Show the mode table mid-session without re-running app detection. |
+| **`maintainer`** | `/ucsc-wp-block-dev:maintainer` | Validates plugin structure, runs tests, reviews skill quality. |
+
+**Block-specific guides:**
+
+| Skill | Call Trigger | Purpose |
+| :--- | :--- | :--- |
+| **`campus-directory`** | `/ucsc-wp-block-dev:campus-directory` | Guides the LDAP-backed Campus Directory block. |
+| **`class-schedule`** | `/ucsc-wp-block-dev:class-schedule` | Guides WCSI app embedding and testing server toggles. |
+| **`course-catalog`** | `/ucsc-wp-block-dev:course-catalog` | Guides AIS PeopleSoft XML integration and caching. |
+
+**Auto-loaded / internal:**
+
+| Skill | Visibility | Purpose |
+| :--- | :--- | :--- |
+| **`blocks`** | Auto-loaded context | Domain reference loaded when editing files in the WP plugin. |
+| **`issue-context`** | Internal | Resolves Jira or user-supplied issue context into an implementation brief. |
 
 ---
 
@@ -210,8 +231,15 @@ Commands driving block compilation, container health, and unit tests:
     * *Course Catalog:* Connects to PeopleSoft XML endpoint (caches via transients).
     * *Campus Directory:* Accesses LDAP using network options.
 * **`maintainer` (Plugin Self-Upkeep):**
-  * Launches Anthropic’s `plugin-dev:plugin-validator` validator agent.
+  * Launches Anthropic’s `plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer` agents.
+  * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
   * Triggers pytest suite (verifying manifest, frontmatter constraints, and index consistency).
+  * See the plugin [README](.claude/plugins/ucsc-wp-block-dev/README.md) for plugin-dev tool install and usage (ADR-013).
+* **Architecture Decision Records (ADRs):**
+  * Live in `docs/adr/` with an index at `docs/adr/index.md`.
+  * Each ADR captures a design decision, its context, and consequences.
+  * Current ADRs cover plugin scope, token efficiency, validation workflow, frontmatter conventions, command intake patterns, and more.
+  * Create new ADRs via the maintainer skill or by adding files directly to `docs/adr/`.
 
 ---
 
@@ -241,15 +269,27 @@ Commands driving block compilation, container health, and unit tests:
 
 ## **Slide Publishing Workflow**
 
-Automated pipeline to compile and deploy these presentation slides:
+Automated pipeline to compile and deploy these presentation slides to Google Docs:
 
-* **Source Material:** Project root [ucsc_wp_block_dev_presentation.md](file:///Users/henryh/_code/_campuspress/wp-dev.ucsc/ucsc_wp_block_dev_presentation.md).
-* **Local Compilation:** Custom script [.claude/scripts/publish_to_gdoc.py](file:///Users/henryh/_code/_campuspress/wp-dev.ucsc/.claude/scripts/publish_to_gdoc.py) converts Marp Markdown to standard styled HTML.
-* **Authentication:** Headless verification using a GCP Service Account key ([service_account.json](file:///Users/henryh/_code/_campuspress/wp-dev.ucsc/.claude/scripts/service_account.json)) with Google Drive and Docs APIs enabled.
-* **Deployment CLI:** Overwrites the live Google Doc via Google Drive API's `files().update` operation:
+* **Source:** `ucsc_wp_block_dev_presentation.md` (Marp Markdown, this file) in the project root.
+* **Script:** `.claude/scripts/publish_to_gdoc.py` — converts Marp Markdown to styled HTML and uploads to Google Drive.
+* **How it works:**
+  1. Strips Marp frontmatter (theme, style, pagination config).
+  2. Converts slide breaks (`---`) to `<hr>` separators.
+  3. Renders Markdown to HTML via the `markdown` Python library (with `extra` and `tables` extensions).
+  4. Wraps the HTML in a styled template (Arial font, blue headings, bordered tables).
+  5. Uploads to Google Drive using the Drive API's `files().update` to overwrite the existing Google Doc.
+  6. Google Drive automatically converts the uploaded HTML into native Google Docs format.
+* **Authentication (three methods, tried in order):**
+  1. `gcloud auth application-default login` with Drive scope (easiest).
+  2. GCP Service Account JSON key (`service_account.json` next to the script).
+  3. Desktop OAuth client flow (`credentials.json` / `token.json` next to the script).
+* **Dependencies:** Auto-installed into a `.venv` next to the script: `markdown`, `google-api-python-client`, `google-auth-httplib2`, `google-auth-oauthlib`.
+* **Publish command:**
   ```bash
   python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
   ```
+* **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
 
 ---
 

@@ -18,3 +18,8 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-010](ADR-010-jira-prompt-may-repeat-at-phase-completion.md) | Jira prompt may repeat at phase completion | Accepted | 2026-06-09 |
 | [ADR-011](ADR-011-universal-command-intake.md) | Every command resolves target, natural-language request, and optional Jira context | Accepted | 2026-06-09 |
 | [ADR-012](ADR-012-setup-capability-summary.md) | Setup provides a simple capability summary | Accepted | 2026-06-09 |
+| [ADR-013](ADR-013-readme-is-first-time-user-reference.md) | README is the canonical first-time user reference | Accepted | 2026-06-10 |
+| [ADR-014](ADR-014-slide-deck-documents-all-skills.md) | Slide deck documents all top-level skills and commands | Accepted | 2026-06-10 |
+| [ADR-015](ADR-015-slide-deck-generated-date.md) | Slide deck always includes a generated date | Accepted | 2026-06-10 |
+| [ADR-016](ADR-016-avoid-bundling-python-in-plugin.md) | Avoid bundling Python dependencies in the plugin | Accepted | 2026-06-10 |
+| [ADR-017](ADR-017-agents-uses-symlinks-not-copies.md) | .agents uses symlinks to .claude, not file copies | Accepted | 2026-06-10 |

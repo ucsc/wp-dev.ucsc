@@ -1,0 +1,10 @@
+# Virtual environment
+.venv/
+
+# Google API credentials — never commit
+service_account.json
+credentials.json
+token.json
+
+# Build artifacts
+temp_presentation.html

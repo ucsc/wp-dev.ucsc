@@ -11,8 +11,8 @@ Options:
   --install   Also register the local marketplace and install the plugin with Codex.
   -h, --help  Show this help text.
 
-.agents contains Codex-specific adapter source plus generated skill copies.
-Shared plugin skills remain under .claude/plugins/ucsc-wp-block-dev.
+.agents contains Codex-specific adapter source plus symlinks to .claude skills.
+Shared plugin source remains under .claude/plugins/ucsc-wp-block-dev (ADR-017).
 EOF
 }
 
@@ -75,14 +75,14 @@ if [ "${CLAUDE_VERSION}" != "${CODEX_VERSION}" ]; then
   exit 1
 fi
 
-if ! command -v rsync >/dev/null 2>&1; then
-  echo "[ERROR] rsync command not found" >&2
-  exit 1
+# ADR-017: use symlinks instead of rsync copies
+if [ -d "${CODEX_PLUGIN_DIR}/skills" ] && [ ! -L "${CODEX_PLUGIN_DIR}/skills" ]; then
+  rm -rf "${CODEX_PLUGIN_DIR}/skills"
 fi
-
-mkdir -p "${CODEX_PLUGIN_DIR}/skills"
-rsync -a --delete "${SOURCE_PLUGIN_DIR}/skills/" "${CODEX_PLUGIN_DIR}/skills/"
-echo "[OK] Synced plugin skills into .agents/plugins/${PLUGIN_NAME}/skills"
+if [ ! -L "${CODEX_PLUGIN_DIR}/skills" ]; then
+  ln -s "../../../.claude/plugins/${PLUGIN_NAME}/skills" "${CODEX_PLUGIN_DIR}/skills"
+fi
+echo "[OK] Symlinked .agents/plugins/${PLUGIN_NAME}/skills -> .claude/plugins/${PLUGIN_NAME}/skills"
 
 if [ "${INSTALL}" -eq 1 ]; then
   if ! command -v codex >/dev/null 2>&1; then

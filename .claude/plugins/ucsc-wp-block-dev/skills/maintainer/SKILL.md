@@ -17,6 +17,21 @@ Keep token use low: run the validator and tests rather than reading every file b
 
 Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context. A bare `maintainer` command implies the `all` health check. Ask one concise question only when the requested scope is ambiguous enough to change the operation.
 
+## Anthropic plugin-dev tools
+
+These are the built-in `plugin-dev:*` agents and skills available for delegating maintenance work. Install the plugin-dev plugin if not already present:
+
+```
+/plugin install plugin-dev@claude-plugins-official
+```
+
+| Tool | Type | Purpose |
+|---|---|---|
+| `plugin-dev:plugin-validator` | Agent | Validates plugin manifest, skill frontmatter, naming, structure, and security |
+| `plugin-dev:skill-reviewer` | Agent | Reviews skill quality — description clarity, triggering effectiveness, best practices |
+| `plugin-dev:skill-development` | Skill | Guidance for writing and improving skills — frontmatter fields, description patterns, argument handling |
+| `plugin-dev:plugin-structure` | Skill | Plugin directory layout, manifest configuration, component organization |
+
 ## validate
 
 Launch the `plugin-dev:plugin-validator` agent against this plugin to check the manifest, skill frontmatter, naming, structure, and security.
@@ -26,7 +41,7 @@ Use the Agent tool:
 - `subagent_type`: `plugin-dev:plugin-validator`
 - `prompt`: "Validate the Claude Code plugin at `.claude/plugins/ucsc-wp-block-dev`. Report critical errors, warnings, and overall quality."
 
-The `plugin-dev` plugin must be installed (`/plugin install plugin-dev@claude-plugins-official`). Relay only the findings that matter; fix critical errors before publishing.
+Relay only the findings that matter; fix critical errors before publishing.
 
 ## test
 

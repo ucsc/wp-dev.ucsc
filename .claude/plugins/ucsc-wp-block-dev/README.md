@@ -50,27 +50,69 @@ docker compose up -d
 docker compose run --rm -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks plugin_npm_start npm test
 ```
 
-## Maintainer setup
+## Plugin management
 
-Install Claude Code:
+### Install
+
+Install Claude Code if you haven't already:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-Install this plugin:
+Install this plugin from the project marketplace:
 
 ```bash
-claude plugin marketplace add ./.claude --scope project
 claude plugin install ucsc-wp-block-dev@ucsc-wordpress --scope project
 ```
 
-Restart Claude Code after installation so the plugin skills are loaded. For
-local development without installing, launch Claude Code with:
+If the marketplace isn't registered yet:
+
+```bash
+claude plugin marketplace add ./.claude --scope project
+```
+
+After installing, restart Claude Code or run `/reload-plugins` inside a session
+so the plugin skills are loaded.
+
+### Uninstall
+
+```bash
+claude plugin uninstall ucsc-wp-block-dev --scope project
+```
+
+Add `--prune` to also remove auto-installed dependencies that are no longer
+needed. Add `--keep-data` to preserve the plugin's persistent data directory.
+
+### Reload after changes
+
+When you edit skills, hooks, or the manifest during development, run
+`/reload-plugins` inside Claude Code to pick up changes without restarting.
+If the reload would change which MCP tools are loaded (invalidating the prompt
+cache), the command warns and skips unless you pass `--force`:
+
+```
+/reload-plugins
+/reload-plugins --force
+```
+
+### List installed plugins
+
+```bash
+claude plugin list
+```
+
+### Launch from source (without installing)
+
+For local development or testing against the source tree, launch Claude Code
+with `--plugin-dir` pointing at the plugin root:
 
 ```bash
 claude --plugin-dir .claude/plugins/ucsc-wp-block-dev
 ```
+
+This loads the plugin for the current session only — no install step needed.
+You can combine multiple `--plugin-dir` flags to load several plugins at once.
 
 ### Validate the plugin
 

@@ -1,3 +1,6 @@
 public/
 .vscode
 .env
+
+# .agents skills are symlinks to .claude (ADR-017) — do not track
+.agents/plugins/ucsc-wp-block-dev/skills/
