@@ -44,7 +44,7 @@ style: |
 
 ## **How to Get Started**
 
-> **Full reference:** See the plugin [README](.claude/plugins/ucsc-wp-block-dev/README.md) for complete install, uninstall, reload, and launch-from-source instructions (ADR-013).
+> **Full reference:** See the plugin [README](../../../README.md) for complete install, uninstall, reload, and launch-from-source instructions (ADR-013).
 
 * **Installation (Project Scope):**
   ```bash
@@ -251,7 +251,7 @@ Commands driving block compilation, container health, and unit tests:
   * Launches Anthropic’s `plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer` agents.
   * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
   * Triggers pytest suite (verifying manifest, frontmatter constraints, and index consistency).
-  * See the plugin [README](.claude/plugins/ucsc-wp-block-dev/README.md) for plugin-dev tool install and usage (ADR-013).
+  * See the plugin [README](../../../README.md) for plugin-dev tool install and usage (ADR-013).
 * **Architecture Decision Records (ADRs):**
   * Live in `docs/adr/` with an index at `docs/adr/index.md`.
   * Each ADR captures a design decision, its context, and consequences.
