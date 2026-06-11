@@ -9,7 +9,7 @@ arguments: [input]
 
 Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code — use `develop`/`fix`/`run` for that).
 
-**Usage:** `/ucsc-wp-block-dev:maintainer [validate | test | review-skills | publish-slides | all]`. Run all commands below from the repo root.
+**Usage:** `/ucsc-wp-block-dev:maintainer [validate | test | review-skills | check-references | publish-slides | all]`. Run all commands below from the repo root.
 
 Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003.
 
@@ -84,6 +84,16 @@ Use the Skill tool:
 
 Consult this before writing a new `SKILL.md` or refactoring an existing one to ensure correct frontmatter fields, argument patterns, and triggering descriptions.
 
+## check-references
+
+Enforce ADR-032: every supporting file under a skill directory must be referenced from that skill's `SKILL.md`, so nested `references/`, `assets/`, and `scripts/` files stay discoverable (progressive disclosure). Run the bundled scanner:
+
+```bash
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_references.sh
+```
+
+It prints one line per skill and a PASS/FAIL summary, exiting non-zero when any nested file is not linked from its `SKILL.md`. Fix a FAIL by adding a skill-relative reference (e.g. `references/foo.md`) to the skill — under a "Reference files" heading when one is warranted — or by removing the obsolete file. The pytest suite runs this same check, so a gap fails `test` too.
+
 ## publish-slides
 
 The canonical Marp source is maintainer-owned:
@@ -108,8 +118,8 @@ The publisher reads only the maintainer asset path. Do not restore a second deck
 
 ## all
 
-Run `test` first (fast, deterministic), then `validate`, then `review-skills`. Publishing remains explicit through `publish-slides`. Report a single combined summary.
+Run `test` first (fast, deterministic), then `validate`, then `check-references`, then `review-skills`. Publishing remains explicit through `publish-slides`. Report a single combined summary.
 
 ## When the manifest or skills change
 
-After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills.
+After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills.

@@ -37,3 +37,5 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Fix and develop offer a Conventional Commit message without Git operations | Accepted | 2026-06-10 |
 | [ADR-030](ADR-030-separate-run-verify-test-and-plugin-validation.md) | Separate run, verify, test, and plugin validation | Accepted | 2026-06-11 |
 | [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Accepted | 2026-06-11 |
+| [ADR-032](ADR-032-skill-support-files-referenced-from-skill-md.md) | Skill support files must be referenced from SKILL.md | Accepted | 2026-06-10 |
+| [ADR-033](ADR-033-work-list-state-in-claude-config-dir.md) | Store work-list state under CLAUDE_CONFIG_DIR | Accepted | 2026-06-10 |

@@ -13,6 +13,23 @@ Follow this recorded project recipe instead of rediscovering the launch process.
 
 Apply ADR-011: resolve the target app or block surface, natural-language run request, and optional Jira key/URL from the full input and session context. Ask one concise question only when the target or requested operation cannot be inferred safely.
 
+## Fast Path — `driver.sh`
+
+For the routine lifecycle, prefer the bundled [`driver.sh`](driver.sh) over issuing the Docker/npm/wp commands one at a time. It runs a whole phase in a single call and prints a compact PASS/FAIL summary, sending verbose output to a logfile it names on exit — read that log only when a step reports FAIL. This keeps a full build-and-launch to ~14 lines of output instead of a dozen noisy command dumps.
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" all      # inspect → build → launch → smoke
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" inspect  # non-destructive state check
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" build    # Dockerized `npm run build`
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" launch   # up -d, wait for DB, activate plugin
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" smoke    # containers, wp-admin, plugin, blocks
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" down     # stop the stack
+```
+
+If `${CLAUDE_PLUGIN_ROOT}` is unset, call the script by its in-plugin path (`skills/run/driver.sh`). The driver autodetects the `wp-dev.ucsc` root; override with `WP_DEV_ROOT=/path`.
+
+Drop to the manual steps below only to drive a single phase by hand or to diagnose a driver FAIL.
+
 ## Inspect Before Starting
 
 Check the minimum state needed for the requested operation:
@@ -92,6 +109,8 @@ Use `/ucsc-wp-block-dev:verify` when the goal is to prove a code change or accep
 ## Recovery
 
 - If Compose reports orphan containers, add `--remove-orphans`.
+- **"Error establishing a database connection" right after `up -d`** — the `db` container needs a few seconds before wp-cli can connect. Wait and retry; `driver.sh launch` polls `wp option get siteurl` for up to 60s before activating the plugin.
+- **`wp db <cmd>` fails with `caching_sha2_password could not be loaded`** — that is the bundled mysql CLI client, not a real database fault. Use PHP/mysqli-path commands instead (`wp option get`, `wp eval`, `wp plugin …`). The driver's readiness probe relies on this.
 - If API output is stale, run `docker compose exec wpcli wp transient delete --all`.
 - If Campus Directory fails locally, confirm VPN access and `DOCKER_DEV=docker_dev`.
 - Do not delete containers, volumes, repositories, or user data without explicit approval.

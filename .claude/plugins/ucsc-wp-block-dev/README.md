@@ -30,7 +30,7 @@ The plugin uses the same interaction model as `ucsc-laravel-vue-dev`: start with
 
 | Skill | Purpose |
 |---|---|
-| `/ucsc-wp-block-dev:maintainer` | Validate structure, run the test suite, and verify ADR index consistency |
+| `/ucsc-wp-block-dev:maintainer` | Validate structure, run the test suite, verify ADR index consistency, and check skill reference integrity |
 
 ## Plugin location
 
@@ -39,6 +39,18 @@ The plugin uses the same interaction model as `ucsc-laravel-vue-dev`: start with
 ## Local development
 
 See `/ucsc-wp-block-dev:run` for the recorded setup and launch recipe, `/ucsc-wp-block-dev:verify` for live behavior checks, and `/ucsc-wp-block-dev:test` for automated tests. The environment README owns clean setup; the product plugin README owns its test commands.
+
+For the routine lifecycle, the `run` and `verify` skills ship a token-frugal `driver.sh` that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
+
+```bash
+# Build + launch + smoke in one call (inspect → build → launch → smoke)
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
+
+# Deterministic pre-checks for a change (plugin active, build fresh, block registered)
+bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
+```
+
+The raw commands below are the underlying steps those drivers automate:
 
 ```bash
 # Build in Docker
@@ -144,6 +156,8 @@ Or run the full check (tests + validation):
 ```
 /ucsc-wp-block-dev:maintainer all
 ```
+
+The `all` flow also runs `check-references`, which enforces ADR-032 — every supporting file under a skill directory must be linked from that skill's `SKILL.md`. The pytest suite enforces the same invariant, so unreferenced reference/asset/script files fail `test` too.
 
 To validate without the skill, ask Claude to "validate the plugin at `.claude/plugins/ucsc-wp-block-dev`" — it will launch the `plugin-dev:plugin-validator` agent. Run the bundled tests directly with:
 

@@ -22,6 +22,18 @@ Apply ADR-011: resolve the target block or app surface, natural-language expecte
 
 Do not use Jest, PHP tests, lint, type checks, or a successful build as proof that the user-facing behavior works. Those checks belong to `/ucsc-wp-block-dev:test`.
 
+## Deterministic Pre-Checks — `driver.sh`
+
+Before the browser pass, run the bundled [`driver.sh`](driver.sh) to confirm the change is even in a verifiable state — built, active, and server-side registered — in one compact call instead of a string of Docker/wp commands:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/verify/driver.sh" <block-slug> [--url URL --needle STRING]
+```
+
+It checks: plugin active, `build/` current with `src/`, the target block registered, and (optionally) a frontend URL returns 200 and contains an expected string. Slug matching is hyphen-insensitive (`campus-directory` matches `campusdirectory`). If `${CLAUDE_PLUGIN_ROOT}` is unset, use the in-plugin path `skills/verify/driver.sh`; the root is autodetected (override with `WP_DEV_ROOT=`).
+
+These checks are a **gate, not proof**. A PASS only means the change is ready to verify; it does **not** substitute for the verification below. Point `--url` at a page that actually renders the block, and still confirm the user-facing behavior visually.
+
 ## Verify Behavior
 
 Use the available browser tool to:
