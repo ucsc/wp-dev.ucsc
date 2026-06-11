@@ -30,11 +30,12 @@ State the app, stack, and current directory in one short context receipt.
 |---|---|---|
 | Develop | `/ucsc-wp-block-dev:develop` | Add or change block behavior |
 | Fix | `/ucsc-wp-block-dev:fix` | Diagnose and repair a problem |
-| Test | `/ucsc-wp-block-dev:test` | Add or run PHP, Jest, or browser checks |
+| Test | `/ucsc-wp-block-dev:test [php\|jest\|e2e]` | Create or run tests after confirming the operation |
 | Review | `/ucsc-wp-block-dev:review` | Review a diff, branch, file, or block |
-| Run | `/ucsc-wp-block-dev:run` | Build, launch, and smoke-test Docker |
+| Run | `/ucsc-wp-block-dev:run` | Build, launch, and drive the WordPress app |
+| Verify | `/ucsc-wp-block-dev:verify` | Prove a change in the running editor or frontend |
 | Maintainer | `/ucsc-wp-block-dev:maintainer` | Improve and validate this plugin |
 
-Route by number, mode name, Jira-backed request, or ordinary language. A clear bug goes to `fix`; new behavior goes to `develop`. Preserve all remaining input during handoff.
+Route by number, mode name, Jira-backed request, or ordinary language. A clear bug goes to `fix`; new behavior goes to `develop`; a request to prove completed behavior goes to `verify`. Preserve all remaining input during handoff.
 
 Mention `/ucsc-wp-block-dev:menu` as the lightweight way to return to the mode list.

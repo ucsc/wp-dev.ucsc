@@ -14,7 +14,8 @@ Give a concise capability summary:
 - **Fix** PHP, JavaScript, REST, LDAP, PeopleSoft, cache, build, and browser issues.
 - **Test** blocks with PHP checks, Jest, Docker, and browser smoke tests.
 - **Review** diffs, branches, files, and block implementations.
-- **Run** the WordPress Docker environment and block build.
+- **Run** and interact with the WordPress Docker environment.
+- **Verify** code changes in the live editor or frontend.
 - **Understand** block architecture, integrations, and local environment behavior.
 - **Maintain** the ucsc-wp-block-dev plugin and its guidance.
 

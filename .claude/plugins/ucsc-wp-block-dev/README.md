@@ -20,9 +20,10 @@ The plugin uses the same interaction model as `ucsc-laravel-vue-dev`: start with
 | `/ucsc-wp-block-dev:setup` | Show a concise capability overview |
 | `/ucsc-wp-block-dev:develop` | Add a described feature to a specified target block, GUI, or app |
 | `/ucsc-wp-block-dev:fix` | Fix a described problem in a specified target block, GUI, or app |
-| `/ucsc-wp-block-dev:test` | Add or run focused PHP, Jest, build, or browser checks |
+| `/ucsc-wp-block-dev:test [php\|jest\|e2e]` | Create or run focused tests after confirming the operation |
 | `/ucsc-wp-block-dev:review` | Review a diff, branch, file, block, or Jira-scoped change |
-| `/ucsc-wp-block-dev:run` | Build, launch, and smoke-test blocks via the wp-dev.ucsc Docker environment |
+| `/ucsc-wp-block-dev:run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
+| `/ucsc-wp-block-dev:verify` | Verify a code change in the running WordPress editor or frontend |
 | `blocks` | Auto-loaded domain reference (not a slash command) — pulled in automatically when working on plugin files |
 
 **On this plugin itself (the tooling):**
@@ -37,17 +38,25 @@ The plugin uses the same interaction model as `ucsc-laravel-vue-dev`: start with
 
 ## Local development
 
-See `/ucsc-wp-block-dev:run` for the full build/run/test workflow. Quick reference:
+See `/ucsc-wp-block-dev:run` for the recorded setup and launch recipe, `/ucsc-wp-block-dev:verify` for live behavior checks, and `/ucsc-wp-block-dev:test` for automated tests. The environment README owns clean setup; the product plugin README owns its test commands.
 
 ```bash
-# Build
-cd public/wp-content/plugins/ucsc-gutenberg-blocks && npm run build
+# Build in Docker
+docker compose -f docker-compose.yml -f docker-compose-start.yml run --rm \
+  -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks \
+  plugin_npm_start npm run build
 
 # Start wp-dev.ucsc
 docker compose up -d
 
 # Run Jest tests
-docker compose run --rm -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks plugin_npm_start npm test
+docker compose -f docker-compose.yml -f docker-compose-start.yml run --rm \
+  -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks \
+  plugin_npm_start npm test
+
+# Run dependency-free PHP tests
+docker run --rm -v "$PWD/public/wp-content/plugins/ucsc-gutenberg-blocks:/plugin" \
+  -w /plugin php:8.1-cli php tests/php/ClassScheduleTest.php
 ```
 
 ## Plugin management

@@ -110,6 +110,7 @@ class TestSkillFrontmatter:
             "test",
             "review",
             "run",
+            "verify",
             "maintainer",
         ]:
             skill_path = SKILLS_DIR / skill_name / "SKILL.md"
@@ -169,6 +170,7 @@ class TestSkillFrontmatter:
             "review",
             "run",
             "test",
+            "verify",
         ]
 
         for skill_name in routers:
@@ -190,12 +192,49 @@ class TestSkillFrontmatter:
     def test_setup_offers_simple_capability_summary(self):
         text = (SKILLS_DIR / "setup" / "SKILL.md").read_text().lower()
         assert "disable-model-invocation: true" in text
-        for capability in ["build", "fix", "test", "review", "run", "understand", "maintain"]:
+        for capability in ["build", "fix", "test", "review", "run", "verify", "understand", "maintain"]:
             assert f"**{capability}**" in text
         assert "natural-language request" in text
         assert "optional jira key/url" in text
         assert "do not run broad discovery" in text
         assert "/ucsc-wp-block-dev:start" in text
+
+    def test_run_records_the_wp_dev_launch_recipe(self):
+        """Run must capture nonstandard setup instead of rediscovering it."""
+        text = (SKILLS_DIR / "run" / "SKILL.md").read_text().lower()
+        for requirement in [
+            ".env.example.txt",
+            "/etc/hosts",
+            "./setup.sh",
+            "docker-compose-install.yml",
+            "wordpress_install",
+            "https://wp-dev.ucsc/wp-admin/",
+            "use the available browser tool",
+        ]:
+            assert requirement in text
+        assert "do not repeat clean setup" in text
+        assert "local node is not required" in text
+
+    def test_verify_requires_live_runtime_evidence(self):
+        """Verify must prove behavior in the app rather than report test success."""
+        text = (SKILLS_DIR / "verify" / "SKILL.md").read_text().lower()
+        assert "following the recorded launch recipe" in text
+        assert "https://wp-dev.ucsc/wp-admin/" in text
+        assert "use the available browser tool" in text
+        assert "do not use jest, php tests, lint, type checks" in text
+        assert "pass or fail for each acceptance criterion" in text
+        assert "do not claim success from automated tests alone" in text
+
+    def test_test_skill_confirms_type_and_operation_before_tools(self):
+        """ADR-031 requires explicit test layer and create/run intent."""
+        text = (SKILLS_DIR / "test" / "SKILL.md").read_text().lower()
+        assert "[php|jest|e2e]" in text
+        assert "**type**" in text
+        assert "`php`, `jest`, or `e2e`" in text
+        assert "**operation**" in text
+        assert "`create` tests or `run` existing tests" in text
+        assert "always ask one concise question only" in text
+        assert "wait for the answer before using tools" in text
 
     def test_fix_requires_user_provided_concrete_problem_before_investigation(self):
         """ADR-007's clarification gate must remain explicit in the fix skill."""
@@ -243,6 +282,14 @@ class TestSkillFrontmatter:
             assert "completion summary may ask for it again" in text
             assert "do not repeat the prompt when an id is already known" in text
             assert "do not treat a missing id as incomplete work" in text
+
+    def test_fix_and_develop_offer_commit_message_without_git_operations(self):
+        """ADR-029 offers message text while prohibiting repository-changing Git commands."""
+        for skill_name in ["fix", "develop"]:
+            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+            assert "offer to generate a conventional commit message" in text
+            assert "generate message text only if the user accepts" in text
+            assert "do not run `git add`, `git commit`, `git push`" in text
 
     def test_atlassian_mcp_reminder_is_optional_and_requires_approval(self):
         """ADR-025 must keep Atlassian setup reminders restrained and user-controlled."""
@@ -338,6 +385,46 @@ class TestAdrIndex:
             assert fm["status"] in ["Proposed", "Accepted", "Rejected", "Deprecated", "Superseded"], (
                 f"{adr_file.name} has invalid status: '{fm['status']}'"
             )
+
+    def test_fix_token_study_is_multi_pronged_and_measured(self):
+        """ADR-026 must optimize full fix sessions without weakening correctness gates."""
+        text = (ADR_DIR / "ADR-026-study-multi-pronged-fix-token-reduction.md").read_text().lower()
+        for workstream in [
+            "loaded instruction size",
+            "intake and routing",
+            "evidence funnel",
+            "progressive file reading",
+            "risk-based validation",
+            "output and tool-result discipline",
+        ]:
+            assert workstream in text
+        assert "establish a baseline" in text
+        assert "benchmark set" in text
+        assert "median token use" in text
+        assert "do not weaken the required target-and-description intake gate" in text
+
+    def test_mcp_token_study_compares_startup_strategies(self):
+        """ADR-027 must measure MCP savings against startup and unused-session cost."""
+        text = (ADR_DIR / "ADR-027-study-github-atlassian-mcp-token-cost.md").read_text().lower()
+        for configuration in ["fallback only", "on demand", "always on"]:
+            assert configuration in text
+        assert "measure github and atlassian independently" in text
+        assert "local-only fix" in text
+        assert "fixed session-start cost" in text
+        assert "number of relevant tasks needed to recover" in text
+        assert "without explicit user approval" in text
+
+    def test_mcp_activation_is_just_in_time_and_token_driven(self):
+        """ADR-028 must keep the multi-purpose plugin light and activation controlled."""
+        text = (ADR_DIR / "ADR-028-start-mcp-just-in-time-when-token-efficient.md").read_text().lower()
+        assert "multi-purpose plugin" in text
+        assert "do not start github or atlassian mcp by default" in text
+        assert "activate only the relevant mcp just in time" in text
+        assert "start both only" in text
+        assert "local-only development" in text
+        assert "total task tokens" in text
+        assert "obtain explicit approval" in text
+        assert "continue with available fallbacks" in text
 
 
 class TestFileLayout:

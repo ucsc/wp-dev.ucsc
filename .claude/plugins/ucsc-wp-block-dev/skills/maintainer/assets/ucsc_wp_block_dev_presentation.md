@@ -114,7 +114,7 @@ style: |
 
 ## **The Plugin Skills Landscape**
 
-The plugin features **14 skills** — user-invocable commands, block-specific guides, and auto-loaded context:
+The plugin features **15 skills** — user-invocable commands, block-specific guides, and auto-loaded context:
 
 **User-invocable commands:**
 
@@ -124,9 +124,10 @@ The plugin features **14 skills** — user-invocable commands, block-specific gu
 | **`setup`** | `/ucsc-wp-block-dev:setup` | First-time capability overview. |
 | **`develop`** | `/ucsc-wp-block-dev:develop` | Guided block creation from scaffold to registration. |
 | **`fix`** | `/ucsc-wp-block-dev:fix` | Debugs JS, PHP, REST API, or transient caching bugs. |
-| **`test`** | `/ucsc-wp-block-dev:test` | Add or run PHP, Jest, Docker, and browser tests. |
+| **`test`** | `/ucsc-wp-block-dev:test [php\|jest\|e2e]` | Create or run tests after confirming the operation. |
 | **`review`** | `/ucsc-wp-block-dev:review` | Review a diff, branch, file, or Jira-scoped change. |
-| **`run`** | `/ucsc-wp-block-dev:run` | Handles Docker lifecycle, builds assets, and runs tests. |
+| **`run`** | `/ucsc-wp-block-dev:run` | Records and executes the Docker setup, build, launch, and app-driving recipe. |
+| **`verify`** | `/ucsc-wp-block-dev:verify` | Proves a change in the running WordPress editor or frontend. |
 | **`menu`** | `/ucsc-wp-block-dev:menu` | Show the mode table mid-session without re-running app detection. |
 | **`maintainer`** | `/ucsc-wp-block-dev:maintainer` | Validates plugin structure, runs tests, reviews skill quality. |
 
@@ -147,7 +148,7 @@ The plugin features **14 skills** — user-invocable commands, block-specific gu
 
 ---
 
-## **Command Menu: 6 Routed Modes**
+## **Command Menu: 7 Routed Modes**
 
 `/ucsc-wp-block-dev:start` identifies the active WordPress app and routes targets, natural-language requests, and optional Jira context into the current command set (ADR-011):
 
@@ -155,10 +156,11 @@ The plugin features **14 skills** — user-invocable commands, block-specific gu
 | :--- | :--- | :--- | :--- |
 | 1 | **Develop** | `/ucsc-wp-block-dev:develop` | Add or change Gutenberg block behavior. |
 | 2 | **Fix** | `/ucsc-wp-block-dev:fix` | Diagnose and repair a block problem. |
-| 3 | **Test** | `/ucsc-wp-block-dev:test` | Add or run PHP, Jest, Docker, or browser checks. |
+| 3 | **Test** | `/ucsc-wp-block-dev:test [php\|jest\|e2e]` | Create or run tests after confirming the operation. |
 | 4 | **Review** | `/ucsc-wp-block-dev:review` | Review a diff, branch, file, block, or Jira change. |
-| 5 | **Run** | `/ucsc-wp-block-dev:run` | Build, launch, and smoke-test `wp-dev.ucsc`. |
-| 6 | **Maintainer** | `/ucsc-wp-block-dev:maintainer` | Validate, test, review, and publish this plugin. |
+| 5 | **Run** | `/ucsc-wp-block-dev:run` | Build, launch, and drive `wp-dev.ucsc`. |
+| 6 | **Verify** | `/ucsc-wp-block-dev:verify` | Confirm behavior in the running editor or frontend. |
+| 7 | **Maintainer** | `/ucsc-wp-block-dev:maintainer` | Validate, test, review, and publish this plugin. |
 
 Use `/ucsc-wp-block-dev:menu` to return to the lightweight mode table without repeating app discovery.
 
@@ -205,17 +207,25 @@ Systematic flowchart for diagnosing and resolving faults in the block codebase:
 
 ## **Skill: Run (`/ucsc-wp-block-dev:run`)**
 
-Commands driving block compilation, container health, and unit tests:
+Recorded commands driving clean setup, block compilation, container health, and the live app:
 
 * **Build Lifecycle:**
   * Build for production: `npm run build` (creates `build/index.js` + `build/index.asset.php`).
   * Rebuild continuously during development: `npm start` (watch mode).
 * **Docker Operations:**
-  * Start development stack: `docker compose up -d` (accessible on port `8080`).
+  * Start development stack: `docker compose up -d`.
   * Activate plugin: `docker compose exec wpcli wp plugin activate ucsc-gutenberg-blocks`.
-* **Testing Execution:**
-  * Execute Jest testing harness inside container:
-    `docker compose run --rm -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks plugin_npm_start npm test`
+* **Live App:** Open `https://wp-dev.ucsc/wp-admin/`, log in, and drive the requested editor or frontend interaction.
+
+---
+
+## **Skill: Verify (`/ucsc-wp-block-dev:verify`)**
+
+Builds and launches from the recorded `run` recipe, then verifies acceptance criteria against the live WordPress application:
+
+* Uses the editor or frontend rather than substituting Jest, PHP tests, lint, or type checks.
+* Exercises the requested block interaction and inspects runtime console or network behavior when relevant.
+* Reports each criterion as pass or fail, including the route used and any environmental limitation.
 
 ---
 

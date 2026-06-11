@@ -207,6 +207,8 @@ After implementing, remind the user: this change needs a build verification in t
 
 If applicable validation is complete and no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 
+Per ADR-029, offer to generate a Conventional Commit message for the completed feature. Generate message text only if the user accepts. Do not run `git add`, `git commit`, `git push`, or equivalent staging, commit, or push operations.
+
 ## Plugin-dev Tools
 
 When this workflow creates or modifies plugin components (skills, manifest, hooks), use the following tools:

@@ -20,9 +20,9 @@ The `.agents/` directory exists to provide a Codex-compatible adapter for the pl
 
 1. **`.claude/` is the single source of truth** for all skills, scripts, hooks, and docs. No skill content lives in `.agents/`.
 
-2. **`.agents/plugins/<name>/skills/` uses symlinks** pointing to the corresponding `.claude/plugins/<name>/skills/` directories. The symlinks are created by `codex.sh` and are not checked into git.
+2. **`.agents/plugins/<name>/skills/` uses symlinks** pointing to the corresponding `.claude/plugins/<name>/skills/` directories. Link direction is always from Codex (`.agents`) to Claude (`.claude`), never from Claude to Codex. The `.claude` skills directory remains the real canonical directory. The symlinks are created by `codex.sh`.
 
-3. **Do not check in symlinks.** Symlinks are platform-specific and break across clones on different OS/path layouts. `.agents/plugins/<name>/skills/` is gitignored, and `codex.sh` recreates the symlinks on demand.
+3. **Do not replace the canonical Claude directory with a symlink.** Packaging or installation problems must be fixed on the Codex adapter side without reversing the link.
 
 4. **What stays in `.agents/` (tracked):**
    - `codex.sh` — the adapter script itself

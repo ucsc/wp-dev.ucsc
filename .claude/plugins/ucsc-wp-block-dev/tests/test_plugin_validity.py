@@ -113,7 +113,7 @@ class TestPluginDetails:
     @requires_installed
     def test_core_skills_present(self):
         r = plugin_details()
-        for skill in ["setup", "start", "develop", "fix", "test", "review", "run"]:
+        for skill in ["setup", "start", "develop", "fix", "test", "review", "run", "verify"]:
             assert skill in r.stdout, f"Core skill '{skill}' missing from plugin details"
 
     @requires_installed

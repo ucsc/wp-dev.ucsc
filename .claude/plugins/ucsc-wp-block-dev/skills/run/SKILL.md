@@ -1,91 +1,97 @@
 ---
 name: run
-description: Build, launch, and smoke-test the ucsc-gutenberg-blocks plugin via the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, or test the WordPress plugin, or when verifying the Docker environment is healthy.
-argument-hint: "[target | run/verify request | Jira key/URL]"
+description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and test for automated tests.
+argument-hint: "[target | run request | Jira key/URL]"
 arguments: [input]
 ---
 
-# Run — ucsc-wp-block-dev
+# Run wp-dev.ucsc
 
-Lifecycle commands for `ucsc-gutenberg-blocks` in the `wp-dev.ucsc` local Docker environment.
-
-**Usage:** `/ucsc-wp-block-dev:run [build | start | test | smoke-check]`.
-
-All paths relative to `wp-dev.ucsc/` unless noted.
+Follow this recorded project recipe instead of rediscovering the launch process. Work from the `wp-dev.ucsc` root.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target app or block surface, natural-language build/run/verification request, and optional Jira key/URL from the full input and session context. Merge Jira acceptance criteria when they define what must be verified, and ask one concise question only when the target or requested operation cannot be inferred safely.
+Apply ADR-011: resolve the target app or block surface, natural-language run request, and optional Jira key/URL from the full input and session context. Ask one concise question only when the target or requested operation cannot be inferred safely.
 
-## Prerequisites
+## Inspect Before Starting
 
-- Docker Desktop running
-- `public/wp-content/plugins/ucsc-gutenberg-blocks/` present and checked out
-
-## Build
+Check the minimum state needed for the requested operation:
 
 ```bash
-cd public/wp-content/plugins/ucsc-gutenberg-blocks
-npm install
-npm run build
+test -f .env
+test -d public/wp-content/plugins/ucsc-gutenberg-blocks
+docker compose ps
 ```
 
-`npm run build` compiles `src/` → `build/index.js` + `build/index.asset.php` via `@wordpress/scripts`.
+Do not repeat clean setup when the checkout, dependencies, WordPress installation, and containers already exist.
 
-For watch mode during active development:
+## Clean Setup
 
-```bash
-npm start
-```
+Use this only for missing prerequisites. Explain and obtain approval before privileged host changes, network clones, or destructive replacement.
 
-## Start Docker Environment
+1. Ensure Docker Desktop is running.
+2. If `.env` is missing, copy `.env.example.txt` to `.env`.
+3. Ensure `/etc/hosts` maps `127.0.0.1 wp-dev.ucsc`. This host edit requires user approval.
+4. Start the base services:
 
 ```bash
 docker compose up -d
 ```
 
-WordPress available at `http://localhost:8080/wp-admin/`.
-
-## Activate Plugin
-
-```bash
-docker compose exec wpcli wp plugin activate ucsc-gutenberg-blocks
-```
-
-Or verify it is already active:
+5. Confirm `public/wp-config.php` exists.
+6. If the theme or product plugins are missing, run `./setup.sh`.
+7. Install dependencies and initialize WordPress:
 
 ```bash
-docker compose exec wpcli wp plugin list --name=ucsc-gutenberg-blocks
+docker compose -f docker-compose-install.yml run --rm theme_composer_install
+docker compose -f docker-compose-install.yml run --rm theme_npm_install
+docker compose -f docker-compose-install.yml run --rm plugin_npm_install
+docker compose -f docker-compose-install.yml run --rm wordpress_install
 ```
 
-## Run Tests
+Campus Directory LDAP requires the UCSC VPN. Local HTTPS uses the repository certificate and may require trusting the browser warning.
 
-Note: the plugin does not currently have a `test` script in `package.json`. If Jest tests are added, run them via Docker:
+## Build Or Watch
+
+Run Node commands in Docker so local Node is not required:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose-start.yml run --rm \
   -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks \
-  plugin_npm_start npm test
+  plugin_npm_start npm run build
 ```
 
-Or locally from inside the plugin directory (requires local Node matching the Docker version):
+For watch mode:
 
 ```bash
-npm test
+docker compose -f docker-compose.yml -f docker-compose-start.yml up -d
 ```
 
-## Smoke Checks
+## Launch
 
-After starting, verify:
+```bash
+docker compose up -d
+docker compose exec wpcli wp plugin activate ucsc-gutenberg-blocks
+docker compose ps
+```
 
-1. `docker compose ps` — all containers healthy
-2. `http://localhost:8080/wp-admin/` loads login page
-3. `docker compose exec wpcli wp plugin list` — `ucsc-gutenberg-blocks` shows as active
-4. Open the block editor on any post — UCSC blocks appear in the inserter
+Use `https://wp-dev.ucsc/wp-admin/` as the canonical browser URL. The development credentials documented by the environment are `admin` / `password`.
 
-## Gotchas
+## Drive The App
 
-- **Build before activate.** `build/index.js` must exist or the block editor throws an asset error.
-- **`npm start` vs `npm run build`** — `start` watches and rebuilds on save; `build` is one-shot for production/test.
-- **Transient cache** — if API data looks stale locally, flush transients: `docker compose exec wpcli wp transient delete --all`.
-- **LDAP in Docker** — Campus Directory binds anonymously when `DOCKER_DEV=docker_dev` is set in the container env.
+Do not stop at container health when the user asks to see the application working.
+
+1. Use the available browser tool to open `https://wp-dev.ucsc/wp-admin/`.
+2. Log in when needed.
+3. Navigate to the relevant editor, page, or frontend route.
+4. Exercise the requested block interaction.
+5. Report what was observed in the running app.
+
+Use `/ucsc-wp-block-dev:verify` when the goal is to prove a code change or acceptance criterion. Use `/ucsc-wp-block-dev:test` for Jest, PHP, or other automated tests.
+
+## Recovery
+
+- If Compose reports orphan containers, add `--remove-orphans`.
+- If API output is stale, run `docker compose exec wpcli wp transient delete --all`.
+- If Campus Directory fails locally, confirm VPN access and `DOCKER_DEV=docker_dev`.
+- Do not delete containers, volumes, repositories, or user data without explicit approval.

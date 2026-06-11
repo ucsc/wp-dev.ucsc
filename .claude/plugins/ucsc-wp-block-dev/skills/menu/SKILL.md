@@ -16,9 +16,10 @@ Apply ADR-011: parse the full input as a possible mode, target, natural-language
 |---|---|---|
 | 1 | Develop | `/ucsc-wp-block-dev:develop` |
 | 2 | Fix | `/ucsc-wp-block-dev:fix` |
-| 3 | Test | `/ucsc-wp-block-dev:test` |
+| 3 | Test | `/ucsc-wp-block-dev:test [php\|jest\|e2e]` |
 | 4 | Review | `/ucsc-wp-block-dev:review` |
 | 5 | Run | `/ucsc-wp-block-dev:run` |
-| 6 | Maintainer | `/ucsc-wp-block-dev:maintainer` |
+| 6 | Verify | `/ucsc-wp-block-dev:verify` |
+| 7 | Maintainer | `/ucsc-wp-block-dev:maintainer` |
 
 Route by number, name, Jira-backed request, or ordinary language.

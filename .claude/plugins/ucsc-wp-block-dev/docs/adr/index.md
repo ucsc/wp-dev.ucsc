@@ -31,3 +31,9 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-023](ADR-023-always-favor-conventional-commits.md) | Always favor Conventional Commits for commit messages | Accepted | 2026-06-10 |
 | [ADR-024](ADR-024-block-target-registry.md) | Command arguments may name a block target, resolved against a block registry | Accepted | 2026-06-10 |
 | [ADR-025](ADR-025-suggest-atlassian-mcp-for-atlassian-references.md) | Suggest Atlassian MCP when Atlassian references are in use | Accepted | 2026-06-10 |
+| [ADR-026](ADR-026-study-multi-pronged-fix-token-reduction.md) | Study multi-pronged token reduction for fix mode | Accepted | 2026-06-10 |
+| [ADR-027](ADR-027-study-github-atlassian-mcp-token-cost.md) | Study GitHub and Atlassian MCP token cost | Accepted | 2026-06-10 |
+| [ADR-028](ADR-028-start-mcp-just-in-time-when-token-efficient.md) | Start MCP just in time when token-efficient | Accepted | 2026-06-10 |
+| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Fix and develop offer a Conventional Commit message without Git operations | Accepted | 2026-06-10 |
+| [ADR-030](ADR-030-separate-run-verify-test-and-plugin-validation.md) | Separate run, verify, test, and plugin validation | Accepted | 2026-06-11 |
+| [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Accepted | 2026-06-11 |

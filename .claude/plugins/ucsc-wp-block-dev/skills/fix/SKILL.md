@@ -113,6 +113,8 @@ After fixing, verify the change in the running environment with `/ucsc-wp-block-
 
 Summarize the completed fix and validation. If no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 
+Per ADR-029, offer to generate a Conventional Commit message for the completed fix. Generate message text only if the user accepts. Do not run `git add`, `git commit`, `git push`, or equivalent staging, commit, or push operations.
+
 ## Plugin-dev Tools
 
 When this workflow creates or modifies plugin components (skills, manifest, hooks), use the following tools:

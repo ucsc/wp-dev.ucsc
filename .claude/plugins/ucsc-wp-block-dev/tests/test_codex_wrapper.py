@@ -58,18 +58,14 @@ class TestCodexWrapper:
         assert codex_data["skills"] == "./skills/"
 
     def test_codex_sh_run_execution(self):
-        """Verify that running codex.sh returns exit code 0 and syncs successfully."""
-        # Run without installation flag to perform a sync check
+        """Verify codex.sh creates a one-way Codex-to-Claude skills symlink."""
         res = subprocess.run([str(CODEX_SH)], capture_output=True, text=True, cwd=str(PROJECT_ROOT))
         assert res.returncode == 0, f"codex.sh execution failed:\nSTDOUT: {res.stdout}\nSTDERR: {res.stderr}"
-        
-        # Verify sync was successful by checking that files in the source skills are copied to Codex skills
-        source_skills = list((PLUGIN_ROOT / "skills").rglob("SKILL.md"))
-        assert len(source_skills) > 0, "No skills found in Claude plugin"
-        
-        for source_skill in source_skills:
-            rel_path = source_skill.relative_to(PLUGIN_ROOT)
-            target_skill = CODEX_PLUGIN_DIR / rel_path
-            
-            assert target_skill.exists(), f"Synced skill file missing: {target_skill}"
-            assert target_skill.read_text() == source_skill.read_text(), f"Content mismatch for {rel_path}"
+
+        claude_skills = PLUGIN_ROOT / "skills"
+        codex_skills = CODEX_PLUGIN_DIR / "skills"
+
+        assert claude_skills.is_dir()
+        assert not claude_skills.is_symlink(), "Claude skills must remain the canonical directory"
+        assert codex_skills.is_symlink(), "Codex skills must link to the Claude skills directory"
+        assert codex_skills.resolve() == claude_skills.resolve()
