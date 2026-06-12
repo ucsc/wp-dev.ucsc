@@ -100,6 +100,8 @@ The canonical Marp source is maintainer-owned:
 
 `skills/maintainer/assets/ucsc_wp_block_dev_presentation.md`
 
+**Fast path:** `bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/refresh_and_publish_slides.sh` bumps the `Generated:` date to today, runs the deck-contract tests, then publishes — in one token-frugal call. Pass `--no-publish` to refresh and test without uploading. The numbered steps below are what it automates and what to reconcile when deck content has drifted.
+
 Before publishing:
 
 1. Compare the deck's skill inventory with every top-level directory under `skills/`.

@@ -36,7 +36,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
-**Generated:** 2026-06-10<br />
+**Generated:** 2026-06-11<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -209,12 +209,15 @@ Systematic flowchart for diagnosing and resolving faults in the block codebase:
 
 Recorded commands driving clean setup, block compilation, container health, and the live app:
 
+* **Fast path (`driver.sh`):** `skills/run/driver.sh all` runs inspect → build → launch → smoke in one token-frugal call with a compact PASS/FAIL summary; verbose output goes to a logfile (ADR-003). Subcommands: `inspect | build | launch | smoke | all | down`.
 * **Build Lifecycle:**
   * Build for production: `npm run build` (creates `build/index.js` + `build/index.asset.php`).
   * Rebuild continuously during development: `npm start` (watch mode).
 * **Docker Operations:**
   * Start development stack: `docker compose up -d`.
   * Activate plugin: `docker compose exec wpcli wp plugin activate ucsc-gutenberg-blocks`.
+* **Testing Execution:**
+  * Execute Jest testing harness inside container: `docker compose run --rm -w /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks plugin_npm_start npm test`
 * **Live App:** Open `https://wp-dev.ucsc/wp-admin/`, log in, and drive the requested editor or frontend interaction.
 
 ---
@@ -223,6 +226,7 @@ Recorded commands driving clean setup, block compilation, container health, and 
 
 Builds and launches from the recorded `run` recipe, then verifies acceptance criteria against the live WordPress application:
 
+* **Deterministic gate (`driver.sh`):** `skills/verify/driver.sh <block-slug>` confirms the change is built, active, and server-side registered (optional `--url` / `--needle` render check) — a gate, not proof.
 * Uses the editor or frontend rather than substituting Jest, PHP tests, lint, or type checks.
 * Exercises the requested block interaction and inspects runtime console or network behavior when relevant.
 * Reports each criterion as pass or fail, including the route used and any environmental limitation.
@@ -260,6 +264,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
 * **`maintainer` (Plugin Self-Upkeep):**
   * Launches Anthropic’s `plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer` agents.
   * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
+  * Runs `check-references` to enforce that every skill support file is linked from its `SKILL.md` (ADR-032).
   * Triggers pytest suite (verifying manifest, frontmatter constraints, and index consistency).
   * See the plugin [README](../../../README.md) for plugin-dev tool install and usage (ADR-013).
 * **Architecture Decision Records (ADRs):**
@@ -274,6 +279,8 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * **ADR-016:** Do not bundle Python environments or dependencies in the plugin.
   * **ADR-017:** `.agents` links to `.claude` skill source instead of maintaining copies.
   * **ADR-018:** The deck is a maintainer-owned asset with one canonical source path.
+  * **ADR-032:** Every skill support file must be referenced from its `SKILL.md`.
+  * **ADR-033:** Work-list state is stored under `CLAUDE_CONFIG_DIR`, not in the repo.
 
 ---
 
@@ -324,6 +331,7 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
   python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
   ```
   This is also the implementation behind `/ucsc-wp-block-dev:maintainer publish-slides`.
+* **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` bumps the `Generated:` date to today, runs the deck-contract tests, then publishes — automating the manual steps below (ADR-003/014/015).
 * **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
 
 ---

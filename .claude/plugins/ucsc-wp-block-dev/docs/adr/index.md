@@ -34,8 +34,12 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-026](ADR-026-study-multi-pronged-fix-token-reduction.md) | Study multi-pronged token reduction for fix mode | Accepted | 2026-06-10 |
 | [ADR-027](ADR-027-study-github-atlassian-mcp-token-cost.md) | Study GitHub and Atlassian MCP token cost | Accepted | 2026-06-10 |
 | [ADR-028](ADR-028-start-mcp-just-in-time-when-token-efficient.md) | Start MCP just in time when token-efficient | Accepted | 2026-06-10 |
-| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Fix and develop offer a Conventional Commit message without Git operations | Accepted | 2026-06-10 |
+| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Offer a Conventional Commit message after every fix or feature | Accepted | 2026-06-10 |
 | [ADR-030](ADR-030-separate-run-verify-test-and-plugin-validation.md) | Separate run, verify, test, and plugin validation | Accepted | 2026-06-11 |
 | [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Accepted | 2026-06-11 |
 | [ADR-032](ADR-032-skill-support-files-referenced-from-skill-md.md) | Skill support files must be referenced from SKILL.md | Accepted | 2026-06-10 |
 | [ADR-033](ADR-033-work-list-state-in-claude-config-dir.md) | Store work-list state under CLAUDE_CONFIG_DIR | Accepted | 2026-06-10 |
+| [ADR-034](ADR-034-defer-github-atlassian-mcp-login-until-needed.md) | Defer GitHub and Atlassian MCP login until needed | Accepted | 2026-06-12 |
+| [ADR-035](ADR-035-warn-on-preexisting-uncommitted-code-once.md) | Warn once about pre-existing uncommitted code | Accepted | 2026-06-12 |
+| [ADR-036](ADR-036-separate-fix-and-feature-workflows.md) | Separate fix and feature workflows | Accepted | 2026-06-12 |
+| [ADR-037](ADR-037-wrap-anthropic-skills-with-context-and-guardrails.md) | Wrap Anthropic skills with UCSC context and guardrails | Accepted | 2026-06-12 |
