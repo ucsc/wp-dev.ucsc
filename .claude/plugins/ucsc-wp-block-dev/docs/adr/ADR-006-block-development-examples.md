@@ -19,11 +19,11 @@ When developing and maintaining custom Gutenberg blocks in the `ucsc-gutenberg-b
 We will officially adopt and reference the WordPress Block Development Examples repository (`https://github.com/WordPress/block-development-examples`) as our primary source of reference patterns for block authoring. 
 
 Additionally, we will:
-1. Add this repository link to the general `blocks` skill reference documentation.
+1. Add this repository link to the general domain reference documentation at `develop/references/domain/blocks.md`.
 2. Instruct developers and the agent to search or consult these examples first before implementing custom React or JS abstractions in our editor controls.
 
 ## Consequences
 
 - Block editor implementations will remain aligned with WordPress core best practices.
 - Time spent debugging custom panel settings or data binding in JS is reduced by matching official recipes.
-- The repository link is easily discoverable within the `blocks` skill for onboarded developers.
+- The repository link is easily discoverable within the domain reference for onboarded developers.

@@ -1,9 +1,6 @@
 ---
 name: review
 description: Review a WordPress block diff, branch, file, pull request, or Jira-scoped change for bugs, regressions, security, accessibility, and missing tests.
-disable-model-invocation: false
-argument-hint: "[target | review focus | Jira key/URL]"
-arguments: [target, input]
 ---
 
 # Review Mode

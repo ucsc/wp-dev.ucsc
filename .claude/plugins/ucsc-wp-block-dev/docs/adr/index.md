@@ -16,10 +16,10 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-008](ADR-008-prefer-jira-id-for-fix-and-develop.md) | Prefer a Jira ID for fix and develop work | Accepted | 2026-06-09 |
 | [ADR-009](ADR-009-fix-and-develop-require-target-and-description.md) | Fix and develop require a target and work description | Accepted | 2026-06-09 |
 | [ADR-010](ADR-010-jira-prompt-may-repeat-at-phase-completion.md) | Jira prompt may repeat at phase completion | Accepted | 2026-06-09 |
-| [ADR-011](ADR-011-universal-command-intake.md) | Every command resolves target, natural-language request, and optional Jira context | Accepted | 2026-06-09 |
-| [ADR-012](ADR-012-setup-capability-summary.md) | Setup provides a simple capability summary | Accepted | 2026-06-09 |
+| [ADR-011](ADR-011-universal-command-intake.md) | Every workflow resolves target, natural-language request, and optional Jira context | Superseded | 2026-06-09 |
+| [ADR-012](ADR-012-setup-capability-summary.md) | Setup provides a simple capability summary | Superseded | 2026-06-09 |
 | [ADR-013](ADR-013-readme-is-first-time-user-reference.md) | README is the canonical first-time user reference | Accepted | 2026-06-10 |
-| [ADR-014](ADR-014-slide-deck-documents-all-skills.md) | Slide deck documents all top-level skills and commands | Accepted | 2026-06-10 |
+| [ADR-014](ADR-014-slide-deck-documents-all-skills.md) | Slide deck documents all top-level skills | Superseded | 2026-06-10 |
 | [ADR-015](ADR-015-slide-deck-generated-date.md) | Slide deck always includes a generated date | Accepted | 2026-06-10 |
 | [ADR-016](ADR-016-avoid-bundling-python-in-plugin.md) | Avoid bundling Python dependencies in the plugin | Accepted | 2026-06-10 |
 | [ADR-017](ADR-017-agents-uses-symlinks-not-copies.md) | .agents uses symlinks to .claude, not file copies | Accepted | 2026-06-10 |
@@ -29,17 +29,25 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-021](ADR-021-accept-jira-id-or-url-in-arguments.md) | Command handlers accept a Jira ID or a full Jira URL in arguments | Accepted | 2026-06-10 |
 | [ADR-022](ADR-022-accept-github-and-bitbucket-pr-references.md) | Command handlers accept a GitHub or Bitbucket pull-request reference | Accepted | 2026-06-10 |
 | [ADR-023](ADR-023-always-favor-conventional-commits.md) | Always favor Conventional Commits for commit messages | Accepted | 2026-06-10 |
-| [ADR-024](ADR-024-block-target-registry.md) | Command arguments may name a block target, resolved against a block registry | Accepted | 2026-06-10 |
+| [ADR-024](ADR-024-block-target-registry.md) | Command arguments may name a block target, resolved against a block registry | Superseded | 2026-06-10 |
 | [ADR-025](ADR-025-suggest-atlassian-mcp-for-atlassian-references.md) | Suggest Atlassian MCP when Atlassian references are in use | Accepted | 2026-06-10 |
 | [ADR-026](ADR-026-study-multi-pronged-fix-token-reduction.md) | Study multi-pronged token reduction for fix mode | Accepted | 2026-06-10 |
 | [ADR-027](ADR-027-study-github-atlassian-mcp-token-cost.md) | Study GitHub and Atlassian MCP token cost | Accepted | 2026-06-10 |
 | [ADR-028](ADR-028-start-mcp-just-in-time-when-token-efficient.md) | Start MCP just in time when token-efficient | Accepted | 2026-06-10 |
 | [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Offer a Conventional Commit message after every fix or feature | Accepted | 2026-06-10 |
 | [ADR-030](ADR-030-separate-run-verify-test-and-plugin-validation.md) | Separate run, verify, test, and plugin validation | Accepted | 2026-06-11 |
-| [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Accepted | 2026-06-11 |
+| [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Superseded | 2026-06-11 |
 | [ADR-032](ADR-032-skill-support-files-referenced-from-skill-md.md) | Skill support files must be referenced from SKILL.md | Accepted | 2026-06-10 |
 | [ADR-033](ADR-033-work-list-state-in-claude-config-dir.md) | Store work-list state under CLAUDE_CONFIG_DIR | Accepted | 2026-06-10 |
 | [ADR-034](ADR-034-defer-github-atlassian-mcp-login-until-needed.md) | Defer GitHub and Atlassian MCP login until needed | Accepted | 2026-06-12 |
 | [ADR-035](ADR-035-warn-on-preexisting-uncommitted-code-once.md) | Warn once about pre-existing uncommitted code | Accepted | 2026-06-12 |
 | [ADR-036](ADR-036-separate-fix-and-feature-workflows.md) | Separate fix and feature workflows | Accepted | 2026-06-12 |
 | [ADR-037](ADR-037-wrap-anthropic-skills-with-context-and-guardrails.md) | Wrap Anthropic skills with UCSC context and guardrails | Accepted | 2026-06-12 |
+| [ADR-038](ADR-038-contributed-skill-incubation.md) | Contributed skills use proposal and incubator tiers | Accepted | 2026-06-15 |
+| [ADR-039](ADR-039-skills-first-map-entry-point.md) | Use a skills-first surface with map as the entry point | Accepted | 2026-06-15 |
+| [ADR-040](ADR-040-shared-issue-context-reference.md) | Issue context is a shared develop reference | Accepted | 2026-06-15 |
+| [ADR-041](ADR-041-block-targets-are-develop-references.md) | Block targets are develop references | Accepted | 2026-06-15 |
+| [ADR-042](ADR-042-test-operations-are-references.md) | Test operations are references under test | Accepted | 2026-06-15 |
+| [ADR-043](ADR-043-documentation-skill-generates-markdown-artifacts.md) | Documentation skill generates portable Markdown artifacts | Superseded | 2026-06-15 |
+| [ADR-044](ADR-044-domain-guidance-is-a-develop-reference.md) | Domain guidance is a develop reference | Accepted | 2026-06-15 |
+| [ADR-045](ADR-045-documentation-is-a-maintainer-reference.md) | Documentation is a maintainer reference | Accepted | 2026-06-15 |

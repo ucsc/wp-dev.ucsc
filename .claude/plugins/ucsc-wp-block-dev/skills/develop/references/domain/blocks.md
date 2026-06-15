@@ -1,13 +1,10 @@
----
-name: blocks
-description: Domain reference for the ucsc-gutenberg-blocks WordPress plugin — custom Gutenberg blocks, PHP render callbacks, templates, PeopleSoft and Campus Directory (LDAP) data, rewrite-rule detail pages, and the @wordpress/scripts build/test workflow. Use when building, fixing, or explaining this plugin's code.
----
-
 # UCSC Gutenberg Blocks
 
 Reference for the `ucsc-gutenberg-blocks` WordPress plugin at `public/wp-content/plugins/ucsc-gutenberg-blocks/`.
 
-**Scope.** Auto-loaded domain reference, not a slash command — Claude pulls it in when working on files under `public/wp-content/plugins/ucsc-gutenberg-blocks/`. Not meant to be invoked directly as `/ucsc-wp-block-dev:blocks`.
+**Scope.** Domain reference for work under
+`public/wp-content/plugins/ucsc-gutenberg-blocks/`. Hosts may load it
+automatically or pair it with a workflow skill.
 
 This is a WordPress plugin, not a Laravel app. Use WordPress plugin patterns, Gutenberg block APIs, PHP render callbacks, and `@wordpress/scripts` conventions throughout.
 
@@ -76,4 +73,3 @@ docker compose -f docker-compose.yml -f docker-compose-start.yml run --rm \
 - **WordPress Create Block Tool Guide**: [`https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/) — Quick-start guide using `@wordpress/create-block`.
 - **WordPress Block Editor Package Reference**: [`https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/) — API reference for `@wordpress/block-editor` components and functions.
 - **WordPress Block Development Examples**: [`https://github.com/WordPress/block-development-examples`](https://github.com/WordPress/block-development-examples) — Official repository containing clean patterns, components, and recipes for custom Gutenberg blocks.
-

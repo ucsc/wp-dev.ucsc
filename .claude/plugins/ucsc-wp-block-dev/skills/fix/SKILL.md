@@ -1,22 +1,31 @@
 ---
 name: fix
 description: Debug and fix a user-identified problem in the ucsc-gutenberg-blocks WordPress plugin. Before investigating, require the target block, GUI, or app and a plain-language description of what needs fixing; prefer but do not require a Jira ID.
-disable-model-invocation: false
-argument-hint: "[target | problem description | Jira key/URL]"
-arguments: [target, input]
 ---
 
 # Fix — Debug a Block Issue
 
 Systematic flow for diagnosing and fixing failures in `ucsc-gutenberg-blocks`.
 
-**Usage:** `/ucsc-wp-block-dev:fix [block name, error message, or symptom]`. Primarily touches `classes/` and `src/`.
+Primarily touches `classes/` and `src/`.
 
 All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/` unless noted.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target, natural-language problem description, and optional Jira key/URL from the full input and session context, regardless of order. Preserve explicit user instructions, merge Jira details through `issue-context`, and ask one concise question only when missing or conflicting information blocks the fix workflow.
+Apply ADR-011: resolve the target, natural-language problem description, and
+optional Jira key/URL from the full input and session context, regardless of
+order. Preserve explicit user instructions and ask one concise question only
+when missing or conflicting information blocks the fix workflow.
+
+When Jira, Confluence, pasted ticket details, or issue normalization applies,
+read
+[`../develop/references/issue-context.md`](../develop/references/issue-context.md)
+before investigating.
+
+Resolve known block targets through
+[`../develop/references/targets/index.md`](../develop/references/targets/index.md)
+and read only the selected target reference.
 
 ## 1. Secure the Target and Fix Description
 
@@ -107,7 +116,8 @@ If missing, add it to the service env in `docker-compose.yml`.
 
 ## 9. Verify in Docker
 
-After fixing, verify the change in the running environment with `/ucsc-wp-block-dev:run`.
+After fixing, verify the change in the running environment with the `run`
+skill.
 
 ## 10. Complete the Fix Phase
 

@@ -29,10 +29,13 @@ The `ucsc-wp-block-dev` Claude Code plugin owns all guidance, skills, and ADRs f
 
 | Skill | Purpose |
 |---|---|
-| `blocks` | Domain reference — architecture, PHP classes, REST API, LDAP, transients |
 | `develop` | Guided flow for adding a new block |
 | `fix` | Debug and fix block issues |
 | `run` | Build, launch, and smoke-test via wp-dev.ucsc Docker |
+
+Domain reference material for architecture, PHP classes, REST API, LDAP, and
+transients lives under `develop/references/domain/` instead of as a top-level
+skill.
 
 The plugin must be loaded explicitly — `.claude/plugins/` is not an auto-discovery path. Load with `claude --plugin-dir .claude/plugins/ucsc-wp-block-dev` or install via `claude plugin install`. Project skills under `.claude/skills/` auto-discover, but plugins require explicit loading or installation.
 

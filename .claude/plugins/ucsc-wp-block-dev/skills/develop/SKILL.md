@@ -1,22 +1,43 @@
 ---
 name: develop
 description: Add a Gutenberg block or feature to the ucsc-gutenberg-blocks plugin. Before investigating or implementing, require the target block, GUI, or app and a plain-language feature description; prefer but do not require a Jira ID.
-disable-model-invocation: false
-argument-hint: "[target | feature request | Jira key/URL]"
-arguments: [target, input]
 ---
 
 # Develop — Add a Block or Feature
 
 Guided flow for adding a new Gutenberg block or extending an existing one in `ucsc-gutenberg-blocks`.
 
-**Usage:** `/ucsc-wp-block-dev:develop [block name or feature description]`. Primarily touches `classes/` and `src/blocks/`.
+Primarily touches `classes/` and `src/blocks/`.
 
 All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/`.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target, natural-language feature request, and optional Jira key/URL from the full input and session context, regardless of order. Preserve explicit user instructions, merge Jira details through `issue-context`, and ask one concise question only when missing or conflicting information blocks the workflow.
+Apply ADR-011: resolve the target, natural-language feature request, and
+optional Jira key/URL from the full input and session context, regardless of
+order. Preserve explicit user instructions and ask one concise question only
+when missing or conflicting information blocks the workflow.
+
+When Jira, Confluence, pasted ticket details, or issue normalization applies,
+read [`references/issue-context.md`](references/issue-context.md) and merge its
+compact implementation brief into this workflow.
+
+Before using tools, require the user to choose a target. Resolve known slugs and
+aliases through
+[`references/targets/index.md`](references/targets/index.md), then read only the
+selected target reference. Do not load all target references.
+
+Target references:
+
+- [`references/targets/campus-directory.md`](references/targets/campus-directory.md)
+- [`references/targets/class-schedule.md`](references/targets/class-schedule.md)
+- [`references/targets/course-catalog.md`](references/targets/course-catalog.md)
+
+Domain references:
+
+- [`references/domain/blocks.md`](references/domain/blocks.md)
+- [`references/domain/references/blocks-reference.md`](references/domain/references/blocks-reference.md)
+- [`references/domain/references/stack-profile.md`](references/domain/references/stack-profile.md)
 
 ## 1. Secure the Target and Feature Description
 
@@ -26,6 +47,9 @@ Before using tools, investigating, or writing code, obtain both required inputs 
 2. **Feature description** — what should be added or changed. A plain-language description is sufficient.
 
 If either input is missing, ask one concise question for all missing inputs and wait for the answer. Request a Jira ID in the same clarification when none was supplied, but Jira is preferred, not required. See ADR-008 and ADR-009.
+
+For an unlisted target, confirm its canonical slug and scope before proceeding.
+Add a target reference only when the resulting domain guidance will be reused.
 
 After the required intake is complete, clarify implementation details as needed:
 
@@ -203,7 +227,8 @@ Note: the plugin does not currently have a `test` script in `package.json`. If J
 
 ## 10. Complete the Feature Phase
 
-After implementing, remind the user: this change needs a build verification in the Docker environment before it is treated as ready (`/ucsc-wp-block-dev:run`).
+After implementing, remind the user that this change needs build verification
+in the Docker environment with the `run` skill before it is treated as ready.
 
 If applicable validation is complete and no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 

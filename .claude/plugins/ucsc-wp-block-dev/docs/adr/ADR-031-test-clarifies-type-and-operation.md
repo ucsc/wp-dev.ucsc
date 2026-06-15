@@ -1,10 +1,14 @@
 ---
 title: "ADR-031: Test clarifies type and operation"
-status: Accepted
+status: Superseded
 date: 2026-06-11
 ---
 
 # ADR-031: Test clarifies type and operation
+
+Superseded by ADR-042. The type and operation clarification remains, but the
+operation-specific workflows now live in `test/references/create.md` and
+`test/references/run.md`.
 
 ## Context
 

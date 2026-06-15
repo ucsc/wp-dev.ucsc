@@ -1,3 +1,5 @@
+<!-- Generated: 2026-06-15 from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->
+
 ---
 marp: true
 theme: gaia
@@ -36,7 +38,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
-**Generated:** 2026-06-11<br />
+**Generated:** 2026-06-15<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -44,7 +46,7 @@ style: |
 
 ## **How to Get Started**
 
-> **Full reference:** See the plugin [README](../../../README.md) for complete install, uninstall, reload, and launch-from-source instructions (ADR-013).
+> **Full reference:** See the plugin [README](../../../../../README.md) for complete install, uninstall, reload, and launch-from-source instructions (ADR-013).
 
 * **Installation (Project Scope):**
   ```bash
@@ -263,7 +265,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
   * Runs `check-references` to enforce that every skill support file is linked from its `SKILL.md` (ADR-032).
   * Triggers pytest suite (verifying manifest, frontmatter constraints, and index consistency).
-  * See the plugin [README](../../../README.md) for plugin-dev tool install and usage (ADR-013).
+  * See the plugin [README](../../../../../README.md) for plugin-dev tool install and usage (ADR-013).
 * **`maintainer/references/documentation/documentation.md` (Portable Markdown Artifacts):**
   * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/documentation/assets/`.
   * Keeps publishing separate; use `maintainer publish-slides` only for Google Docs upload.

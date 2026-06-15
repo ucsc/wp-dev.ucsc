@@ -1,8 +1,6 @@
 ---
 name: run
 description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and test for automated tests.
-argument-hint: "[target | run request | Jira key/URL]"
-arguments: [input]
 ---
 
 # Run wp-dev.ucsc
@@ -104,7 +102,8 @@ Do not stop at container health when the user asks to see the application workin
 4. Exercise the requested block interaction.
 5. Report what was observed in the running app.
 
-Use `/ucsc-wp-block-dev:verify` when the goal is to prove a code change or acceptance criterion. Use `/ucsc-wp-block-dev:test` for Jest, PHP, or other automated tests.
+Use the `verify` skill when the goal is to prove a code change or acceptance
+criterion. Use the `test` skill for Jest, PHP, or other automated tests.
 
 ## Recovery
 

@@ -1,0 +1,53 @@
+---
+name: feature
+description: Define and implement new behavior for the ucsc-gutenberg-blocks WordPress plugin. Use for feature requests, new Gutenberg blocks, editor or frontend enhancements, and behavior changes that are not fixes for existing defects.
+---
+
+# Feature Workflow
+
+Use this as the preferred workflow for new behavior. Use `fix` when existing
+behavior is incorrect.
+
+## Universal Command Intake
+
+Apply ADR-011: resolve the target block, GUI, or app; the natural-language
+feature request; and optional Jira key/URL from the full input. Ask one concise question only when missing or conflicting information prevents useful work.
+
+When Jira, Confluence, pasted ticket details, or issue normalization applies,
+read
+[`../develop/references/issue-context.md`](../develop/references/issue-context.md)
+before defining the feature.
+
+Before using tools, require:
+
+- **Target:** the block, GUI, or app that will change.
+- **Desired outcome:** a plain-language description of the new behavior.
+
+A Jira ID is preferred, not required.
+
+## Define The Feature
+
+1. Restate the desired user-visible outcome.
+2. Identify acceptance criteria, affected users, and important edge cases.
+3. Distinguish requirements from implementation suggestions.
+4. Inspect the nearest existing block or workflow pattern.
+5. Propose the smallest vertical slice and obtain confirmation when the request
+   leaves a meaningful product decision unresolved.
+
+## Implement
+
+Use the `develop` skill as the shared implementation core after the feature is
+defined. Preserve the target, requirements, acceptance criteria, and Jira
+context during that handoff.
+
+For `ucsc-gutenberg-blocks` domain guidance, read
+[`../develop/references/domain/blocks.md`](../develop/references/domain/blocks.md)
+inside the selected workflow. Resolve block-specific context through
+[`../develop/references/targets/index.md`](../develop/references/targets/index.md)
+rather than a top-level target skill.
+
+## Complete
+
+Run focused tests, use `run` for the Docker build and launch workflow, and use
+`verify` for user-facing acceptance evidence. Summarize changed behavior and
+offer a Conventional Commit message.

@@ -1,12 +1,9 @@
 ---
 name: test
-description: Create or run focused PHP, Jest, or end-to-end tests for a target Gutenberg block, feature, fix, or Jira acceptance criterion. Always clarify the test type and whether the user wants test creation or test execution before acting.
-disable-model-invocation: false
-argument-hint: "[php|jest|e2e] [target | test request | Jira key/URL]"
-arguments: [type, input]
+description: Route WordPress block test work to either test creation or existing test execution. Use when asked to create tests, add coverage, run PHP/Jest/e2e tests, or validate a target Gutenberg block, feature, fix, or Jira acceptance criterion with automated tests.
 ---
 
-# Test Mode
+# Test
 
 ## Universal Command Intake
 
@@ -29,13 +26,9 @@ Use these test types:
 | `jest` | Block registration, attributes, editor controls, client behavior |
 | `e2e` | WordPress editor insertion, frontend rendering, Docker/browser integration |
 
-For `create`, read the nearest existing test pattern before adding focused coverage, then run the created test. For `run`, execute the narrowest existing test first and broaden only when requested or risk requires it. Build checks may support any type but are not a fourth test type. Jira acceptance criteria may define assertions but Jira is optional.
+After confirmation, read exactly one operation reference:
 
-## Check-in text (ADR-019)
+- For `create`, read [`references/create.md`](references/create.md).
+- For `run`, read [`references/run.md`](references/run.md).
 
-When `create` adds or meaningfully changes coverage, finish by emitting ready-to-paste check-in text:
-
-1. A **Jira title** — short imperative summary of the test work.
-2. A **description** as a [Conventional Commit](https://www.conventionalcommits.org/): a `type(scope): subject` header plus a body.
-
-The commit `type` is normally `test` (use `fix`/`feat` only if block behavior also changed); `scope` is the kebab-case target block. The body names the test type, behaviors covered, and runtime caveats. Reference a Jira key in the footer when known. Skip this step for `run` when no coverage changed.
+Jira acceptance criteria may define assertions, but Jira is optional.

@@ -1,10 +1,13 @@
 ---
 title: "ADR-014: Slide deck documents all top-level skills and commands"
-status: Accepted
+status: Superseded
 date: 2026-06-10
 ---
 
-# ADR-014: Slide deck documents all top-level skills and commands
+# ADR-014: Slide deck documents all top-level skills
+
+Superseded by ADR-039. The inventory requirement remains, but the deck now
+describes portable skills rather than a command surface.
 
 **Status:** Accepted
 **Date:** 2026-06-10

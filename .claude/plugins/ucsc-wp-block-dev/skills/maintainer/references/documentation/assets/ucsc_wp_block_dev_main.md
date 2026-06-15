@@ -1,3 +1,9 @@
+---
+title: UCSC WordPress Block Development Plugin Guide
+generated: 2026-06-15
+source: README.md
+---
+
 # ucsc-wp-block-dev
 
 Claude Code plugin for developing the `ucsc-gutenberg-blocks` WordPress plugin at UCSC ITS.

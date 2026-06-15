@@ -1,15 +1,17 @@
 ---
 name: maintainer
-description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, slide publishing, or release readiness.
-argument-hint: "[target | maintenance request | Jira key/URL]"
-arguments: [input]
+description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, review or promote contributed skills, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, contribution review, slide publishing, or release readiness.
 ---
 
 # Maintainer — ucsc-wp-block-dev
 
-Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code — use `develop`/`fix`/`run` for that).
+Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code —
+use `develop`/`fix`/`run` for that). For Markdown artifact regeneration, read
+[`references/documentation/documentation.md`](references/documentation/documentation.md).
 
-**Usage:** `/ucsc-wp-block-dev:maintainer [validate | test | review-skills | check-references | publish-slides | all]`. Run all commands below from the repo root.
+Use this skill with one operation: `validate`, `test`, `review-skills`,
+`review-contrib`, `promote-contrib`, `check-references`, `documentation`,
+`publish-slides`, or `all`. Run all commands below from the repo root.
 
 Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003.
 
@@ -17,7 +19,7 @@ Keep token use low: run the validator and tests rather than reading every file b
 
 Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `publish-slides`, and `all`. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `documentation`, `publish-slides`, and `all`. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 ## Anthropic plugin-dev tools
 
@@ -84,6 +86,57 @@ Use the Skill tool:
 
 Consult this before writing a new `SKILL.md` or refactoring an existing one to ensure correct frontmatter fields, argument patterns, and triggering descriptions.
 
+## review-contrib
+
+Review a proposal under `contrib/proposals/` or a candidate under
+`contrib/incubator/`. Require the candidate name when it is not clear from the
+request. Read `contrib/README.md` before reviewing.
+
+For a proposal:
+
+1. Check that it follows `contrib/proposals/TEMPLATE.md`.
+2. Compare its triggers and workflow with existing production skills.
+3. Check that the scope is specific to UCSC WordPress block development.
+4. Return one decision: `reject`, `revise`, or `incubate`, with concise reasons.
+5. For `incubate`, create `contrib/incubator/<skill-name>/SKILL.md` from
+   `contrib/incubator/TEMPLATE.md`, carrying forward the accepted proposal
+   details. Keep the original proposal until promotion for review history.
+
+For an incubator candidate:
+
+1. Apply the `skill-development` guidance.
+2. Check trigger clarity, workflow completeness, overlap, security, support-file
+   references, tests, and realistic examples.
+3. Return one decision: `revise` or `promote`, with remaining work listed.
+
+Do not place a candidate under `skills/` during review.
+
+## promote-contrib
+
+Promote a named directory from `contrib/incubator/<skill-name>/` into
+`skills/<skill-name>/`. Read `contrib/README.md` and apply the
+`skill-development` guidance first.
+
+Before moving files:
+
+1. Confirm no production skill has the same name or substantially overlapping
+   triggers.
+2. Confirm the directory name matches the frontmatter `name`.
+3. Confirm the description clearly states behavior and trigger context.
+4. Confirm every support file is linked from `SKILL.md`.
+5. Run focused candidate tests or examples.
+
+After moving files:
+
+1. Update `README.md`, `AGENTS.md`, `map/SKILL.md`, and the maintainer slide
+   deck when the new skill changes those inventories.
+2. Add or update structural tests for the supported skill surface.
+3. Run `test`, `validate`, `check-references`, and `review-skills`.
+4. Remove the corresponding proposal only after the promotion checks pass.
+
+If any check fails, leave the candidate in `contrib/incubator/` and report the
+required revisions.
+
 ## check-references
 
 Enforce ADR-032: every supporting file under a skill directory must be referenced from that skill's `SKILL.md`, so nested `references/`, `assets/`, and `scripts/` files stay discoverable (progressive disclosure). Run the bundled scanner:
@@ -93,6 +146,24 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_ref
 ```
 
 It prints one line per skill and a PASS/FAIL summary, exiting non-zero when any nested file is not linked from its `SKILL.md`. Fix a FAIL by adding a skill-relative reference (e.g. `references/foo.md`) to the skill — under a "Reference files" heading when one is warranted — or by removing the obsolete file. The pytest suite runs this same check, so a gap fails `test` too.
+
+## documentation
+
+Regenerate portable Markdown documentation artifacts for Google Docs or
+Confluence. Read
+[`references/documentation/documentation.md`](references/documentation/documentation.md),
+then run:
+
+```bash
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/documentation/scripts/regenerate.sh
+```
+
+This writes generated artifacts under
+`skills/maintainer/references/documentation/assets/`, including
+[`references/documentation/assets/ucsc_wp_block_dev_main.md`](references/documentation/assets/ucsc_wp_block_dev_main.md)
+and
+[`references/documentation/assets/ucsc_wp_block_dev_presentation.md`](references/documentation/assets/ucsc_wp_block_dev_presentation.md).
+It does not publish or upload anything.
 
 ## publish-slides
 
@@ -105,7 +176,7 @@ The canonical Marp source is maintainer-owned:
 Before publishing:
 
 1. Compare the deck's skill inventory with every top-level directory under `skills/`.
-2. Compare its command table with the modes in `start/SKILL.md` and `menu/SKILL.md`.
+2. Compare its skill map with `map/SKILL.md`.
 3. Compare its ADR summary with `docs/adr/index.md`.
 4. Refresh the title slide's `Generated:` value to the current date.
 5. Run the plugin tests, which enforce the deck path and inventory contract.
@@ -122,6 +193,10 @@ The publisher reads only the maintainer asset path. Do not restore a second deck
 
 Run `test` first (fast, deterministic), then `validate`, then `check-references`, then `review-skills`. Publishing remains explicit through `publish-slides`. Report a single combined summary.
 
+Contribution candidates are intentionally excluded from `all`; run
+`review-contrib <candidate>` explicitly because proposals and incubator skills
+may be incomplete.
+
 ## When the manifest or skills change
 
-After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills.
+After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills. When the main guide or deck should be prepared for Google Docs or Confluence without publishing, use the `documentation` operation in this skill.

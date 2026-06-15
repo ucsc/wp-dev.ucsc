@@ -12,11 +12,23 @@ import pytest
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = PLUGIN_ROOT.parents[2]
 SKILLS_DIR = PLUGIN_ROOT / "skills"
+CONTRIB_DIR = PLUGIN_ROOT / "contrib"
 ADR_DIR = PLUGIN_ROOT / "docs" / "adr"
 SLIDE_DECK = SKILLS_DIR / "maintainer" / "assets" / "ucsc_wp_block_dev_presentation.md"
 PUBLISHER = PROJECT_ROOT / ".claude" / "scripts" / "publish_to_gdoc.py"
 PLUGIN_NAME = "ucsc-wp-block-dev"
 FORBIDDEN_PLUGIN_NAME = "ucsc-" + "wordpress-block-dev"
+EXPECTED_LIVE_SKILLS = {
+    "develop",
+    "feature",
+    "fix",
+    "maintainer",
+    "map",
+    "review",
+    "run",
+    "test",
+    "verify",
+}
 
 
 class TestPluginJson:
@@ -98,23 +110,68 @@ class TestSkillFrontmatter:
                 )
 
     def test_core_skills_present(self):
-        """The common workflow surface and WordPress reference must exist."""
-        for skill_name in [
-            "blocks",
-            "setup",
-            "start",
-            "menu",
-            "develop",
-            "fix",
-            "issue-context",
-            "test",
-            "review",
-            "run",
-            "verify",
-            "maintainer",
-        ]:
+        """The common workflow surface must exist."""
+        for skill_name in sorted(EXPECTED_LIVE_SKILLS):
             skill_path = SKILLS_DIR / skill_name / "SKILL.md"
             assert skill_path.exists(), f"Core skill '{skill_name}' missing"
+
+    def test_live_skill_inventory_is_exact(self):
+        """Reference-only workflows must not drift back into exported skills."""
+        actual = {
+            path.name
+            for path in SKILLS_DIR.iterdir()
+            if path.is_dir() and (path / "SKILL.md").exists()
+        }
+        assert actual == EXPECTED_LIVE_SKILLS
+
+    def test_blocks_guidance_is_hidden_reference(self):
+        """Domain guidance should stay available without becoming a top-level skill."""
+        assert not (SKILLS_DIR / "blocks" / "SKILL.md").exists()
+        reference = SKILLS_DIR / "develop" / "references" / "domain" / "blocks.md"
+        assert reference.exists()
+        assert not reference.read_text().startswith("---"), (
+            "blocks reference should not expose skill frontmatter"
+        )
+
+    def test_documentation_guidance_is_maintainer_reference(self):
+        """Documentation generation stays available without becoming a top-level skill."""
+        reference = SKILLS_DIR / "maintainer" / "references" / "documentation"
+        assert not (SKILLS_DIR / "documentation" / "SKILL.md").exists()
+        assert (reference / "documentation.md").exists()
+        assert (reference / "scripts" / "regenerate.sh").exists()
+        assert (reference / "assets" / "ucsc_wp_block_dev_main.md").exists()
+        assert (reference / "assets" / "ucsc_wp_block_dev_presentation.md").exists()
+        assert not (reference / "documentation.md").read_text().startswith("---"), (
+            "documentation reference should not expose skill frontmatter"
+        )
+
+    def test_reference_directories_do_not_define_nested_skills(self):
+        """Progressive references are markdown files, not nested plugin skills."""
+        nested_skill_files = [
+            path
+            for skill_dir in SKILLS_DIR.iterdir()
+            if skill_dir.is_dir()
+            for path in (skill_dir / "references").rglob("SKILL.md")
+            if (skill_dir / "references").exists()
+        ]
+        assert nested_skill_files == []
+
+    def test_contrib_candidates_are_outside_live_skills(self):
+        assert (CONTRIB_DIR / "README.md").exists()
+        assert (CONTRIB_DIR / "proposals" / "TEMPLATE.md").exists()
+        assert (CONTRIB_DIR / "incubator" / "TEMPLATE.md").exists()
+        assert not (SKILLS_DIR / "contrib").exists()
+
+    def test_maintainer_routes_contributed_skills(self):
+        text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text().lower()
+        for requirement in [
+            "review-contrib",
+            "promote-contrib",
+            "contrib/proposals/",
+            "contrib/incubator/",
+            "do not place a candidate under `skills/` during review",
+        ]:
+            assert requirement in text
 
     def test_description_under_truncation_cap(self, skill_files):
         """description + when_to_use must fit within the 1,536-char listing cap."""
@@ -134,15 +191,9 @@ class TestSkillFrontmatter:
                 "exceeds 1,536-char truncation cap"
             )
 
-    def test_frontmatter_keys_are_supported(self, skill_files):
-        """Skill frontmatter uses the supported command-routing fields."""
-        allowed = {
-            "name",
-            "description",
-            "disable-model-invocation",
-            "argument-hint",
-            "arguments",
-        }
+    def test_frontmatter_uses_portable_agent_skills_fields(self, skill_files):
+        """Canonical skills use only the portable Agent Skills core fields."""
+        allowed = {"name", "description"}
         for path in skill_files:
             text = path.read_text()
             fm_match = re.match(r"^---\n(.+?)\n---", text, re.DOTALL)
@@ -157,15 +208,12 @@ class TestSkillFrontmatter:
                     f"{path.relative_to(PLUGIN_ROOT)} has unsupported frontmatter keys: {extra_keys}."
                 )
 
-    def test_command_handlers_support_universal_input_resolution(self):
-        routers = ["start", "menu"]
+    def test_workflow_skills_support_universal_input_resolution(self):
+        routers = ["map"]
         handlers = [
-            "campus-directory",
-            "class-schedule",
-            "course-catalog",
             "develop",
+            "feature",
             "fix",
-            "issue-context",
             "maintainer",
             "review",
             "run",
@@ -189,15 +237,80 @@ class TestSkillFrontmatter:
             assert "jira" in text
             assert "ask one concise question only" in text
 
-    def test_setup_offers_simple_capability_summary(self):
-        text = (SKILLS_DIR / "setup" / "SKILL.md").read_text().lower()
-        assert "disable-model-invocation: true" in text
-        for capability in ["build", "fix", "test", "review", "run", "verify", "understand", "maintain"]:
-            assert f"**{capability}**" in text
-        assert "natural-language request" in text
-        assert "optional jira key/url" in text
-        assert "do not run broad discovery" in text
-        assert "/ucsc-wp-block-dev:start" in text
+    def test_issue_context_is_a_shared_develop_reference(self):
+        reference = SKILLS_DIR / "develop" / "references" / "issue-context.md"
+        assert reference.exists()
+        assert not (SKILLS_DIR / "issue-context" / "SKILL.md").exists()
+
+        for skill_name in ["develop", "feature", "fix"]:
+            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text()
+            assert "issue-context.md" in text
+
+    def test_block_targets_are_develop_references(self):
+        targets = SKILLS_DIR / "develop" / "references" / "targets"
+        expected = {
+            "campus-directory.md",
+            "class-schedule.md",
+            "course-catalog.md",
+        }
+        assert expected <= {path.name for path in targets.glob("*.md")}
+
+        for target in ["campus-directory", "class-schedule", "course-catalog"]:
+            assert not (SKILLS_DIR / target / "SKILL.md").exists()
+
+        develop = (SKILLS_DIR / "develop" / "SKILL.md").read_text().lower()
+        assert "require the user to choose a target" in develop
+        assert "references/targets/index.md" in develop
+        assert "do not load all target references" in develop
+        assert "references/domain/blocks.md" in develop
+
+    def test_map_is_the_single_skill_entry_point(self):
+        text = (SKILLS_DIR / "map" / "SKILL.md").read_text().lower()
+        for skill_name in ["feature", "fix", "test", "review", "run", "verify", "maintainer"]:
+            assert f"`{skill_name}`" in text
+        assert "references/documentation/documentation.md" in text
+        assert "documentation` is intentionally a hidden reference" in text
+        assert "portable entry point" in text
+        assert "route by intent rather than command syntax" in text
+
+    def test_maintainer_reference_regenerates_markdown_artifacts(self):
+        """Maintainer owns Markdown outputs for Google Docs and Confluence."""
+        reference = SKILLS_DIR / "maintainer" / "references" / "documentation"
+        text = (reference / "documentation.md").read_text().lower()
+
+        for requirement in [
+            "assets/ucsc_wp_block_dev_main.md",
+            "assets/ucsc_wp_block_dev_presentation.md",
+            "scripts/regenerate.sh",
+            "does not publish",
+            "google docs",
+            "confluence",
+        ]:
+            assert requirement in text
+
+        assert (reference / "scripts" / "regenerate.sh").exists()
+
+    def test_maintainer_documents_documentation_operation(self):
+        """Documentation regeneration is an operation on maintainer, not its own skill."""
+        text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text().lower()
+        assert "## documentation" in text
+        assert "references/documentation/documentation.md" in text
+        assert "references/documentation/scripts/regenerate.sh" in text
+        assert "documentation` operation" in text
+
+    def test_documentation_generator_writes_to_maintainer_reference(self):
+        """The regenerate script must not recreate the removed documentation skill."""
+        script = (
+            SKILLS_DIR
+            / "maintainer"
+            / "references"
+            / "documentation"
+            / "scripts"
+            / "regenerate.sh"
+        ).read_text()
+        assert 'plugin_root="$(cd "$skill_dir/../../../.." && pwd)"' in script
+        assert 'out_dir="$skill_dir/assets"' in script
+        assert "skills/documentation" not in script
 
     def test_run_records_the_wp_dev_launch_recipe(self):
         """Run must capture nonstandard setup instead of rediscovering it."""
@@ -218,7 +331,8 @@ class TestSkillFrontmatter:
     def test_verify_requires_live_runtime_evidence(self):
         """Verify must prove behavior in the app rather than report test success."""
         text = (SKILLS_DIR / "verify" / "SKILL.md").read_text().lower()
-        assert "following the recorded launch recipe" in text
+        assert "recorded launch recipe" in text
+        assert "`run` skill" in text
         assert "https://wp-dev.ucsc/wp-admin/" in text
         assert "use the available browser tool" in text
         assert "do not use jest, php tests, lint, type checks" in text
@@ -228,13 +342,22 @@ class TestSkillFrontmatter:
     def test_test_skill_confirms_type_and_operation_before_tools(self):
         """ADR-031 requires explicit test layer and create/run intent."""
         text = (SKILLS_DIR / "test" / "SKILL.md").read_text().lower()
-        assert "[php|jest|e2e]" in text
         assert "**type**" in text
         assert "`php`, `jest`, or `e2e`" in text
         assert "**operation**" in text
         assert "`create` tests or `run` existing tests" in text
         assert "always ask one concise question only" in text
         assert "wait for the answer before using tools" in text
+        assert "references/create.md" in text
+        assert "references/run.md" in text
+
+    def test_test_operations_are_progressive_references(self):
+        create_ref = SKILLS_DIR / "test" / "references" / "create.md"
+        run_ref = SKILLS_DIR / "test" / "references" / "run.md"
+        assert create_ref.exists()
+        assert run_ref.exists()
+        assert "check-in text" in create_ref.read_text().lower()
+        assert "do not emit check-in text" in run_ref.read_text().lower()
 
     def test_fix_requires_user_provided_concrete_problem_before_investigation(self):
         """ADR-007's clarification gate must remain explicit in the fix skill."""
@@ -293,8 +416,16 @@ class TestSkillFrontmatter:
 
     def test_atlassian_mcp_reminder_is_optional_and_requires_approval(self):
         """ADR-025 must keep Atlassian setup reminders restrained and user-controlled."""
-        for skill_name in ["issue-context", "review"]:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        texts = [
+            (
+                SKILLS_DIR
+                / "develop"
+                / "references"
+                / "issue-context.md"
+            ).read_text().lower(),
+            (SKILLS_DIR / "review" / "SKILL.md").read_text().lower(),
+        ]
+        for text in texts:
             assert "atlassian mcp tools are unavailable" in text
             assert "mention once" in text
             assert "non-blocking" in text
@@ -553,7 +684,7 @@ class TestCrossPlatformNaming:
         launcher = (PROJECT_ROOT / ".agents" / "codex.sh").read_text()
         assert f'PLUGIN_NAME="{PLUGIN_NAME}"' in launcher
 
-    def test_slash_commands_use_canonical_name(self):
+    def test_canonical_skills_do_not_embed_plugin_slash_commands(self):
         command_pattern = re.compile(r"/(ucsc-(?:wp|wordpress)-block-dev):[a-z-]+")
         files = [PLUGIN_ROOT / "README.md", *SKILLS_DIR.rglob("SKILL.md")]
         commands = [
@@ -561,8 +692,10 @@ class TestCrossPlatformNaming:
             for path in files
             for match in command_pattern.finditer(path.read_text())
         ]
-        assert commands, "No plugin slash-command examples found"
-        assert set(commands) == {PLUGIN_NAME}
+        assert commands == [], (
+            "Canonical skills should be portable and must not embed "
+            f"host-specific plugin slash commands: {commands}"
+        )
 
     def test_forbidden_long_plugin_id_is_absent(self):
         roots = [PLUGIN_ROOT, PROJECT_ROOT / ".agents"]

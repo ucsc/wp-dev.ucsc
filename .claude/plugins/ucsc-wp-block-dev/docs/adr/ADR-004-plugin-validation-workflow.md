@@ -14,7 +14,7 @@ Accepted
 
 `ucsc-wp-block-dev` is itself a Claude Code plugin that needs upkeep — manifest correctness, skill frontmatter, naming conventions, structure, and security. Anthropic's `plugin-dev` plugin ships a `plugin-validator` agent that checks exactly these. Relying on it avoids hand-rolling validation logic and keeps maintenance low-token (see ADR-003).
 
-The block-dev skills (`develop`, `fix`, `run`, `blocks`) operate on `ucsc-gutenberg-blocks` code and should not be cluttered with plugin self-maintenance concerns.
+The block-dev skills (`develop`, `fix`, `run`) operate on `ucsc-gutenberg-blocks` code and should not be cluttered with plugin self-maintenance concerns. Hidden domain references under `develop/references/domain/` provide shared WordPress block context without adding another top-level skill.
 
 ## Decision
 

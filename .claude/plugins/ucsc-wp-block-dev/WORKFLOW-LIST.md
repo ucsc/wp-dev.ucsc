@@ -29,13 +29,13 @@ Block namespace: `ucscblocks/*` (not `ucsc/*`).
 - [x] Skill reviewer review — 2 major, 4 minor, overall pass (2026-06-08)
 - [x] Verified all Codex findings against actual codebase (2026-06-08)
 - [x] Fix 1: Docker service name — `wordpress` -> `wpcli` in fix/SKILL.md, run/SKILL.md (8 occurrences)
-- [x] Fix 2: Block namespace `ucsc/*` -> `ucscblocks/*`, registration via `add_action('init', ...)`, JS export-function pattern in dev/SKILL.md and blocks/SKILL.md
+- [x] Fix 2: Block namespace `ucsc/*` -> `ucscblocks/*`, registration via `add_action('init', ...)`, JS export-function pattern in dev/SKILL.md and domain reference
 - [x] Fix 3: `npm test` references — added "no test script" notes across all 4 skills
 - [x] Fix 4: stack-profile.md — version 1.1.29, correct git SHA, replaced nonexistent `src/API/Course_Schedule_API.php` with actual `classes/ClassSchedule.php`
 - [x] Fix 5: ADR-001 — corrected plugin discovery claim; documented `--plugin-dir` / install requirement
-- [x] Fix 6: Added `paths` to blocks/SKILL.md for hidden skill auto-triggering
+- [x] Fix 6: Converted blocks guidance from hidden skill concept to hidden reference material
 - [x] Fix 7: Added `argument-hint` to run/SKILL.md
-- [x] Fix 8: README — removed `/ucsc-wp-block-dev:blocks` from command table, noted it as hidden skill
+- [x] Fix 8: README — removed `/ucsc-wp-block-dev:blocks` from command table, noted it as hidden reference material
 - [x] Fix 9: Removed non-standard `paths` key from run/SKILL.md frontmatter
 - [x] Fix 10: Added .gitignore
 - [x] Fix 11: Added `paths` to dev/SKILL.md and fix/SKILL.md

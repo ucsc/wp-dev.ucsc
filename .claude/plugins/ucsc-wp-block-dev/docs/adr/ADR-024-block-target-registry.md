@@ -1,10 +1,14 @@
 ---
 title: "ADR-024: Command arguments may name a block target, resolved against a block registry"
-status: Accepted
+status: Superseded
 date: 2026-06-10
 ---
 
 # ADR-024: Block target argument and registry
+
+Superseded by ADR-041. Targets are now resolved through
+`skills/develop/references/targets/index.md` and load target references rather
+than top-level target skills.
 
 ## Context
 

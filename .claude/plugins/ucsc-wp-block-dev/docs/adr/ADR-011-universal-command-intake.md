@@ -1,10 +1,14 @@
 ---
 title: "ADR-011: Every command resolves target, natural-language request, and optional Jira context"
-status: Accepted
+status: Superseded
 date: 2026-06-09
 ---
 
 # ADR-011: Universal command intake
+
+Superseded by ADR-039. The input-resolution contract remains, but `map`
+replaces the `start` and `menu` routers and the public surface is described as
+skills rather than commands.
 
 ## Context
 

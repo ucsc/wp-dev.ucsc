@@ -113,7 +113,7 @@ class TestPluginDetails:
     @requires_installed
     def test_core_skills_present(self):
         r = plugin_details()
-        for skill in ["setup", "start", "develop", "fix", "test", "review", "run", "verify"]:
+        for skill in ["map", "feature", "develop", "fix", "test", "review", "run", "verify", "maintainer"]:
             assert skill in r.stdout, f"Core skill '{skill}' missing from plugin details"
 
     @requires_installed
@@ -191,29 +191,15 @@ class TestSkillRouting:
             assert name not in names, f"Duplicate skill name: {name}"
             names.append(name)
 
-    def test_argument_hints_present_where_needed(self):
-        """Skills declaring 'arguments' must also have 'argument-hint'."""
+    def test_frontmatter_is_portable(self):
+        """Skills expose only the Agent Skills core metadata."""
         for skill_dir in sorted(SKILLS_DIR.iterdir()):
             if not (skill_dir / "SKILL.md").exists():
                 continue
             fm = self._read_frontmatter(skill_dir)
-            if fm.get("arguments"):
-                assert fm.get("argument-hint"), (
-                    f"{skill_dir.name} has 'arguments' but no 'argument-hint'"
-                )
-
-    def test_internal_skills_marked_not_user_invocable(self):
-        """Skills with 'internal' or 'on-demand' in their description should be user-invocable: false."""
-        for skill_dir in sorted(SKILLS_DIR.iterdir()):
-            if not (skill_dir / "SKILL.md").exists():
-                continue
-            fm = self._read_frontmatter(skill_dir)
-            desc = fm.get("description", "").lower()
-            body = (skill_dir / "SKILL.md").read_text().lower()
-            if "do not trigger automatically" in body or "internal" in desc:
-                assert "user-invocable: false" in body, (
-                    f"{skill_dir.name} appears internal but is missing 'user-invocable: false'"
-                )
+            assert set(fm) == {"name", "description"}, (
+                f"{skill_dir.name} has host-specific frontmatter: {set(fm)}"
+            )
 
     def test_wp_keywords_in_descriptions(self):
         """Each skill description should reference at least one WordPress/block concept."""
@@ -240,13 +226,13 @@ class TestPluginDirLoading:
         r = subprocess.run(
             [
                 "claude", "--plugin-dir", str(PLUGIN_ROOT),
-                "-p", "list your /ucsc-wp-block-dev: skills as a comma-separated list",
+                "-p", "list your ucsc-wp-block-dev skills as a comma-separated list",
                 "--output-format", "text",
             ],
             capture_output=True, text=True, timeout=60,
         )
         assert r.returncode == 0, f"Plugin failed to load: {r.stderr}"
         out = r.stdout.lower()
-        assert any(skill in out for skill in ["blocks", "develop", "fix", "maintainer", "run"]), (
+        assert any(skill in out for skill in ["develop", "fix", "maintainer", "run"]), (
             f"Plugin loaded but skills not visible in response: {r.stdout[:200]}"
         )
