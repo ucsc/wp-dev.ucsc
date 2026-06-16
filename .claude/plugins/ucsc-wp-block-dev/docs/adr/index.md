@@ -61,3 +61,4 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-053](ADR-053-tag-commits-with-skillset.md) | Tag commits with ucsc-wp-block-dev skillset use | Accepted | 2026-06-15 |
 | [ADR-054](ADR-054-offer-to-create-pull-requests.md) | Offer to create pull requests | Accepted | 2026-06-15 |
 | [ADR-055](ADR-055-do-not-push-without-checking.md) | Generally do not push to Git, never push without checking | Accepted | 2026-06-15 |
+| [ADR-056](ADR-056-github-only-operations.md) | Do not offer operations on non-GitHub repositories | Accepted | 2026-06-15 |
