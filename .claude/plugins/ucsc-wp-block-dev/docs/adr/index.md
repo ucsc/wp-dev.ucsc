@@ -58,3 +58,4 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-050](ADR-050-no-local-php-python-dependency.md) | No local PHP or Python dependency | Accepted | 2026-06-15 |
 | [ADR-051](ADR-051-offer-automatic-commit.md) | Offer to automatically commit in addition to providing message text | Accepted | 2026-06-15 |
 | [ADR-052](ADR-052-allow-co-authored-by-ai.md) | Allow Co-authored-by AI in commit messages | Accepted | 2026-06-15 |
+| [ADR-053](ADR-053-tag-commits-with-skillset.md) | Tag commits with ucsc-wp-block-dev skillset use | Accepted | 2026-06-15 |
