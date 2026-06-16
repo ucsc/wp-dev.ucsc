@@ -34,7 +34,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-026](ADR-026-study-multi-pronged-fix-token-reduction.md) | Study multi-pronged token reduction for fix mode | Accepted | 2026-06-10 |
 | [ADR-027](ADR-027-study-github-atlassian-mcp-token-cost.md) | Study GitHub and Atlassian MCP token cost | Accepted | 2026-06-10 |
 | [ADR-028](ADR-028-start-mcp-just-in-time-when-token-efficient.md) | Start MCP just in time when token-efficient | Accepted | 2026-06-10 |
-| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Offer Conventional Commit syntax after fixes, features, and reviews | Accepted | 2026-06-10 |
+| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Offer Conventional Commit syntax after fixes, features, and reviews | Superseded | 2026-06-10 |
 | [ADR-030](ADR-030-separate-run-verify-test-and-plugin-validation.md) | Separate run, verify, test, and plugin validation | Accepted | 2026-06-11 |
 | [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Superseded | 2026-06-11 |
 | [ADR-032](ADR-032-skill-support-files-referenced-from-skill-md.md) | Skill support files must be referenced from SKILL.md | Accepted | 2026-06-10 |
@@ -54,3 +54,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-046](ADR-046-maintainer-is-a-hidden-manual-skill.md) | Maintainer is a hidden manual skill | Accepted | 2026-06-15 |
 | [ADR-047](ADR-047-warn-before-editing-on-non-feature-branches.md) | Warn before editing on non-feature branches | Accepted | 2026-06-16 |
 | [ADR-048](ADR-048-generate-docs-uses-adrs-and-roadmap.md) | Generate docs uses ADRs and includes a roadmap | Accepted | 2026-06-16 |
+| [ADR-049](ADR-049-perform-retrospective-after-tasks.md) | Perform a retrospective after tasks to save lessons learned | Accepted | 2026-06-15 |
+| [ADR-050](ADR-050-no-local-php-python-dependency.md) | No local PHP or Python dependency | Accepted | 2026-06-15 |
+| [ADR-051](ADR-051-offer-automatic-commit.md) | Offer to automatically commit in addition to providing message text | Accepted | 2026-06-15 |
+| [ADR-052](ADR-052-allow-co-authored-by-ai.md) | Allow Co-authored-by AI in commit messages | Accepted | 2026-06-15 |

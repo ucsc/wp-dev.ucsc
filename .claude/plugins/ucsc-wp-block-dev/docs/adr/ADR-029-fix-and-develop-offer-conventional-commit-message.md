@@ -1,6 +1,6 @@
 ---
 title: "ADR-029: Offer Conventional Commit syntax after fixes, features, and reviews"
-status: Accepted
+status: Superseded
 date: 2026-06-10
 ---
 
