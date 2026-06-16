@@ -25,11 +25,12 @@ EXPECTED_LIVE_SKILLS = {
     "maintainer",
     "map",
     "review",
+    "retrospective",
     "run",
     "test",
     "verify",
 }
-EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS - {"maintainer"}
+EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS - {"maintainer", "retrospective"}
 
 
 class TestPluginJson:
@@ -137,9 +138,13 @@ class TestSkillFrontmatter:
 
         assert "| `maintainer` |" not in readme
         assert "| `maintainer` |" not in map_text
+        assert "| `retrospective` |" not in readme
+        assert "| `retrospective` |" not in map_text
         assert "maintenance is intentionally hidden" in readme.lower()
         assert "`maintainer` directly" in readme.lower()
+        assert "`retrospective` directly" in readme.lower()
         assert "type `maintainer` directly" in map_text.lower()
+        assert "type `retrospective` directly" in map_text.lower()
 
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill."""
@@ -407,15 +412,30 @@ class TestSkillFrontmatter:
         assert "ask one concise question" in gate
         assert "do not inspect source files" in gate
 
-    def test_fix_and_develop_prefer_but_do_not_require_jira(self):
-        """ADR-008 must remain explicit in both implementation workflows."""
-        for skill_name in ["fix", "develop"]:
+    def test_fix_feature_and_develop_prompt_for_jira_up_front(self):
+        """ADR-008 prompts for Jira early while keeping it non-blocking."""
+        for skill_name in ["fix", "feature", "develop"]:
             text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
-            assert "jira id" in text
-            assert "preferred, not required" in text
+            normalized = re.sub(r"\s+", " ", text)
+            assert "jira id" in normalized
+            assert "up front" in normalized
+            assert "preferred, not required" in normalized
+            assert "atlassian mcp tools are available" in normalized
+            assert "fetch the jira record" in normalized
+            assert "atlassian mcp tools are unavailable" in normalized
+            assert "paste the ticket details" in normalized
 
         fix_text = (SKILLS_DIR / "fix" / "SKILL.md").read_text().lower()
         assert "same clarification" in fix_text
+
+    def test_issue_context_fetches_jira_or_requests_pasted_details(self):
+        """Shared issue context owns Atlassian MCP and pasted-ticket fallback."""
+        text = (SKILLS_DIR / "develop" / "references" / "issue-context.md").read_text().lower()
+        normalized = re.sub(r"\s+", " ", text)
+        assert "fetch the jira record" in normalized
+        assert "merge its summary" in normalized
+        assert "paste the ticket details" in normalized
+        assert "preferred, not required" in normalized
 
     def test_fix_and_develop_require_target_and_work_description(self):
         """ADR-009's two-part intake gate must remain explicit."""

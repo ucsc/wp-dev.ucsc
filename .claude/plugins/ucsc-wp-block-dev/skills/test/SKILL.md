@@ -1,6 +1,6 @@
 ---
 name: test
-description: Route WordPress block test work to either test creation or existing test execution. Use when asked to create tests, add coverage, run PHP/Jest/e2e tests, or validate a target Gutenberg block, feature, fix, or Jira acceptance criterion with automated tests.
+description: Create or run automated PHP, Jest, or e2e tests for a ucsc-gutenberg-blocks block, feature, fix, or Jira acceptance criterion. Use `verify` instead when proving behavior in the live running editor or frontend — `test` is for automated test suites only.
 ---
 
 # Test

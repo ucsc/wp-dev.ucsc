@@ -23,7 +23,11 @@ Before using tools, require:
 - **Target:** the block, GUI, or app that will change.
 - **Desired outcome:** a plain-language description of the new behavior.
 
-A Jira ID is preferred, not required.
+Prompt for a Jira ID up front in the initial clarification when none was
+supplied. When Atlassian MCP tools are available and a Jira ID or URL is
+supplied, fetch the Jira record before defining the feature. When Atlassian MCP
+tools are unavailable, ask the user to paste the ticket details or summarize
+the relevant requirements. Jira is preferred, not required.
 
 ## Define The Feature
 

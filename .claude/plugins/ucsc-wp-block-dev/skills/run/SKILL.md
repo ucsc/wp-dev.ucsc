@@ -96,11 +96,11 @@ Use `https://wp-dev.ucsc/wp-admin/` as the canonical browser URL. The developmen
 
 Do not stop at container health when the user asks to see the application working.
 
-1. Use the available browser tool to open `https://wp-dev.ucsc/wp-admin/`.
+1. Use the available browser tool to open `https://wp-dev.ucsc/wp-admin/`. If no visual browser tool is available and you need to verify frontend routing or block output (like FSE template fallbacks), use headless requests like `curl -ks https://wp-dev.ucsc/path/`.
 2. Log in when needed.
 3. Navigate to the relevant editor, page, or frontend route.
 4. Exercise the requested block interaction.
-5. Report what was observed in the running app.
+5. Report what was observed in the running app (or the HTML output if fetching headlessly).
 
 Use the `verify` skill when the goal is to prove a code change or acceptance
 criterion. Use the `test` skill for Jest, PHP, or other automated tests.

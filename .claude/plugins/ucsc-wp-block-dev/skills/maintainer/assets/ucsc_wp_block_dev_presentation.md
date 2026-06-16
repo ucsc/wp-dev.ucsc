@@ -139,6 +139,8 @@ references:
 
 **Hidden manual skill:** type `maintainer` directly for plugin maintenance,
 validation, contribution review, reference checks, and slide publishing.
+Type `retrospective` directly to capture lessons learned into skill references
+after fix, feature, review, or run sessions.
 
 `develop/references/issue-context.md` is shared by `develop`, `feature`, and
 `fix` when Jira, Confluence, or pasted issue context is present.
@@ -270,6 +272,9 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
 * **`maintainer/references/generate-docs/generate-docs.md` (Portable Markdown Artifacts):**
   * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/generate-docs/assets/`.
   * Keeps publishing separate; use `maintainer publish-slides` only for Google Docs upload.
+* **`retrospective` (Hidden Lessons-Capture Workflow):**
+  * Manually reachable by typing `retrospective`, but omitted from the public workflow list.
+  * Captures new patterns, gotchas, and reusable knowledge into the closest skill reference after a work session.
 * **Architecture Decision Records (ADRs):**
   * Live in `docs/adr/` with an index at `docs/adr/index.md`.
   * Each ADR captures a design decision, its context, and consequences.
@@ -288,6 +293,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * **ADR-045:** Documentation generation lives under `maintainer/references/generate-docs/`.
   * **ADR-046:** Maintainer is a hidden manual skill.
   * **ADR-047:** Warn before editing on `main`, `master`, or `develop`.
+  * **ADR-008:** Prompt for Jira up front; fetch via Atlassian MCP or request pasted ticket details.
 
 ---
 

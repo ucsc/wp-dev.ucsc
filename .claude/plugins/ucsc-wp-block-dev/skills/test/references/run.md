@@ -25,6 +25,21 @@ feature, fix, or acceptance criterion.
 
 Build checks may support any type but are not a fourth test type.
 
+## Running PHP Tests
+
+Always use Docker — never assume a local `php` binary (ADR-050):
+
+```bash
+# Run a single test file
+docker run --rm -v "$PWD:/plugin" -w /plugin php:8.1-cli php tests/php/ClassName Test.php
+
+# Run all existing PHP tests
+docker run --rm -v "$PWD:/plugin" -w /plugin php:8.1-cli \
+  sh -c 'for f in tests/php/*.php; do php "$f"; done'
+```
+
+Test files exit non-zero on failure — capture the pass/fail line at the end of output.
+
 ## Reporting
 
 Report pass/fail, the exact command, and the smallest actionable detail. For

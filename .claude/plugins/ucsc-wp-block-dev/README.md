@@ -41,6 +41,10 @@ Maintenance is intentionally hidden from the public workflow list. Type
 promote contributed skills, verify ADR consistency, or check skill reference
 integrity.
 
+Retrospectives are also hidden from the public workflow list. Type
+`retrospective` directly when lessons from a fix, feature, review, or run
+session should be saved into skill references.
+
 Use the maintainer `generate-docs` reference at
 `maintainer/references/generate-docs/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or

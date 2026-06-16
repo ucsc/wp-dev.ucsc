@@ -1,6 +1,6 @@
 ---
 name: develop
-description: Add a Gutenberg block or feature to the ucsc-gutenberg-blocks plugin. Before investigating or implementing, require the target block, GUI, or app and a plain-language feature description; prefer but do not require a Jira ID.
+description: Implementation core for ucsc-gutenberg-blocks block development. Invoked by the `feature` and `fix` skills after scope is defined; do not trigger directly for new feature or fix requests. Handles PHP class, template, JS editor, REST, and build steps.
 ---
 
 # Develop — Add a Block or Feature
@@ -46,7 +46,7 @@ Before using tools, investigating, or writing code, obtain both required inputs 
 1. **Target** — the block, GUI, or app being worked on.
 2. **Feature description** — what should be added or changed. A plain-language description is sufficient.
 
-If either input is missing, ask one concise question for all missing inputs and wait for the answer. Request a Jira ID in the same clarification when none was supplied, but Jira is preferred, not required. See ADR-008 and ADR-009.
+If either input is missing, ask one concise question for all missing inputs and wait for the answer. Prompt for a Jira ID up front in the same clarification when none was supplied. When Atlassian MCP tools are available and a Jira ID or URL is supplied, fetch the Jira record before implementation. When Atlassian MCP tools are unavailable, ask the user to paste the ticket details or summarize the relevant requirements. Jira is preferred, not required. See ADR-008 and ADR-009.
 
 For an unlisted target, confirm its canonical slug and scope before proceeding.
 Add a target reference only when the resulting domain guidance will be reused.

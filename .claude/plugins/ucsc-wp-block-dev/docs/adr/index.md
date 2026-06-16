@@ -13,7 +13,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-005](ADR-005-skill-frontmatter-convention.md) | Skill frontmatter uses supported skill and command fields | Superseded | 2026-06-09 |
 | [ADR-006](ADR-006-block-development-examples.md) | Referencing official WordPress Block Development Examples | Accepted | 2026-06-09 |
 | [ADR-007](ADR-007-fix-requires-user-provided-problem.md) | Fix requires a user-provided concrete problem | Accepted | 2026-06-09 |
-| [ADR-008](ADR-008-prefer-jira-id-for-fix-and-develop.md) | Prefer a Jira ID for fix and develop work | Accepted | 2026-06-09 |
+| [ADR-008](ADR-008-prefer-jira-id-for-fix-and-develop.md) | Prompt for a Jira ID up front for fix and feature work | Accepted | 2026-06-09 |
 | [ADR-009](ADR-009-fix-and-develop-require-target-and-description.md) | Fix and develop require a target and work description | Accepted | 2026-06-09 |
 | [ADR-010](ADR-010-jira-prompt-may-repeat-at-phase-completion.md) | Jira prompt may repeat at phase completion | Accepted | 2026-06-09 |
 | [ADR-011](ADR-011-universal-command-intake.md) | Every workflow resolves target, natural-language request, and optional Jira context | Superseded | 2026-06-09 |
@@ -62,3 +62,5 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-054](ADR-054-offer-to-create-pull-requests.md) | Offer to create pull requests | Accepted | 2026-06-15 |
 | [ADR-055](ADR-055-do-not-push-without-checking.md) | Generally do not push to Git, never push without checking | Accepted | 2026-06-15 |
 | [ADR-056](ADR-056-github-only-operations.md) | Do not offer operations on non-GitHub repositories | Accepted | 2026-06-15 |
+| [ADR-057](ADR-057-do-not-inspect-parent-git-repos.md) | Do not inspect parent Git repos | Accepted | 2026-06-15 |
+| [ADR-058](ADR-058-optimize-for-low-token-use.md) | Optimize for low token use, prefer single agent | Accepted | 2026-06-15 |

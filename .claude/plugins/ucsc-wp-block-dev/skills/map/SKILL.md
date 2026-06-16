@@ -33,12 +33,18 @@ State the app, stack, and current directory in one short context receipt.
 | Skill | Route when the user wants to |
 | --- | --- |
 | `feature` | Add new block behavior through the preferred feature workflow. |
-| `develop` | Use the existing development workflow during migration. |
+| `develop` | Implementation core — handles code steps for `feature` and `fix`; not a direct user entry point. |
 | `fix` | Diagnose and repair incorrect behavior. |
 | `test` | Create or run PHP, Jest, or end-to-end tests. |
 | `review` | Review a diff, branch, file, pull request, or block. |
 | `run` | Build, launch, watch, open, or interact with WordPress. |
 | `verify` | Prove acceptance criteria in the running editor or frontend. |
+
+For capturing lessons learned after a session, type `retrospective` directly.
+It is intentionally hidden from the routed workflow table (per ADR-049) but
+remains manually reachable and should be offered at the end of fix, feature,
+review, and run sessions.
+
 When work touches `ucsc-gutenberg-blocks`, load domain guidance from
 [`../develop/references/domain/blocks.md`](../develop/references/domain/blocks.md)
 inside the selected workflow. `blocks` is intentionally a hidden reference, not

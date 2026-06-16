@@ -36,7 +36,12 @@ Before using tools or investigating, obtain both required inputs from the user:
 
 A target alone is not sufficient, and a description without a target is not sufficient. A Jira ID alone is also insufficient unless its available details clearly supply both. If either required input is missing, ask one concise question for all missing inputs and wait for the answer.
 
-Prefer obtaining a Jira ID from the user. If none was supplied, include the Jira request in the same clarification as the concrete-problem question. The user may say there is no ticket or skip it; Jira is preferred, not required. See ADR-008.
+Prompt for a Jira ID up front. If none was supplied, include the Jira request in
+the same clarification as the concrete-problem question. When Atlassian MCP
+tools are available and a Jira ID or URL is supplied, fetch the Jira record
+before reproducing. When Atlassian MCP tools are unavailable, ask the user to
+paste the ticket details or summarize the relevant requirements. The user may
+say there is no ticket or skip it; Jira is preferred, not required. See ADR-008.
 
 Do not inspect source files, logs, git history, browser or runtime state, builds, or tests until this gate is satisfied. See ADR-007 and ADR-009.
 
@@ -121,14 +126,14 @@ If missing, add it to the service env in `docker-compose.yml`.
 
 ## 9. Verify in Docker
 
-After fixing, verify the change in the running environment with the `run`
-skill.
+After fixing, prove the behavior change in the running environment with the `verify`
+skill. Use `run` only if the environment is not already up.
 
 ## 10. Complete the Fix Phase
 
 Summarize the completed fix and validation. If no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 
-Per ADR-029, offer to generate Conventional Commit syntax for the completed
+Per ADR-051, offer to generate Conventional Commit syntax and automatically commit the completed
 fix. Generate message text only if the user accepts. Manual check-in is the
 default: do not run `git add`, `git commit`, `git push`, or equivalent staging,
 commit, or push operations unless the user explicitly asks.
