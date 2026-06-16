@@ -42,17 +42,17 @@ Block-specific guidance lives under `develop/references/targets/`. The
 `develop` workflow requires a target and loads only the selected target
 reference.
 
-**On this plugin itself (the tooling):**
+Maintenance is intentionally hidden from the public workflow list. Type
+`maintainer` directly when you need to validate structure, run tests, review or
+promote contributed skills, verify ADR consistency, or check skill reference
+integrity.
 
-| Skill | Purpose |
-|---|---|
-| `maintainer` | Validate structure, run tests, review or promote contributed skills, verify ADR consistency, and check skill reference integrity |
-
-Use the maintainer documentation reference at
-`maintainer/references/documentation/documentation.md` to regenerate portable
+Use the maintainer `generate-docs` reference at
+`maintainer/references/generate-docs/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or
-Confluence. Use `maintainer publish-slides` only when publishing the canonical
-deck to Google Docs.
+Confluence. Use `maintainer generate-docs` for regeneration and
+`maintainer publish-slides` only when publishing the canonical deck to Google
+Docs.
 
 ## Contributing skills
 

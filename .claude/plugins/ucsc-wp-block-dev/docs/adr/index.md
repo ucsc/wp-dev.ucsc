@@ -34,7 +34,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-026](ADR-026-study-multi-pronged-fix-token-reduction.md) | Study multi-pronged token reduction for fix mode | Accepted | 2026-06-10 |
 | [ADR-027](ADR-027-study-github-atlassian-mcp-token-cost.md) | Study GitHub and Atlassian MCP token cost | Accepted | 2026-06-10 |
 | [ADR-028](ADR-028-start-mcp-just-in-time-when-token-efficient.md) | Start MCP just in time when token-efficient | Accepted | 2026-06-10 |
-| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Offer a Conventional Commit message after every fix or feature | Accepted | 2026-06-10 |
+| [ADR-029](ADR-029-fix-and-develop-offer-conventional-commit-message.md) | Offer Conventional Commit syntax after fixes, features, and reviews | Accepted | 2026-06-10 |
 | [ADR-030](ADR-030-separate-run-verify-test-and-plugin-validation.md) | Separate run, verify, test, and plugin validation | Accepted | 2026-06-11 |
 | [ADR-031](ADR-031-test-clarifies-type-and-operation.md) | Test clarifies type and operation | Superseded | 2026-06-11 |
 | [ADR-032](ADR-032-skill-support-files-referenced-from-skill-md.md) | Skill support files must be referenced from SKILL.md | Accepted | 2026-06-10 |
@@ -50,4 +50,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-042](ADR-042-test-operations-are-references.md) | Test operations are references under test | Accepted | 2026-06-15 |
 | [ADR-043](ADR-043-documentation-skill-generates-markdown-artifacts.md) | Documentation skill generates portable Markdown artifacts | Superseded | 2026-06-15 |
 | [ADR-044](ADR-044-domain-guidance-is-a-develop-reference.md) | Domain guidance is a develop reference | Accepted | 2026-06-15 |
-| [ADR-045](ADR-045-documentation-is-a-maintainer-reference.md) | Documentation is a maintainer reference | Accepted | 2026-06-15 |
+| [ADR-045](ADR-045-documentation-is-a-maintainer-reference.md) | Generate docs is a maintainer reference | Accepted | 2026-06-15 |
+| [ADR-046](ADR-046-maintainer-is-a-hidden-manual-skill.md) | Maintainer is a hidden manual skill | Accepted | 2026-06-15 |
+| [ADR-047](ADR-047-warn-before-editing-on-non-feature-branches.md) | Warn before editing on non-feature branches | Accepted | 2026-06-16 |
+| [ADR-048](ADR-048-generate-docs-uses-adrs-and-roadmap.md) | Generate docs uses ADRs and includes a roadmap | Accepted | 2026-06-16 |

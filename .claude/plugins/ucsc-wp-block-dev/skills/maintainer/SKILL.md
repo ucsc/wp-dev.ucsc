@@ -7,10 +7,10 @@ description: Maintain the ucsc-wp-block-dev plugin itself — validate structure
 
 Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code —
 use `develop`/`fix`/`run` for that). For Markdown artifact regeneration, read
-[`references/documentation/documentation.md`](references/documentation/documentation.md).
+[`references/generate-docs/generate-docs.md`](references/generate-docs/generate-docs.md).
 
 Use this skill with one operation: `validate`, `test`, `review-skills`,
-`review-contrib`, `promote-contrib`, `check-references`, `documentation`,
+`review-contrib`, `promote-contrib`, `check-references`, `generate-docs`,
 `publish-slides`, or `all`. Run all commands below from the repo root.
 
 Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003.
@@ -19,7 +19,7 @@ Keep token use low: run the validator and tests rather than reading every file b
 
 Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `documentation`, `publish-slides`, and `all`. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`, `publish-slides`, and `all`. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 ## Anthropic plugin-dev tools
 
@@ -147,22 +147,22 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_ref
 
 It prints one line per skill and a PASS/FAIL summary, exiting non-zero when any nested file is not linked from its `SKILL.md`. Fix a FAIL by adding a skill-relative reference (e.g. `references/foo.md`) to the skill — under a "Reference files" heading when one is warranted — or by removing the obsolete file. The pytest suite runs this same check, so a gap fails `test` too.
 
-## documentation
+## generate-docs
 
 Regenerate portable Markdown documentation artifacts for Google Docs or
 Confluence. Read
-[`references/documentation/documentation.md`](references/documentation/documentation.md),
+[`references/generate-docs/generate-docs.md`](references/generate-docs/generate-docs.md),
 then run:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/documentation/scripts/regenerate.sh
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/generate-docs/scripts/regenerate.sh
 ```
 
 This writes generated artifacts under
-`skills/maintainer/references/documentation/assets/`, including
-[`references/documentation/assets/ucsc_wp_block_dev_main.md`](references/documentation/assets/ucsc_wp_block_dev_main.md)
+`skills/maintainer/references/generate-docs/assets/`, including
+[`references/generate-docs/assets/ucsc_wp_block_dev_main.md`](references/generate-docs/assets/ucsc_wp_block_dev_main.md)
 and
-[`references/documentation/assets/ucsc_wp_block_dev_presentation.md`](references/documentation/assets/ucsc_wp_block_dev_presentation.md).
+[`references/generate-docs/assets/ucsc_wp_block_dev_presentation.md`](references/generate-docs/assets/ucsc_wp_block_dev_presentation.md).
 It does not publish or upload anything.
 
 ## publish-slides
@@ -199,4 +199,4 @@ may be incomplete.
 
 ## When the manifest or skills change
 
-After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills. When the main guide or deck should be prepared for Google Docs or Confluence without publishing, use the `documentation` operation in this skill.
+After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills. When the main guide or deck should be prepared for Google Docs or Confluence without publishing, use the `generate-docs` operation in this skill.

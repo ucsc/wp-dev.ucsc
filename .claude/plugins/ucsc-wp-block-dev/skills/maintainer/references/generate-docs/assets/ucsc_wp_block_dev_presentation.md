@@ -131,14 +131,16 @@ references:
 | **`review`** | Review request | Reviews a diff, branch, file, or Jira-scoped change. |
 | **`run`** | Build or launch request | Records and executes the Docker setup, build, launch, and app-driving recipe. |
 | **`verify`** | Acceptance verification | Proves a change in the running WordPress editor or frontend. |
-| **`maintainer`** | Plugin maintenance | Validates plugin structure, runs tests, and reviews skill quality. |
 
 **Hidden reference material:**
 
 | Reference | Visibility | Purpose |
 | :--- | :--- | :--- |
 | **`develop/references/domain/blocks.md`** | Progressive disclosure | Domain reference loaded by workflow skills when working on the WP plugin. |
-| **`maintainer/references/documentation/documentation.md`** | Progressive disclosure | Documentation regeneration reference owned by the maintainer workflow. |
+| **`maintainer/references/generate-docs/generate-docs.md`** | Progressive disclosure | Documentation regeneration reference owned by the maintainer workflow. |
+
+**Hidden manual skill:** type `maintainer` directly for plugin maintenance,
+validation, contribution review, reference checks, and slide publishing.
 
 `develop/references/issue-context.md` is shared by `develop`, `feature`, and
 `fix` when Jira, Confluence, or pasted issue context is present.
@@ -260,14 +262,15 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
     * *Class Schedule:* Registers REST endpoints at `ucscgutenbergblocks/v1`.
     * *Course Catalog:* Connects to PeopleSoft XML endpoint (caches via transients).
     * *Campus Directory:* Accesses LDAP using network options.
-* **`maintainer` (Plugin Self-Upkeep):**
+* **`maintainer` (Hidden Plugin Self-Upkeep):**
+  * Manually reachable by typing `maintainer`, but omitted from the public workflow list.
   * Launches Anthropic’s `plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer` agents.
   * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
   * Runs `check-references` to enforce that every skill support file is linked from its `SKILL.md` (ADR-032).
   * Triggers pytest suite (verifying manifest, frontmatter constraints, and index consistency).
   * See the plugin [README](../../../../../README.md) for plugin-dev tool install and usage (ADR-013).
-* **`maintainer/references/documentation/documentation.md` (Portable Markdown Artifacts):**
-  * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/documentation/assets/`.
+* **`maintainer/references/generate-docs/generate-docs.md` (Portable Markdown Artifacts):**
+  * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/generate-docs/assets/`.
   * Keeps publishing separate; use `maintainer publish-slides` only for Google Docs upload.
 * **Architecture Decision Records (ADRs):**
   * Live in `docs/adr/` with an index at `docs/adr/index.md`.
@@ -284,7 +287,9 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * **ADR-032:** Every skill support file must be referenced from its `SKILL.md`.
   * **ADR-033:** Work-list state is stored under `CLAUDE_CONFIG_DIR`, not in the repo.
   * **ADR-044:** Domain guidance lives under `develop/references/domain/`.
-  * **ADR-045:** Documentation generation lives under `maintainer/references/documentation/`.
+  * **ADR-045:** Documentation generation lives under `maintainer/references/generate-docs/`.
+  * **ADR-046:** Maintainer is a hidden manual skill.
+  * **ADR-047:** Warn before editing on `main`, `master`, or `develop`.
 
 ---
 
@@ -338,6 +343,18 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
   operation.
 * **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` bumps the `Generated:` date to today, runs the deck-contract tests, then publishes — automating the manual steps below (ADR-003/014/015).
 * **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
+
+---
+
+## **Future Roadmap**
+
+Roadmap themes are drawn from accepted and study-oriented ADRs so planning stays tied to recorded decisions:
+
+* **Measure fix-mode token reduction** — establish benchmarks, compare evidence funnels, and preserve correctness gates while reducing loaded instruction size (ADR-026).
+* **Evaluate GitHub and Atlassian MCP startup cost** — compare fallback-only, on-demand, and always-on strategies for PR/Jira workflows (ADR-027/ADR-034).
+* **Keep MCP activation just-in-time** — continue avoiding default GitHub/Atlassian MCP startup unless task value outweighs session cost (ADR-028).
+* **Refine feature-branch safety** — make branch warnings and `dev/developer_name/ISSUE-1234_short_desc` guidance easy to follow without automating Git by default (ADR-047).
+* **Grow references before skills** — prefer progressive references for domain, target, test, and documentation knowledge until a genuinely user-facing workflow emerges (ADR-040/041/042/044/045).
 
 ---
 

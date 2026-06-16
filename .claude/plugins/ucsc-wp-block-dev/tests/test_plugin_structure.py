@@ -29,6 +29,7 @@ EXPECTED_LIVE_SKILLS = {
     "test",
     "verify",
 }
+EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS - {"maintainer"}
 
 
 class TestPluginJson:
@@ -124,6 +125,22 @@ class TestSkillFrontmatter:
         }
         assert actual == EXPECTED_LIVE_SKILLS
 
+    def test_public_workflow_inventory_hides_maintainer(self):
+        """The public docs advertise product workflows, while maintainer remains manual."""
+        readme = (PLUGIN_ROOT / "README.md").read_text()
+        map_text = (SKILLS_DIR / "map" / "SKILL.md").read_text()
+
+        for skill_name in sorted(EXPECTED_PUBLIC_WORKFLOW_SKILLS):
+            assert f"| `{skill_name}` |" in readme
+        for skill_name in sorted(EXPECTED_PUBLIC_WORKFLOW_SKILLS - {"map"}):
+            assert f"| `{skill_name}` |" in map_text
+
+        assert "| `maintainer` |" not in readme
+        assert "| `maintainer` |" not in map_text
+        assert "maintenance is intentionally hidden" in readme.lower()
+        assert "`maintainer` directly" in readme.lower()
+        assert "type `maintainer` directly" in map_text.lower()
+
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill."""
         assert not (SKILLS_DIR / "blocks" / "SKILL.md").exists()
@@ -133,16 +150,16 @@ class TestSkillFrontmatter:
             "blocks reference should not expose skill frontmatter"
         )
 
-    def test_documentation_guidance_is_maintainer_reference(self):
+    def test_generate_docs_guidance_is_maintainer_reference(self):
         """Documentation generation stays available without becoming a top-level skill."""
-        reference = SKILLS_DIR / "maintainer" / "references" / "documentation"
+        reference = SKILLS_DIR / "maintainer" / "references" / "generate-docs"
         assert not (SKILLS_DIR / "documentation" / "SKILL.md").exists()
-        assert (reference / "documentation.md").exists()
+        assert (reference / "generate-docs.md").exists()
         assert (reference / "scripts" / "regenerate.sh").exists()
         assert (reference / "assets" / "ucsc_wp_block_dev_main.md").exists()
         assert (reference / "assets" / "ucsc_wp_block_dev_presentation.md").exists()
-        assert not (reference / "documentation.md").read_text().startswith("---"), (
-            "documentation reference should not expose skill frontmatter"
+        assert not (reference / "generate-docs.md").read_text().startswith("---"), (
+            "generate-docs reference should not expose skill frontmatter"
         )
 
     def test_reference_directories_do_not_define_nested_skills(self):
@@ -266,22 +283,26 @@ class TestSkillFrontmatter:
 
     def test_map_is_the_single_skill_entry_point(self):
         text = (SKILLS_DIR / "map" / "SKILL.md").read_text().lower()
-        for skill_name in ["feature", "fix", "test", "review", "run", "verify", "maintainer"]:
+        for skill_name in ["feature", "fix", "test", "review", "run", "verify"]:
             assert f"`{skill_name}`" in text
-        assert "references/documentation/documentation.md" in text
-        assert "documentation` is intentionally a hidden reference" in text
+        assert "type `maintainer` directly" in text
+        assert "references/generate-docs/generate-docs.md" in text
+        assert "generate-docs` is intentionally a hidden reference" in text
         assert "portable entry point" in text
         assert "route by intent rather than command syntax" in text
 
     def test_maintainer_reference_regenerates_markdown_artifacts(self):
         """Maintainer owns Markdown outputs for Google Docs and Confluence."""
-        reference = SKILLS_DIR / "maintainer" / "references" / "documentation"
-        text = (reference / "documentation.md").read_text().lower()
+        reference = SKILLS_DIR / "maintainer" / "references" / "generate-docs"
+        text = (reference / "generate-docs.md").read_text().lower()
 
         for requirement in [
             "assets/ucsc_wp_block_dev_main.md",
             "assets/ucsc_wp_block_dev_presentation.md",
             "scripts/regenerate.sh",
+            "docs/adr/index.md",
+            "adr-derived content",
+            "future roadmap slide",
             "does not publish",
             "google docs",
             "confluence",
@@ -290,13 +311,28 @@ class TestSkillFrontmatter:
 
         assert (reference / "scripts" / "regenerate.sh").exists()
 
-    def test_maintainer_documents_documentation_operation(self):
+    def test_generate_docs_draws_from_adrs(self):
+        """ADR-048 requires generated docs to be reconciled with ADR context."""
+        text = (
+            SKILLS_DIR
+            / "maintainer"
+            / "references"
+            / "generate-docs"
+            / "generate-docs.md"
+        ).read_text().lower()
+        assert "docs/adr/index.md" in text
+        assert "referenced adrs" in text
+        assert "accepted decisions" in text
+        assert "superseded adr behavior" in text
+        assert "future roadmap slide" in text
+
+    def test_maintainer_documents_generate_docs_operation(self):
         """Documentation regeneration is an operation on maintainer, not its own skill."""
         text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text().lower()
-        assert "## documentation" in text
-        assert "references/documentation/documentation.md" in text
-        assert "references/documentation/scripts/regenerate.sh" in text
-        assert "documentation` operation" in text
+        assert "## generate-docs" in text
+        assert "references/generate-docs/generate-docs.md" in text
+        assert "references/generate-docs/scripts/regenerate.sh" in text
+        assert "generate-docs` operation" in text
 
     def test_documentation_generator_writes_to_maintainer_reference(self):
         """The regenerate script must not recreate the removed documentation skill."""
@@ -304,7 +340,7 @@ class TestSkillFrontmatter:
             SKILLS_DIR
             / "maintainer"
             / "references"
-            / "documentation"
+            / "generate-docs"
             / "scripts"
             / "regenerate.sh"
         ).read_text()
@@ -406,13 +442,28 @@ class TestSkillFrontmatter:
             assert "do not repeat the prompt when an id is already known" in text
             assert "do not treat a missing id as incomplete work" in text
 
-    def test_fix_and_develop_offer_commit_message_without_git_operations(self):
-        """ADR-029 offers message text while prohibiting repository-changing Git commands."""
-        for skill_name in ["fix", "develop"]:
+    def test_fix_feature_develop_and_review_offer_commit_syntax_without_git_operations(self):
+        """ADR-029 offers Conventional Commit syntax while keeping Git operations manual."""
+        for skill_name in ["fix", "feature", "develop", "review"]:
             text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
-            assert "offer to generate a conventional commit message" in text
-            assert "generate message text only if the user accepts" in text
-            assert "do not run `git add`, `git commit`, `git push`" in text
+            normalized = re.sub(r"\s+", " ", text)
+            assert "offer to generate conventional commit syntax" in normalized
+            assert "generate message text only if the user accepts" in normalized
+            assert "manual check-in is the default" in normalized
+            assert "`git add`, `git commit`, `git push`" in normalized
+            assert "unless the user explicitly asks" in normalized
+
+    def test_editing_workflows_warn_on_non_feature_branches(self):
+        """ADR-047 requires a branch warning before code edits on shared branches."""
+        for skill_name in ["fix", "feature", "develop", "review"]:
+            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+            normalized = re.sub(r"\s+", " ", text)
+            assert "current git branch" in normalized
+            assert "`main`" in normalized
+            assert "`master`" in normalized
+            assert "`develop`" in normalized
+            assert "dev/developer_name/issue-1234_short_desc" in normalized
+            assert "do not create or switch branches unless the user explicitly asks" in normalized
 
     def test_atlassian_mcp_reminder_is_optional_and_requires_approval(self):
         """ADR-025 must keep Atlassian setup reminders restrained and user-controlled."""
@@ -465,6 +516,13 @@ class TestMaintainerSlideDeck:
     def test_deck_has_current_generated_date_format(self):
         text = SLIDE_DECK.read_text()
         assert re.search(r"\*\*Generated:\*\* \d{4}-\d{2}-\d{2}<br />", text)
+
+    def test_deck_has_adr_backed_future_roadmap(self):
+        text = SLIDE_DECK.read_text()
+        assert "## **Future Roadmap**" in text
+        for adr in ["ADR-026", "ADR-027", "ADR-028", "ADR-047"]:
+            assert adr in text
+        assert "Roadmap themes are drawn from accepted and study-oriented ADRs" in text
 
     def test_publisher_uses_maintainer_deck(self):
         text = PUBLISHER.read_text()

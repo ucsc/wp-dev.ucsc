@@ -65,6 +65,11 @@ Establish the smallest reproduction before changing anything:
 
 ## 4. Read Before Patching
 
+Before editing, check the current Git branch. Per ADR-047, if it is `main`,
+`master`, or `develop`, warn that changes should normally happen on a feature
+branch named `dev/developer_name/ISSUE-1234_short_desc`. Do not create or
+switch branches unless the user explicitly asks.
+
 Read the relevant class and JS file fully before editing. Check:
 
 - Is the block registered in `index.php` and `src/index.js`?
@@ -123,7 +128,10 @@ skill.
 
 Summarize the completed fix and validation. If no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 
-Per ADR-029, offer to generate a Conventional Commit message for the completed fix. Generate message text only if the user accepts. Do not run `git add`, `git commit`, `git push`, or equivalent staging, commit, or push operations.
+Per ADR-029, offer to generate Conventional Commit syntax for the completed
+fix. Generate message text only if the user accepts. Manual check-in is the
+default: do not run `git add`, `git commit`, `git push`, or equivalent staging,
+commit, or push operations unless the user explicitly asks.
 
 ## Plugin-dev Tools
 

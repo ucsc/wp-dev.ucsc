@@ -52,7 +52,7 @@ After approval, both commands use the same general implementation discipline:
 - keep related schema, server, editor, and rendering changes synchronized;
 - run risk-appropriate validation and report any validation gaps;
 - offer to create focused tests for the completed fix or feature change set;
-- offer a Conventional Commit message under ADR-029.
+- offer Conventional Commit syntax under ADR-029.
 
 The test offer is distinct from automatically creating tests. If accepted, route to the test workflow with the target, change-set context, and whether the work is a fix or feature preserved.
 

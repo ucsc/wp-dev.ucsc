@@ -1,10 +1,10 @@
 ---
-title: "ADR-045: Documentation is a maintainer reference"
+title: "ADR-045: Generate docs is a maintainer reference"
 status: Accepted
 date: 2026-06-15
 ---
 
-# ADR-045: Documentation is a maintainer reference
+# ADR-045: Generate docs is a maintainer reference
 
 ## Status
 
@@ -22,22 +22,22 @@ the maintainer workflow that already owns validation and publishing.
 
 Move documentation generation guidance to:
 
-`skills/maintainer/references/documentation/documentation.md`
+`skills/maintainer/references/generate-docs/generate-docs.md`
 
 Move its script and generated assets under:
 
-`skills/maintainer/references/documentation/`
+`skills/maintainer/references/generate-docs/`
 
 The `maintainer` skill owns and indexes the reference. Documentation
-regeneration is available as the `maintainer documentation` operation. The
+regeneration is available as the `maintainer generate-docs` operation. The
 operation runs:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/documentation/scripts/regenerate.sh
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/generate-docs/scripts/regenerate.sh
 ```
 
 The script writes generated Markdown artifacts under
-`skills/maintainer/references/documentation/assets/` and does not publish or
+`skills/maintainer/references/generate-docs/assets/` and does not publish or
 upload anything.
 
 ## Consequences

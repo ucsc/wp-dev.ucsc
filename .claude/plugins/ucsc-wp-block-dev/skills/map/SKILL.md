@@ -39,16 +39,18 @@ State the app, stack, and current directory in one short context receipt.
 | `review` | Review a diff, branch, file, pull request, or block. |
 | `run` | Build, launch, watch, open, or interact with WordPress. |
 | `verify` | Prove acceptance criteria in the running editor or frontend. |
-| `maintainer` | Maintain, validate, or extend this skill set. |
 When work touches `ucsc-gutenberg-blocks`, load domain guidance from
 [`../develop/references/domain/blocks.md`](../develop/references/domain/blocks.md)
 inside the selected workflow. `blocks` is intentionally a hidden reference, not
 a top-level skill.
 
+For plugin maintenance, type `maintainer` directly. It is intentionally hidden
+from the routed workflow table but remains manually reachable.
+
 When the request is to regenerate Markdown documentation artifacts, route to
 `maintainer` and its
-[`../maintainer/references/documentation/documentation.md`](../maintainer/references/documentation/documentation.md)
-reference. `documentation` is intentionally a hidden reference, not a top-level
+[`../maintainer/references/generate-docs/generate-docs.md`](../maintainer/references/generate-docs/generate-docs.md)
+reference. `generate-docs` is intentionally a hidden reference, not a top-level
 skill.
 
 Route by intent rather than command syntax. A clear bug routes to `fix`; new

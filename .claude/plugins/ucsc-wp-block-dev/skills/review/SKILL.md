@@ -23,6 +23,18 @@ Prioritize actionable findings:
 
 Report findings first, ordered by severity, with file and line references. Keep summary secondary.
 
+If the review turns into follow-up code edits, check the current Git branch
+before editing. Per ADR-047, if it is `main`, `master`, or `develop`, warn that
+changes should normally happen on a feature branch named
+`dev/developer_name/ISSUE-1234_short_desc`. Do not create or switch branches
+unless the user explicitly asks.
+
+Per ADR-029, offer to generate Conventional Commit syntax for reviewed changes
+or review follow-up edits. Generate message text only if the user accepts.
+Manual check-in is the default: do not run `git add`, `git commit`, `git push`,
+or equivalent staging, commit, or push operations unless the user explicitly
+asks.
+
 ## Plugin-dev Tools
 
 When reviewing plugin components (skills, manifest, hooks), use the following tools:

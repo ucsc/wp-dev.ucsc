@@ -36,6 +36,11 @@ A Jira ID is preferred, not required.
 
 ## Implement
 
+Before editing, check the current Git branch. Per ADR-047, if it is `main`,
+`master`, or `develop`, warn that changes should normally happen on a feature
+branch named `dev/developer_name/ISSUE-1234_short_desc`. Do not create or
+switch branches unless the user explicitly asks.
+
 Use the `develop` skill as the shared implementation core after the feature is
 defined. Preserve the target, requirements, acceptance criteria, and Jira
 context during that handoff.
@@ -50,4 +55,7 @@ rather than a top-level target skill.
 
 Run focused tests, use `run` for the Docker build and launch workflow, and use
 `verify` for user-facing acceptance evidence. Summarize changed behavior and
-offer a Conventional Commit message.
+offer to generate Conventional Commit syntax. Generate message text only if the
+user accepts. Manual check-in is the default; do not run `git add`, `git
+commit`, `git push`, or equivalent staging, commit, or push operations unless
+the user explicitly asks.

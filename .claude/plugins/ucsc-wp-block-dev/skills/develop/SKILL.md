@@ -61,6 +61,11 @@ Default to dynamic blocks with PHP render callbacks unless the block has no serv
 
 ## 2. Find the Nearest Existing Block
 
+Before editing, check the current Git branch. Per ADR-047, if it is `main`,
+`master`, or `develop`, warn that changes should normally happen on a feature
+branch named `dev/developer_name/ISSUE-1234_short_desc`. Do not create or
+switch branches unless the user explicitly asks.
+
 Before writing from scratch, find the existing block that most closely resembles the new one:
 
 ```bash
@@ -232,7 +237,10 @@ in the Docker environment with the `run` skill before it is treated as ready.
 
 If applicable validation is complete and no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 
-Per ADR-029, offer to generate a Conventional Commit message for the completed feature. Generate message text only if the user accepts. Do not run `git add`, `git commit`, `git push`, or equivalent staging, commit, or push operations.
+Per ADR-029, offer to generate Conventional Commit syntax for the completed
+feature. Generate message text only if the user accepts. Manual check-in is the
+default: do not run `git add`, `git commit`, `git push`, or equivalent staging,
+commit, or push operations unless the user explicitly asks.
 
 ## Plugin-dev Tools
 
