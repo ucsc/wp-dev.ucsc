@@ -13,6 +13,10 @@ Per ADR-022, the review target may be a pull-request reference: a **GitHub PR** 
 
 Per ADR-025, when a Bitbucket PR, Jira reference, or Confluence URL is in use and Atlassian MCP tools are unavailable, mention once that the user can set up Atlassian MCP for direct access. Keep the reminder brief and non-blocking, continue with available context, and do not repeat it later in the task. Never install, configure, authenticate, or reload Atlassian MCP without explicit user approval.
 
+When GitHub CLI tooling is needed for pull request creation or inspection, read
+[`../develop/references/github.md`](../develop/references/github.md) before
+proceeding.
+
 Prioritize actionable findings:
 
 1. Runtime bugs and behavior regressions.
@@ -31,9 +35,11 @@ unless the user explicitly asks.
 
 Per ADR-029, offer to generate Conventional Commit syntax for reviewed changes
 or review follow-up edits. Generate message text only if the user accepts.
-Manual check-in is the default: do not run `git add`, `git commit`, `git push`,
-or equivalent staging, commit, or push operations unless the user explicitly
-asks.
+Manual check-in is the default: do not run `git add`, `git commit`, or
+equivalent staging/commit operations unless the user explicitly asks. Never run
+`git push`, `git push --force`, `git push --force-with-lease`, or equivalent
+remote-write operations; provide the command or PR URL for the user to run
+instead.
 
 ## Plugin-dev Tools
 

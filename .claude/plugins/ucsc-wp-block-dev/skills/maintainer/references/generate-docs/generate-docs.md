@@ -60,8 +60,8 @@ regenerating artifacts:
 2. Run `maintainer check-references` because this reference owns a script and
    generated assets.
 3. If top-level skills changed, update `README.md`, `AGENTS.md`,
-   `skills/map/SKILL.md`, the maintainer slide deck, and the API signature
+   the `hub` skill, the maintainer slide deck, and the API signature
    before regenerating the artifacts.
 
-Use `maintainer publish-slides` only when the user explicitly asks to publish
-the canonical slide deck to Google Docs.
+Use `maintainer publish` (`slides`/`docs`/`all`) only when the user explicitly
+asks to publish the canonical slide deck or the prose guide to Google Docs.

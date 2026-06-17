@@ -135,8 +135,10 @@ Summarize the completed fix and validation. If no Jira ID was captured, the comp
 
 Per ADR-051, offer to generate Conventional Commit syntax and automatically commit the completed
 fix. Generate message text only if the user accepts. Manual check-in is the
-default: do not run `git add`, `git commit`, `git push`, or equivalent staging,
-commit, or push operations unless the user explicitly asks.
+default: do not run `git add`, `git commit`, or equivalent staging/commit
+operations unless the user explicitly asks. Never run `git push`,
+`git push --force`, `git push --force-with-lease`, or equivalent remote-write
+operations; provide the command or PR URL for the user to run instead.
 
 ## Plugin-dev Tools
 

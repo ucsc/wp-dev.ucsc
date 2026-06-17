@@ -44,7 +44,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-036](ADR-036-separate-fix-and-feature-workflows.md) | Separate fix and feature workflows | Accepted | 2026-06-12 |
 | [ADR-037](ADR-037-wrap-anthropic-skills-with-context-and-guardrails.md) | Wrap Anthropic skills with UCSC context and guardrails | Accepted | 2026-06-12 |
 | [ADR-038](ADR-038-contributed-skill-incubation.md) | Contributed skills use proposal and incubator tiers | Accepted | 2026-06-15 |
-| [ADR-039](ADR-039-skills-first-map-entry-point.md) | Use a skills-first surface with map as the entry point | Accepted | 2026-06-15 |
+| [ADR-039](ADR-039-skills-first-map-entry-point.md) | Use a skills-first surface with map as the entry point | Superseded | 2026-06-15 |
 | [ADR-040](ADR-040-shared-issue-context-reference.md) | Issue context is a shared develop reference | Accepted | 2026-06-15 |
 | [ADR-041](ADR-041-block-targets-are-develop-references.md) | Block targets are develop references | Accepted | 2026-06-15 |
 | [ADR-042](ADR-042-test-operations-are-references.md) | Test operations are references under test | Accepted | 2026-06-15 |
@@ -54,13 +54,21 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-046](ADR-046-maintainer-is-a-hidden-manual-skill.md) | Maintainer is a hidden manual skill | Accepted | 2026-06-15 |
 | [ADR-047](ADR-047-warn-before-editing-on-non-feature-branches.md) | Warn before editing on non-feature branches | Accepted | 2026-06-16 |
 | [ADR-048](ADR-048-generate-docs-uses-adrs-and-roadmap.md) | Generate docs uses ADRs and includes a roadmap | Accepted | 2026-06-16 |
-| [ADR-049](ADR-049-perform-retrospective-after-tasks.md) | Perform a retrospective after tasks to save lessons learned | Accepted | 2026-06-15 |
+| [ADR-049](ADR-049-perform-retrospective-after-tasks.md) | Perform a retrospective after tasks to save lessons learned | Superseded | 2026-06-15 |
 | [ADR-050](ADR-050-no-local-php-python-dependency.md) | No local PHP or Python dependency | Accepted | 2026-06-15 |
 | [ADR-051](ADR-051-offer-automatic-commit.md) | Offer to automatically commit in addition to providing message text | Accepted | 2026-06-15 |
 | [ADR-052](ADR-052-allow-co-authored-by-ai.md) | Allow Co-authored-by AI in commit messages | Accepted | 2026-06-15 |
 | [ADR-053](ADR-053-tag-commits-with-skillset.md) | Tag commits with ucsc-wp-block-dev skillset use | Accepted | 2026-06-15 |
 | [ADR-054](ADR-054-offer-to-create-pull-requests.md) | Offer to create pull requests | Accepted | 2026-06-15 |
-| [ADR-055](ADR-055-do-not-push-without-checking.md) | Generally do not push to Git, never push without checking | Accepted | 2026-06-15 |
+| [ADR-055](ADR-055-do-not-push-without-checking.md) | Do not push to Git remotes | Accepted | 2026-06-15 |
 | [ADR-056](ADR-056-github-only-operations.md) | Do not offer operations on non-GitHub repositories | Accepted | 2026-06-15 |
 | [ADR-057](ADR-057-do-not-inspect-parent-git-repos.md) | Do not inspect parent Git repos | Accepted | 2026-06-15 |
-| [ADR-058](ADR-058-optimize-for-low-token-use.md) | Optimize for low token use, prefer single agent | Accepted | 2026-06-15 |
+| [ADR-058](ADR-058-optimize-for-low-token-use.md) | Optimize for low token use, single-agent mode by default | Accepted | 2026-06-15 |
+| [ADR-059](ADR-059-offer-retrospective-for-skill-and-script-enrichment.md) | Offer a retrospective for skill and script enrichment | Accepted | 2026-06-16 |
+| [ADR-060](ADR-060-support-hub-to-list-skills.md) | Support :hub to list plugin skills | Accepted | 2026-06-16 |
+| [ADR-061](ADR-061-remove-map-rely-on-native-discovery.md) | Remove map, rely on native skill discovery | Accepted | 2026-06-16 |
+| [ADR-062](ADR-062-github-operations-tool-fallbacks.md) | GitHub operations may use CLI, MCP, or REST | Accepted | 2026-06-16 |
+| [ADR-063](ADR-063-unified-publish-operation.md) | Unify publishing into a publish operation with slides/docs/all targets | Accepted | 2026-06-16 |
+| [ADR-064](ADR-064-agent-backed-checks-are-opt-in.md) | Agent-backed maintainer checks are opt-in, not default | Accepted | 2026-06-16 |
+| [ADR-065](ADR-065-new-adr-script.md) | Introduce automated ADR creation script new_adr.sh | Accepted | 2026-06-16 |
+| [ADR-066](ADR-066-test-driver.md) | Introduce test/driver.sh script for automated test suites | Accepted | 2026-06-16 |

@@ -10,7 +10,7 @@
 
 set -uo pipefail
 
-GDOC_URL="https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
+GDOC_URL="https://docs.google.com/document/d/1r5gglrwp6AXabaXqOWhzWj7qDpJZhjvUAFci0-rXIII/edit"
 
 # scripts/ -> maintainer -> skills -> plugin root; project root is three more up.
 PLUGIN_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"

@@ -11,13 +11,15 @@ and skill names. Use “WordPress” only in human-facing names and prose.
 ## Skills
 
 Start with a target, describe the goal in ordinary language, and optionally
-include a Jira key or URL. `map` is the primary entry point for routing requests.
+include a Jira key or URL. Claude routes to the right skill from each skill's
+description; type `hub` (`:hub`) to list what's available, or invoke a skill
+directly.
 
 **On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
 
 | Skill | Purpose |
 |---|---|
-| `map` | Detect the active app and route the request to a skill |
+| `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `feature` | Add new behavior through the preferred feature workflow |
 | `develop` | Use the existing development workflow during migration |
 | `fix` | Fix a described problem in a specified target block, GUI, or app |
@@ -49,8 +51,8 @@ Use the maintainer `generate-docs` reference at
 `maintainer/references/generate-docs/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or
 Confluence. Use `maintainer generate-docs` for regeneration and
-`maintainer publish-slides` only when publishing the canonical deck to Google
-Docs.
+`maintainer publish` (`slides`/`docs`/`all`) only when publishing the guide or
+deck to Google Docs.
 
 ## Contributing skills
 
@@ -78,7 +80,7 @@ See the `run` skill for the recorded setup and launch recipe, `verify` for live
 behavior checks, and `test` for automated tests. The environment README owns
 clean setup; the product plugin README owns its test commands.
 
-For the routine lifecycle, the `run` and `verify` skills ship a token-frugal `driver.sh` that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
+For the routine lifecycle, the `run`, `verify`, and `test` skills ship a token-frugal `driver.sh` that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
 
 ```bash
 # Build + launch + smoke in one call (inspect → build → launch → smoke)
@@ -86,6 +88,9 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
 
 # Deterministic pre-checks for a change (plugin active, build fresh, block registered)
 bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
+
+# Run PHP and Jest automated test suites in Docker
+bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh all
 ```
 
 The raw commands below are the underlying steps those drivers automate:

@@ -1,10 +1,14 @@
 ---
 title: "ADR-049: Perform Retrospective After Tasks"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 
 # ADR-049: Perform Retrospective After Tasks
+
+## Status
+
+Superseded by ADR-059
 
 ## Context
 

@@ -1,6 +1,6 @@
 ---
 title: "ADR-039: Use a skills-first surface with map as the entry point"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 
@@ -8,7 +8,7 @@ date: 2026-06-15
 
 ## Status
 
-Accepted
+Superseded by ADR-061
 
 ## Context
 

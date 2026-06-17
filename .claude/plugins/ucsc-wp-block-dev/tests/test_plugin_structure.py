@@ -22,8 +22,8 @@ EXPECTED_LIVE_SKILLS = {
     "develop",
     "feature",
     "fix",
+    "hub",
     "maintainer",
-    "map",
     "review",
     "retrospective",
     "run",
@@ -127,24 +127,25 @@ class TestSkillFrontmatter:
         assert actual == EXPECTED_LIVE_SKILLS
 
     def test_public_workflow_inventory_hides_maintainer(self):
-        """The public docs advertise product workflows, while maintainer remains manual."""
+        """The public docs advertise product workflows, while maintainer/retrospective remain manual."""
         readme = (PLUGIN_ROOT / "README.md").read_text()
-        map_text = (SKILLS_DIR / "map" / "SKILL.md").read_text()
 
         for skill_name in sorted(EXPECTED_PUBLIC_WORKFLOW_SKILLS):
             assert f"| `{skill_name}` |" in readme
-        for skill_name in sorted(EXPECTED_PUBLIC_WORKFLOW_SKILLS - {"map"}):
-            assert f"| `{skill_name}` |" in map_text
 
         assert "| `maintainer` |" not in readme
-        assert "| `maintainer` |" not in map_text
         assert "| `retrospective` |" not in readme
-        assert "| `retrospective` |" not in map_text
         assert "maintenance is intentionally hidden" in readme.lower()
         assert "`maintainer` directly" in readme.lower()
         assert "`retrospective` directly" in readme.lower()
-        assert "type `maintainer` directly" in map_text.lower()
-        assert "type `retrospective` directly" in map_text.lower()
+
+    def test_hub_lists_every_live_skill(self):
+        """:hub is the inventory surface; it must enumerate every live skill (ADR-060)."""
+        hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
+        for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub"}):
+            assert f"`{skill_name}`" in hub, f"hub is missing skill '{skill_name}'"
+        # hub enumerates; it does not route (ADR-061).
+        assert "invoke the specific skill directly" in hub.lower()
 
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill."""
@@ -231,7 +232,6 @@ class TestSkillFrontmatter:
                 )
 
     def test_workflow_skills_support_universal_input_resolution(self):
-        routers = ["map"]
         handlers = [
             "develop",
             "feature",
@@ -242,14 +242,6 @@ class TestSkillFrontmatter:
             "test",
             "verify",
         ]
-
-        for skill_name in routers:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
-            assert "## universal input routing" in text
-            assert "target" in text
-            assert "natural-language request" in text
-            assert "jira key/url" in text
-            assert "preserve" in text
 
         for skill_name in handlers:
             text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
@@ -285,16 +277,6 @@ class TestSkillFrontmatter:
         assert "references/targets/index.md" in develop
         assert "do not load all target references" in develop
         assert "references/domain/blocks.md" in develop
-
-    def test_map_is_the_single_skill_entry_point(self):
-        text = (SKILLS_DIR / "map" / "SKILL.md").read_text().lower()
-        for skill_name in ["feature", "fix", "test", "review", "run", "verify"]:
-            assert f"`{skill_name}`" in text
-        assert "type `maintainer` directly" in text
-        assert "references/generate-docs/generate-docs.md" in text
-        assert "generate-docs` is intentionally a hidden reference" in text
-        assert "portable entry point" in text
-        assert "route by intent rather than command syntax" in text
 
     def test_maintainer_reference_regenerates_markdown_artifacts(self):
         """Maintainer owns Markdown outputs for Google Docs and Confluence."""
@@ -463,14 +445,16 @@ class TestSkillFrontmatter:
             assert "do not treat a missing id as incomplete work" in text
 
     def test_fix_feature_develop_and_review_offer_commit_syntax_without_git_operations(self):
-        """ADR-029 offers Conventional Commit syntax while keeping Git operations manual."""
+        """Commit syntax is offered while staging/commit stays manual and push is forbidden (ADR-051, ADR-055)."""
         for skill_name in ["fix", "feature", "develop", "review"]:
             text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
             normalized = re.sub(r"\s+", " ", text)
             assert "offer to generate conventional commit syntax" in normalized
             assert "generate message text only if the user accepts" in normalized
             assert "manual check-in is the default" in normalized
-            assert "`git add`, `git commit`, `git push`" in normalized
+            # Staging/commit stays manual; pushing is forbidden outright (ADR-055).
+            assert "do not run `git add`, `git commit`" in normalized
+            assert "never run `git push`" in normalized
             assert "unless the user explicitly asks" in normalized
 
     def test_editing_workflows_warn_on_non_feature_branches(self):

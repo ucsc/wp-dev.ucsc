@@ -17,13 +17,15 @@ and skill names. Use “WordPress” only in human-facing names and prose.
 ## Skills
 
 Start with a target, describe the goal in ordinary language, and optionally
-include a Jira key or URL. `map` is the primary entry point for routing requests.
+include a Jira key or URL. Claude routes to the right skill from each skill's
+description; type `hub` (`:hub`) to list what's available, or invoke a skill
+directly.
 
 **On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
 
 | Skill | Purpose |
 |---|---|
-| `map` | Detect the active app and route the request to a skill |
+| `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `feature` | Add new behavior through the preferred feature workflow |
 | `develop` | Use the existing development workflow during migration |
 | `fix` | Fix a described problem in a specified target block, GUI, or app |
@@ -55,8 +57,8 @@ Use the maintainer `generate-docs` reference at
 `maintainer/references/generate-docs/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or
 Confluence. Use `maintainer generate-docs` for regeneration and
-`maintainer publish-slides` only when publishing the canonical deck to Google
-Docs.
+`maintainer publish` (`slides`/`docs`/`all`) only when publishing the guide or
+deck to Google Docs.
 
 ## Contributing skills
 

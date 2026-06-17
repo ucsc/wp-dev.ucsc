@@ -123,7 +123,7 @@ references:
 
 | Skill | Trigger | Purpose |
 | :--- | :--- | :--- |
-| **`map`** | Unclear workflow or target | Entry point — identifies the app and routes to the right skill. |
+| **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
 | **`feature`** | New behavior | Preferred feature workflow. |
 | **`develop`** | Existing development workflow | Compatibility workflow during migration. |
 | **`fix`** | Bug or regression | Debugs JS, PHP, REST API, or transient caching bugs. |
@@ -152,9 +152,9 @@ Block-specific target guidance lives under `develop/references/targets/`.
 
 ---
 
-## **Skill Map**
+## **Skill Routing**
 
-`map` identifies the active WordPress app and routes targets, natural-language requests, and optional Jira context into the portable skill set (ADR-039):
+Claude routes targets, natural-language requests, and optional Jira context to the right skill from each skill's description; `hub` lists the set (ADR-061):
 
 | Skill | Outcome |
 | :--- | :--- |
@@ -273,7 +273,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * See the plugin [README](../../../../../README.md) for plugin-dev tool install and usage (ADR-013).
 * **`maintainer/references/generate-docs/generate-docs.md` (Portable Markdown Artifacts):**
   * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/generate-docs/assets/`.
-  * Keeps publishing separate; use `maintainer publish-slides` only for Google Docs upload.
+  * Keeps publishing separate; use `maintainer publish` (`slides`/`docs`/`all`) only for Google Docs upload.
 * **`retrospective` (Hidden Lessons-Capture Workflow):**
   * Manually reachable by typing `retrospective`, but omitted from the public workflow list.
   * Captures new patterns, gotchas, and reusable knowledge into the closest skill reference after a work session.
@@ -343,11 +343,11 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
 * **Dependencies:** Auto-installed into a `.venv` next to the script: `markdown`, `google-api-python-client`, `google-auth-httplib2`, `google-auth-oauthlib`.
 * **Publish command:**
   ```bash
-  python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
+  python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1r5gglrwp6AXabaXqOWhzWj7qDpJZhjvUAFci0-rXIII/edit"
   ```
-  This is also the implementation behind the maintainer `publish-slides`
-  operation.
-* **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` bumps the `Generated:` date to today, runs the deck-contract tests, then publishes — automating the manual steps below (ADR-003/014/015).
+  This is also the implementation behind the maintainer `publish slides`
+  operation; `publish docs` publishes the prose guide the same way (ADR-063).
+* **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` (deck) and `refresh_and_publish_docs.sh` (guide) bump/regenerate, run the contract tests, then publish — automating the manual steps below (ADR-003/014/015/063).
 * **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
 
 ---

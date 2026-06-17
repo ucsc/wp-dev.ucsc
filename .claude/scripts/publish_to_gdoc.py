@@ -357,6 +357,18 @@ def main():
         if len(parts) > 1:
             doc_id = parts[1].split("/")[0]
 
+    # Parse source markdown argument (defaults to the slide deck for back-compat)
+    source_path = SLIDES_PATH
+    for arg in sys.argv:
+        if arg.startswith("--source="):
+            source_path = Path(arg.split("=", 1)[1]).expanduser().resolve()
+            break
+    else:
+        if "--source" in sys.argv:
+            idx = sys.argv.index("--source")
+            if idx + 1 < len(sys.argv):
+                source_path = Path(sys.argv[idx + 1]).expanduser().resolve()
+
     gcloud_adc_path = Path("/Users/henryh/.config/gcloud/application_default_credentials.json")
     if not gcloud_adc_path.exists() and not SERVICE_ACCOUNT_FILE.exists() and not CREDENTIALS_FILE.exists() and not TOKEN_FILE.exists():
         print_instructions_and_exit()
@@ -368,8 +380,8 @@ def main():
         print(f"[ERROR] Failed to authenticate: {e}", file=sys.stderr)
         sys.exit(1)
 
-    print("Converting Markdown presentation to HTML...")
-    html_content = convert_md_to_html(SLIDES_PATH)
+    print(f"Converting Markdown source to HTML: {source_path}")
+    html_content = convert_md_to_html(source_path)
     
     temp_html_path = SCRIPT_DIR / "temp_presentation.html"
     temp_html_path.write_text(html_content)

@@ -21,8 +21,15 @@ $baseURL = $useNewServer
     : 'https://webapps.ucsc.edu/wcsi';
 ```
 
-It renders either a `department` or `subject` attribute in `<div id="wcsi">`
+It renders either a `department` or `subject` attribute in `<div id="classSchedule">`
 according to `subjectOrDept`.
+
+## Rendered-HTML Detection
+
+Dynamic block — strips `<!-- wp: -->` comments from `content.rendered`.
+Detect via: `id="classSchedule"` in the rendered HTML.
+
+Previous versions used `id="wcsi"` — that ID is no longer current.
 
 ## Testing Toggle
 

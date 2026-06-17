@@ -25,20 +25,31 @@ feature, fix, or acceptance criterion.
 
 Build checks may support any type but are not a fourth test type.
 
-## Running PHP Tests
+## Running Tests via Driver (Preferred)
 
-Always use Docker — never assume a local `php` binary (ADR-050):
+Always prefer running tests using the test driver in a single token-frugal call:
+
+```bash
+# Run all tests (PHP + Jest)
+bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh all
+
+# Run only PHP tests
+bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh php
+
+# Run only Jest unit tests
+bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh jest
+```
+
+## Running PHP Tests (Manual/Fallback)
+
+If you need to run specific PHP tests manually:
 
 ```bash
 # Run a single test file
-docker run --rm -v "$PWD:/plugin" -w /plugin php:8.1-cli php tests/php/ClassName Test.php
-
-# Run all existing PHP tests
-docker run --rm -v "$PWD:/plugin" -w /plugin php:8.1-cli \
-  sh -c 'for f in tests/php/*.php; do php "$f"; done'
+docker run --rm -v "$PWD:/plugin" -w /plugin php:8.1-cli php tests/php/ClassNameTest.php
 ```
 
-Test files exit non-zero on failure — capture the pass/fail line at the end of output.
+Test files exit non-zero on failure.
 
 ## Reporting
 

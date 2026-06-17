@@ -1,22 +1,31 @@
 ---
-title: "ADR-055: Generally do not push to Git, never push without checking"
+title: "ADR-055: Do not push to Git remotes"
 status: Accepted
 date: 2026-06-15
 ---
 
-# ADR-055: Generally do not push to Git, never push without checking
+# ADR-055: Do not push to Git remotes
 
 ## Context
 
-While [ADR-054](ADR-054-offer-to-create-pull-requests.md) encourages offering Pull Request creation, the underlying Git push operations present risks of pushing untested or unintended changes, especially when multiple repositories (outer plugin framework vs inner plugin source) are involved. 
+While [ADR-054](ADR-054-offer-to-create-pull-requests.md) encourages offering Pull Request creation, the underlying Git push operations present risks of pushing untested or unintended changes, especially when multiple repositories (outer plugin framework vs inner plugin source) are involved.
+
+Force-pushing is especially risky because it can rewrite remote branch history. Even when the user is trying to create or update a pull request, branch publication should remain a human-controlled action.
 
 ## Decision
 
-The AI assistant must generally default to *not* pushing to remote Git repositories automatically. Pushing is permitted only when explicitly required, and the assistant must **NEVER push without thoroughly checking** the current state (e.g., via `git status`, `git log`, and confirming the target branch and repository). 
+The AI assistant must not run `git push`, `git push --force`, `git push --force-with-lease`, or equivalent remote-write operations in this repository.
 
-If a push is necessary, the assistant must explicitly verify the current repository context (e.g., inner repo vs outer repo) and confirm exactly what is being pushed before proceeding.
+When pull request creation or branch publication is needed, the assistant may:
+
+1. Verify and summarize the local repository state.
+2. Provide the exact push command for the user to run manually.
+3. Provide a GitHub compare URL or PR title/body.
+4. Create a PR only when the branch is already available remotely and PR creation does not require pushing.
+
+Remote history rewrites are never performed by the assistant. This includes `--force` and `--force-with-lease`.
 
 ## Consequences
 
-- **Positive:** Prevents accidental pushes of unreviewed code or pushing to the wrong remote tracking branch.
-- **Negative:** Requires slightly more user back-and-forth for final branch publishing.
+- **Positive:** Prevents accidental pushes of unreviewed code, wrong-repository pushes, and unintended remote history rewrites.
+- **Negative:** Requires the user to publish branches manually before PR creation when the remote branch is missing or stale.

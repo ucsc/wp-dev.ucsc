@@ -11,15 +11,26 @@ use `develop`/`fix`/`run` for that). For Markdown artifact regeneration, read
 
 Use this skill with one operation: `validate`, `test`, `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`,
-`publish-slides`, or `all`. Run all commands below from the repo root.
+`publish` (`slides`/`docs`/`all`), or `all`. Run all commands below from the
+repo root.
 
-Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003.
+To work on the plugin itself, launch Claude Code from the repo root with the
+plugin loaded directly from its development directory:
+
+```bash
+claude --plugin-dir .claude/plugins/ucsc-wp-block-dev
+```
+
+This loads the in-tree plugin (skills, agents, hooks) so maintainer edits take
+effect without installing from a marketplace.
+
+Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003 and ADR-058 (single-agent mode by default).
 
 ## Universal Command Intake
 
 Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`, `publish-slides`, and `all`. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`, `publish` (`slides`/`docs`/`all`), and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 ## Anthropic plugin-dev tools
 
@@ -38,7 +49,7 @@ These are the built-in `plugin-dev:*` agents and skills available for delegating
 
 ## validate
 
-Launch the `plugin-dev:plugin-validator` agent against this plugin to check the manifest, skill frontmatter, naming, structure, and security.
+Opt-in only and token-heavy (~10k tokens): never run automatically or as part of `all` (ADR-064). Launch the `plugin-dev:plugin-validator` agent against this plugin to check the manifest, skill frontmatter, naming, structure, and security.
 
 Use the Agent tool:
 
@@ -67,7 +78,7 @@ Some tests skip gracefully when the `claude` CLI is unavailable — that is expe
 
 ## review-skills
 
-Launch the `plugin-dev:skill-reviewer` agent to audit skill quality, description effectiveness, and best-practice adherence after creating or modifying any `SKILL.md`.
+Opt-in only and token-heavy (~14k tokens): never run automatically or as part of `all` (ADR-064). Launch the `plugin-dev:skill-reviewer` agent to audit skill quality, description effectiveness, and best-practice adherence after creating or modifying any `SKILL.md`.
 
 Use the Agent tool:
 
@@ -128,7 +139,7 @@ Before moving files:
 
 After moving files:
 
-1. Update `README.md`, `AGENTS.md`, `map/SKILL.md`, and the maintainer slide
+1. Update `README.md`, `AGENTS.md`, the `hub` skill, and the maintainer slide
    deck when the new skill changes those inventories.
 2. Add or update structural tests for the supported skill surface.
 3. Run `test`, `validate`, `check-references`, and `review-skills`.
@@ -165,7 +176,12 @@ and
 [`references/generate-docs/assets/ucsc_wp_block_dev_presentation.md`](references/generate-docs/assets/ucsc_wp_block_dev_presentation.md).
 It does not publish or upload anything.
 
-## publish-slides
+## publish
+
+Per ADR-063, `publish` takes a target: `slides`, `docs`, or `all`. Publishing is
+always explicit and never part of `all`.
+
+### publish slides
 
 The canonical Marp source is maintainer-owned:
 
@@ -176,27 +192,133 @@ The canonical Marp source is maintainer-owned:
 Before publishing:
 
 1. Compare the deck's skill inventory with every top-level directory under `skills/`.
-2. Compare its skill map with `map/SKILL.md`.
-3. Compare its ADR summary with `docs/adr/index.md`.
-4. Refresh the title slide's `Generated:` value to the current date.
-5. Run the plugin tests, which enforce the deck path and inventory contract.
+2. Compare its ADR summary with `docs/adr/index.md`.
+3. Refresh the title slide's `Generated:` value to the current date.
+4. Run the plugin tests, which enforce the deck path and inventory contract.
 
-Publish the verified source to the existing Google Doc:
+Publish the verified deck to the existing Google Doc:
 
 ```bash
-python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
+python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1r5gglrwp6AXabaXqOWhzWj7qDpJZhjvUAFci0-rXIII/edit"
 ```
 
-The publisher reads only the maintainer asset path. Do not restore a second deck at the repository root (ADR-018).
+Do not restore a second deck at the repository root (ADR-018).
+
+### publish docs
+
+Publishes the generated prose guide
+`skills/maintainer/references/generate-docs/assets/ucsc_wp_block_dev_main.md`
+(derived from `README.md` via `generate-docs`) to its own Google Doc.
+
+**Fast path:** `bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/refresh_and_publish_docs.sh` regenerates the artifacts, runs the generate-docs contract tests, then publishes. Pass `--no-publish` to refresh and test without uploading.
+
+The guide's destination Google Doc URL must be set in `GDOC_URL` inside
+`refresh_and_publish_docs.sh` before first publish; until then the script refuses
+to upload. The underlying publisher accepts an explicit source:
+
+```bash
+python3 .claude/scripts/publish_to_gdoc.py \
+  --source skills/maintainer/references/generate-docs/assets/ucsc_wp_block_dev_main.md \
+  --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
+```
+
+### publish all
+
+Run `publish slides` then `publish docs`.
+
+## new-adr
+
+Automatically allocates the next available ADR number, creates a new ADR markdown file with standard frontmatter and markdown skeleton, and updates the ADR index file. Run the script:
+
+```bash
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <slug> "<title>"
+```
 
 ## all
 
-Run `test` first (fast, deterministic), then `validate`, then `check-references`, then `review-skills`. Publishing remains explicit through `publish-slides`. Report a single combined summary.
+Run the token-frugal deterministic checks only: `test` first (fast, deterministic), then `check-references`. Report a single combined summary.
 
-Contribution candidates are intentionally excluded from `all`; run
+Per ADR-064, `all` deliberately **excludes** the agent-backed checks `validate`
+and `review-skills` — each spawns a token-heavy Anthropic `plugin-dev` agent, so
+they run only when explicitly requested. Offer them after `all` if a deeper
+review is wanted.
+
+Contribution candidates are also excluded from `all`; run
 `review-contrib <candidate>` explicitly because proposals and incubator skills
 may be incomplete.
+
+## Skill visibility and invocation (hidden skills)
+
+Claude Code exposes two frontmatter booleans that control *how* a skill can be
+invoked. Know what they do before deciding how to "hide" a skill:
+
+| Field | Default | When set to the non-default | Effect |
+|---|---|---|---|
+| `user-invocable` | `true` | `user-invocable: false` | Hides the skill from the `/` slash-command menu. The user can no longer invoke it by name; **the model can still auto-invoke it** from its description. |
+| `disable-model-invocation` | `false` | `disable-model-invocation: true` | The model will **not** auto-trigger the skill from its description; **the user can still run it** explicitly via `/<skill>`. |
+
+Combined behavior:
+
+| `user-invocable` | `disable-model-invocation` | Who can invoke |
+|---|---|---|
+| `true` (default) | `false` (default) | User (slash menu) **and** model (auto) — fully public |
+| `false` | `false` | Model only — auto-invoked, hidden from the slash menu |
+| `true` | `true` | User only — manual `/<skill>`, no model auto-trigger |
+| `false` | `true` | Effectively unreachable — avoid |
+
+Note the defaults are `user-invocable: true` and
+`disable-model-invocation: false`; writing those values explicitly does nothing,
+so only add a field when you mean to flip it.
+
+### How this plugin actually hides skills
+
+This plugin **does not use either field.** The structural test
+`test_frontmatter_uses_portable_agent_skills_fields` restricts canonical
+`SKILL.md` frontmatter to `name` and `description` only (portable Agent Skills
+core fields; see ADR-005, superseded by ADR-011). Adding `user-invocable` or
+`disable-model-invocation` to a `skills/*/SKILL.md` would **fail `test`.**
+
+Instead, "hidden" is achieved by convention:
+
+- **`maintainer`** is a hidden *manual* skill (ADR-046): it stays a live,
+  type-able skill but is removed from the public workflow tables in `README`,
+  `hub`, and the slide deck so it does not clutter the product-facing list.
+  Hiding is documentation-level, not frontmatter-level.
+- **`develop`** is kept from direct triggering by **description wording**
+  ("Invoked by the `feature` and `fix` skills after scope is defined; do not
+  trigger directly"), not by `disable-model-invocation`.
+
+If a future change genuinely needs frontmatter-enforced visibility, first widen
+the allow-list in `test_frontmatter_uses_portable_agent_skills_fields` and
+record the decision in a new ADR superseding the ADR-005/011 frontmatter
+convention — otherwise `test` and `validate` will reject the skill.
 
 ## When the manifest or skills change
 
 After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills. When the main guide or deck should be prepared for Google Docs or Confluence without publishing, use the `generate-docs` operation in this skill.
+
+## Maintenance gotchas
+
+- **Claim the ADR number before writing.** Concurrent edits (or a linter) can add
+  an ADR with the next sequential number while you work, so a fresh `ADR-NNN`
+  file can collide. Before creating one, check **both** `docs/adr/index.md` and
+  `ls docs/adr/`; if your number was taken, renumber the file, its title/heading,
+  every in-body reference, and the index row.
+- **Adding or removing a skill touches an inventory sync set — move them
+  together or `test` fails.** The set is: the README skills table, the `hub`
+  listing, the slide deck skill table (`skills/maintainer/assets/…presentation.md`),
+  `EXPECTED_LIVE_SKILLS` in `tests/test_plugin_structure.py` (plus any
+  hardcoded skill lists in tests, e.g. `test_plugin_validity.py`), and the
+  generated `generate-docs` assets (run `generate-docs` to refresh). Then run
+  `check-references` and `test`.
+- **Publishing is per-target.** Each `publish` target has its own destination
+  Google Doc; `publish_to_gdoc.py --source <md> --doc <url>` publishes any
+  markdown, and each fast-path script holds its own `GDOC_URL` (ADR-063).
+- **Superseding an ADR can leave a stale test.** Tests sometimes assert a
+  decision's literal wording (e.g. a commit-syntax string). When an ADR is
+  superseded — including by concurrent/external work — `grep` the tests for
+  phrases tied to the old ADR, update the assertions to the current wording, and
+  re-point the test docstring to the superseding ADR(s). A superseded ADR whose
+  test still asserts the old text fails `test` even though the skills are
+  correct (e.g. ADR-029's `git add`/`commit`/`push` literal after the git-ops
+  rework).

@@ -22,6 +22,9 @@ When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read [`references/issue-context.md`](references/issue-context.md) and merge its
 compact implementation brief into this workflow.
 
+When GitHub CLI tooling is needed for pull request creation or inspection, read
+[`references/github.md`](references/github.md) before proceeding.
+
 Before using tools, require the user to choose a target. Resolve known slugs and
 aliases through
 [`references/targets/index.md`](references/targets/index.md), then read only the
@@ -239,8 +242,10 @@ If applicable validation is complete and no Jira ID was captured, the completion
 
 Per ADR-029, offer to generate Conventional Commit syntax for the completed
 feature. Generate message text only if the user accepts. Manual check-in is the
-default: do not run `git add`, `git commit`, `git push`, or equivalent staging,
-commit, or push operations unless the user explicitly asks.
+default: do not run `git add`, `git commit`, or equivalent staging/commit
+operations unless the user explicitly asks. Never run `git push`,
+`git push --force`, `git push --force-with-lease`, or equivalent remote-write
+operations; provide the command or PR URL for the user to run instead.
 
 ## Plugin-dev Tools
 

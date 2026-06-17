@@ -61,5 +61,7 @@ Run focused tests, use `run` for the Docker build and launch workflow, and use
 `verify` for user-facing acceptance evidence. Summarize changed behavior and
 offer to generate Conventional Commit syntax. Generate message text only if the
 user accepts. Manual check-in is the default; do not run `git add`, `git
-commit`, `git push`, or equivalent staging, commit, or push operations unless
-the user explicitly asks.
+commit`, or equivalent staging/commit operations unless the user explicitly
+asks. Never run `git push`, `git push --force`, `git push --force-with-lease`,
+or equivalent remote-write operations; provide the command or PR URL for the
+user to run instead.
