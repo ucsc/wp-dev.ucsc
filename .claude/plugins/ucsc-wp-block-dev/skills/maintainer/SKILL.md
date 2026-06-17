@@ -325,9 +325,10 @@ decision in an ADR — the test will no longer reject it.
   useful for adding trigger phrases without bloating the primary description.
 - **`${CLAUDE_SKILL_DIR}`** — expands to the skill's own directory at runtime.
   Reference bundled scripts with this variable so paths survive regardless of
-  where the session starts (e.g. `` !`bash ${CLAUDE_SKILL_DIR}/scripts/foo.sh` ``).
-- **Dynamic context injection** — a line beginning with `` !`command` `` (or a
-  fenced ` ```! ` block) runs the command *before* Claude sees the skill and
+  where the session starts. To inject output at load time, prefix a line with `!`
+  followed by a backtick-wrapped shell command (e.g. `!` + `` `bash …/scripts/run.sh` ``).
+- **Dynamic context injection** — a line beginning with `!` and a backtick-wrapped
+  command (or a fenced ` ```! ` block) runs the command *before* Claude sees the skill and
   inlines its output. Use to inject live state (current branch, build status,
   etc.) directly into a skill prompt without extra tool calls.
 - **`context: fork` + `agent`** — runs the skill in an isolated subagent; the
