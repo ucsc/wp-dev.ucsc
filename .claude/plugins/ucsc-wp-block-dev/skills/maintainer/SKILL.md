@@ -36,10 +36,21 @@ Per ADR-020, when the user enters maintainer mode **without an explicit operatio
 
 ## Anthropic plugin-dev tools
 
-These are the built-in `plugin-dev:*` agents and skills available for delegating maintenance work. Install the plugin-dev plugin if not already present:
+`plugin-dev` is the required companion plugin for all Tier 2 operations (ADR-079).
+Docs: https://code.claude.com/docs/en/plugins  
+Source: https://github.com/anthropics/claude-plugins-official
+
+**Before running any Tier 2 operation, verify it is installed:**
+
+```bash
+claude plugin list | grep plugin-dev
+```
+
+If absent, install it then reload:
 
 ```text
 /plugin install plugin-dev@claude-plugins-official
+/reload-plugins
 ```
 
 | Tool | Type | Purpose |
@@ -51,9 +62,22 @@ These are the built-in `plugin-dev:*` agents and skills available for delegating
 
 ## validate
 
-Opt-in only and token-heavy (~10k tokens): never run automatically or as part of `all` (ADR-064). Launch the `plugin-dev:plugin-validator` agent against this plugin to check the manifest, skill frontmatter, naming, structure, and security.
+Two-tier validation per ADR-078:
 
-Use the Agent tool:
+**Tier 1 — CLI structural check (free, deterministic):**
+
+```bash
+claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
+```
+
+Run this first. It checks manifest, frontmatter, naming, and file structure
+with no agent tokens. This is also exercised by `maintainer test` via the
+pytest suite.
+
+**Tier 2 — plugin-dev agent semantic review (opt-in, ~10k tokens):**
+
+Only offer this after Tier 1 passes and a deeper qualitative review is wanted
+(ADR-064). Launch via the Agent tool:
 
 - `subagent_type`: `plugin-dev:plugin-validator`
 - `prompt`: "Validate the Claude Code plugin at `.claude/plugins/ucsc-wp-block-dev`. Report critical errors, warnings, and overall quality."
@@ -267,12 +291,19 @@ Run after any `SKILL.md` frontmatter change to confirm the invocation posture is
 
 ## all
 
-Run the token-frugal deterministic checks only: `test` first (fast, deterministic), then `check-references`. Report a single combined summary.
+Run the token-frugal deterministic checks in order: `test` (pytest suite),
+`check-references`, then the CLI structural validator. Report a single combined
+summary.
 
-Per ADR-064, `all` deliberately **excludes** the agent-backed checks `validate`
-and `review-skills` — each spawns a token-heavy Anthropic `plugin-dev` agent, so
-they run only when explicitly requested. Offer them after `all` if a deeper
-review is wanted.
+```bash
+# Tier 1 structural validation included in `all` (ADR-078)
+claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
+```
+
+Per ADR-064, `all` deliberately **excludes** the agent-backed checks
+(`plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer`) — each spawns
+a token-heavy subagent, so they run only when explicitly requested. Offer them
+after `all` if a deeper semantic review is wanted.
 
 Contribution candidates are also excluded from `all`; run
 `review-contrib <candidate>` explicitly because proposals and incubator skills

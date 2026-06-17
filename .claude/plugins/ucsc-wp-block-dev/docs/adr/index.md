@@ -83,3 +83,5 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-075](ADR-075-prefer-single-agent-mode.md) | prefer single-agent mode — avoid multi-agent pipelines unless the task requires parallelism | Accepted | 2026-06-17 |
 | [ADR-076](ADR-076-token-burn-log.md) | track token-heavy operations in a usage log for retrospective review | Accepted | 2026-06-17 |
 | [ADR-077](ADR-077-lessons-learned-to-scripts-and-skills.md) | always consider lessons learned and token-reduction opportunities via scripts and skill improvements | Accepted | 2026-06-17 |
+| [ADR-078](ADR-078-cli-validate-as-primary-check.md) | use claude plugin validate ./path as the primary structural check before the plugin-dev agent | Accepted | 2026-06-17 |
+| [ADR-079](ADR-079-plugin-dev-companion-plugin.md) | plugin-dev from claude-plugins-official is the required companion for Tier 2 maintainer operations | Accepted | 2026-06-17 |

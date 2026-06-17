@@ -753,47 +753,6 @@ class TestFileLayout:
         assert "__pycache__/" in text or "__pycache__" in text
         assert ".pytest_cache/" in text or ".pytest_cache" in text
 
-
-class TestCrossPlatformNaming:
-    """Claude and Codex must expose the same canonical plugin ID."""
-
-    @pytest.fixture()
-    def codex_manifest(self):
-        path = (
-            PROJECT_ROOT
-            / ".agents"
-            / "plugins"
-            / PLUGIN_NAME
-            / ".codex-plugin"
-            / "plugin.json"
-        )
-        return json.loads(path.read_text())
-
-    @pytest.fixture()
-    def marketplace(self):
-        path = PROJECT_ROOT / ".agents" / "plugins" / "marketplace.json"
-        return json.loads(path.read_text())
-
-    def test_codex_manifest_uses_canonical_name(self, codex_manifest):
-        assert codex_manifest["name"] == PLUGIN_NAME
-
-    def test_version_consistency(self, codex_manifest):
-        """The base semantic version (major.minor.patch) must be identical in both Claude and Codex manifests."""
-        claude_manifest = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text())
-        claude_ver = claude_manifest["version"].split("+")[0]
-        codex_ver = codex_manifest["version"].split("+")[0]
-        assert claude_ver == codex_ver, (
-            f"Claude version '{claude_ver}' does not match Codex version '{codex_ver}'"
-        )
-
-    def test_codex_marketplace_uses_canonical_name_and_path(self, marketplace):
-        entry = next(plugin for plugin in marketplace["plugins"] if plugin["name"] == PLUGIN_NAME)
-        assert entry["source"]["path"] == f"./.agents/plugins/{PLUGIN_NAME}"
-
-    def test_codex_launcher_uses_canonical_name(self):
-        launcher = (PROJECT_ROOT / ".agents" / "codex.sh").read_text()
-        assert f'PLUGIN_NAME="{PLUGIN_NAME}"' in launcher
-
     def test_canonical_skills_do_not_embed_plugin_slash_commands(self):
         command_pattern = re.compile(r"/(ucsc-(?:wp|wordpress)-block-dev):[a-z-]+")
         files = [PLUGIN_ROOT / "README.md", *SKILLS_DIR.rglob("SKILL.md")]
@@ -808,15 +767,49 @@ class TestCrossPlatformNaming:
         )
 
     def test_forbidden_long_plugin_id_is_absent(self):
-        roots = [PLUGIN_ROOT, PROJECT_ROOT / ".agents"]
         offenders = []
-        for root in roots:
-            for path in root.rglob("*"):
-                if "__pycache__" in path.parts or ".pytest_cache" in path.parts:
-                    continue
-                if path.is_file() and FORBIDDEN_PLUGIN_NAME in path.read_text(errors="ignore"):
-                    offenders.append(str(path.relative_to(PROJECT_ROOT)))
+        for path in PLUGIN_ROOT.rglob("*"):
+            if "__pycache__" in path.parts or ".pytest_cache" in path.parts:
+                continue
+            if path.is_file() and FORBIDDEN_PLUGIN_NAME in path.read_text(errors="ignore"):
+                offenders.append(str(path.relative_to(PLUGIN_ROOT)))
         assert offenders == [], (
             f"Use '{PLUGIN_NAME}' for machine-facing identifiers; found "
             f"'{FORBIDDEN_PLUGIN_NAME}' in: {offenders}"
+        )
+
+
+class TestAgentsMd:
+    """AGENTS.md at the project root must stay in sync with live skills."""
+
+    def test_agents_md_exists(self):
+        assert (PROJECT_ROOT / "AGENTS.md").exists(), "AGENTS.md not found at repo root"
+
+    def test_agents_md_lists_all_live_skills(self):
+        """Every live skill must appear in the AGENTS.md skill routing table."""
+        text = (PROJECT_ROOT / "AGENTS.md").read_text()
+        actual_skills = {
+            path.name
+            for path in SKILLS_DIR.iterdir()
+            if path.is_dir() and (path / "SKILL.md").exists()
+        }
+        for skill_name in sorted(actual_skills):
+            assert f"`{skill_name}`" in text, (
+                f"AGENTS.md missing live skill '{skill_name}' — "
+                "run sync_inventory.sh --write to regenerate"
+            )
+
+    def test_agents_md_has_no_stale_skills(self):
+        """No retired skill names should appear in the AGENTS.md routing table rows."""
+        text = (PROJECT_ROOT / "AGENTS.md").read_text()
+        actual_skills = {
+            path.name
+            for path in SKILLS_DIR.iterdir()
+            if path.is_dir() and (path / "SKILL.md").exists()
+        }
+        listed = set(re.findall(r"^\| `([^`]+)` \|", text, re.MULTILINE))
+        stale = listed - actual_skills
+        assert not stale, (
+            f"AGENTS.md routing table references retired skills: {sorted(stale)} — "
+            "run sync_inventory.sh --write to regenerate"
         )

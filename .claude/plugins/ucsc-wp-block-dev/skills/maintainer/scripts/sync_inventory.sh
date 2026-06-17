@@ -37,66 +37,77 @@ METADATA = {
     "develop": {
         "readme": "Add or modify block code directly, or invoked by feature/fix after scope is defined",
         "hub": "Add or modify block code (PHP, template, JS editor, REST, build) — use directly or invoked by `feature`/`fix`.",
+        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build).",
         "deck_trigger": "Block code changes",
         "deck_desc": "Adds or modifies PHP class, template, JS editor, REST, and build steps."
     },
     "feature": {
         "readme": "Add new behavior through the preferred feature workflow",
         "hub": "Define and implement new block behavior, blocks, or editor/frontend enhancements.",
+        "agents_md": "Define and implement new block behavior, blocks, or editor/frontend enhancements.",
         "deck_trigger": "New behavior",
         "deck_desc": "Preferred feature workflow."
     },
     "fix": {
         "readme": "Fix a described problem in a specified target block, GUI, or app",
         "hub": "Debug and fix a described defect in a specified block, GUI, or app.",
+        "agents_md": "Debug and fix a described defect in a specified block, GUI, or app.",
         "deck_trigger": "Bug or regression",
         "deck_desc": "Debugs JS, PHP, REST API, or transient caching bugs."
     },
     "hub": {
         "readme": "List every available skill and command (`:hub`) — enumeration only",
         "hub": None,  # Hub is not listed in its own public workflows table
+        "agents_md": "List all available skills and commands. Use when unsure which skill applies.",
         "deck_trigger": '"List the skills" (`:hub`)',
         "deck_desc": "Enumerates the available skills and commands; does not route (ADR-060)."
     },
     "maintainer": {
         "readme": None,
         "hub": "Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides (ADR-046).",
+        "agents_md": "Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides.",
         "deck_trigger": "Plugin maintenance",
         "deck_desc": "Validate, test, check references, generate docs, publish slides."
     },
     "retrospective": {
         "readme": None,
         "hub": "Capture session lessons into skill and script files. Offered at the end of fix, feature, review, and run sessions (ADR-059).",
+        "agents_md": "Capture session lessons into skill and script files at the end of a working session.",
         "deck_trigger": "Post-session capture",
         "deck_desc": "Capture session lessons into skill and script files."
     },
     "review": {
         "readme": "Review a diff, branch, file, block, or Jira-scoped change",
         "hub": "Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests.",
+        "agents_md": "Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests.",
         "deck_trigger": "Review request",
         "deck_desc": "Reviews a diff, branch, file, or Jira-scoped change."
     },
     "run": {
         "readme": "Build, launch, and drive blocks via the wp-dev.ucsc Docker environment",
         "hub": "Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment.",
+        "agents_md": "Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment.",
         "deck_trigger": "Build or launch request",
         "deck_desc": "Records and executes the Docker setup, build, launch, and app-driving recipe."
     },
     "survey": {
         "readme": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites",
         "hub": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites.",
+        "agents_md": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites.",
         "deck_trigger": '"survey"',
         "deck_desc": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites."
     },
     "test": {
         "readme": "Create or run focused PHP, Jest, or end-to-end tests",
         "hub": "Create or run automated PHP, Jest, or e2e tests.",
+        "agents_md": "Create or run automated PHP, Jest, or e2e tests.",
         "deck_trigger": "Test creation or execution",
         "deck_desc": "Creates or runs PHP, Jest, or end-to-end tests."
     },
     "verify": {
         "readme": "Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend",
         "hub": "Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend.",
+        "agents_md": "Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend.",
         "deck_trigger": "Acceptance verification",
         "deck_desc": "Live DOM test of a change in the running WordPress editor or frontend."
     }
