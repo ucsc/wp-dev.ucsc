@@ -1,6 +1,6 @@
 ---
 title: UCSC WordPress Block Development Plugin Guide
-generated: 2026-06-16
+generated: 2026-06-17
 source: README.md
 ---
 
@@ -25,14 +25,15 @@ directly.
 
 | Skill | Purpose |
 |---|---|
-| `hub` | List every available skill and command (`:hub`) — enumeration only |
+| `develop` | Add or modify block code directly, or invoked by feature/fix after scope is defined |
 | `feature` | Add new behavior through the preferred feature workflow |
-| `develop` | Use the existing development workflow during migration |
 | `fix` | Fix a described problem in a specified target block, GUI, or app |
-| `test` | Create or run focused PHP, Jest, or end-to-end tests |
+| `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
-| `verify` | Verify a code change in the running WordPress editor or frontend |
+| `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites |
+| `test` | Create or run focused PHP, Jest, or end-to-end tests |
+| `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
 
 `develop/references/issue-context.md` provides shared Jira and issue
 normalization guidance for `develop`, `feature`, and `fix`.
@@ -86,7 +87,7 @@ See the `run` skill for the recorded setup and launch recipe, `verify` for live
 behavior checks, and `test` for automated tests. The environment README owns
 clean setup; the product plugin README owns its test commands.
 
-For the routine lifecycle, the `run` and `verify` skills ship a token-frugal `driver.sh` that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
+For the routine lifecycle, the `run`, `verify`, and `test` skills ship a token-frugal `driver.sh` that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
 
 ```bash
 # Build + launch + smoke in one call (inspect → build → launch → smoke)
@@ -94,6 +95,9 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
 
 # Deterministic pre-checks for a change (plugin active, build fresh, block registered)
 bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
+
+# Run PHP and Jest automated test suites in Docker
+bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh all
 ```
 
 The raw commands below are the underlying steps those drivers automate:

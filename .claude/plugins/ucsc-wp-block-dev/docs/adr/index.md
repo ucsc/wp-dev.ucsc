@@ -78,3 +78,4 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-070](ADR-070-align-frontmatter-allowlist-with-official-skills-spec.md) | Align frontmatter allowlist with official Claude Code skills specification | Accepted | 2026-06-16 |
 | [ADR-071](ADR-071-skill-details-developer-view.md) | Add skill-details operation to show per-skill frontmatter and invocation settings | Accepted | 2026-06-16 |
 | [ADR-072](ADR-072-skill-display-format.md) | Standardized detailed skill display format for maintainers | Accepted | 2026-06-16 |
+| [ADR-073](ADR-073-use-claude-for-plugin-operations.md) | Always use .claude for plugin operations; ignore .agents config | Accepted | 2026-06-17 |

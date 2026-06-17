@@ -1,4 +1,4 @@
-<!-- Generated: 2026-06-16 from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->
+<!-- Generated: 2026-06-17 from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->
 
 ---
 marp: true
@@ -38,7 +38,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
-**Generated:** 2026-06-16<br />
+**Generated:** 2026-06-17<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -123,14 +123,15 @@ references:
 
 | Skill | Trigger | Purpose |
 | :--- | :--- | :--- |
-| **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
+| **`develop`** | Block code changes | Adds or modifies PHP class, template, JS editor, REST, and build steps. |
 | **`feature`** | New behavior | Preferred feature workflow. |
-| **`develop`** | Existing development workflow | Compatibility workflow during migration. |
 | **`fix`** | Bug or regression | Debugs JS, PHP, REST API, or transient caching bugs. |
-| **`test`** | Test creation or execution | Creates or runs PHP, Jest, or end-to-end tests. |
+| **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
 | **`review`** | Review request | Reviews a diff, branch, file, or Jira-scoped change. |
 | **`run`** | Build or launch request | Records and executes the Docker setup, build, launch, and app-driving recipe. |
-| **`verify`** | Acceptance verification | Proves a change in the running WordPress editor or frontend. |
+| **`survey`** | "survey" | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites. |
+| **`test`** | Test creation or execution | Creates or runs PHP, Jest, or end-to-end tests. |
+| **`verify`** | Acceptance verification | Live DOM test of a change in the running WordPress editor or frontend. |
 
 **Hidden reference material:**
 
