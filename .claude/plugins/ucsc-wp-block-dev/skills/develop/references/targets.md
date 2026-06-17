@@ -11,13 +11,13 @@ rendered namespace: `ucsc/*`.
 
 | Target | Aliases | Block name (dev) | Block name (rendered) | Reference |
 | --- | --- | --- | --- | --- |
-| `class-schedule` | class schedule, schedule, wcsi | `ucscblocks/classschedule` | `ucsc/class-schedule` | [`class-schedule.md`](class-schedule.md) |
-| `course-catalog` | course catalog, catalog | `ucscblocks/coursecatalog` | `ucsc/course-catalog` | [`course-catalog.md`](course-catalog.md) |
-| `campus-directory` | campus directory, directory, people | `ucscblocks/campusdirectory` | `ucsc/campus-directory` | [`campus-directory.md`](campus-directory.md) |
-| `accordion` | accordion, faq | `ucscblocks/accordion` | `ucsc/accordion` | [`accordion.md`](accordion.md) |
-| `events` | events, event | unknown | `ucsc/events` | [`events.md`](events.md) |
-| `content-sharer` | content sharer, sharer | unknown | `ucsc/content-sharer` | [`content-sharer.md`](content-sharer.md) |
-| `feedback` | feedback | unknown | `ucsc/feedback` | [`feedback.md`](feedback.md) |
+| `class-schedule` | class schedule, schedule, wcsi | `ucscblocks/classschedule` | `ucsc/class-schedule` | [`target-class-schedule.md`](target-class-schedule.md) |
+| `course-catalog` | course catalog, catalog | `ucscblocks/coursecatalog` | `ucsc/course-catalog` | [`target-course-catalog.md`](target-course-catalog.md) |
+| `campus-directory` | campus directory, directory, people | `ucscblocks/campusdirectory` | `ucsc/campus-directory` | [`target-campus-directory.md`](target-campus-directory.md) |
+| `accordion` | accordion, faq | `ucscblocks/accordion` | `ucsc/accordion` | [`target-accordion.md`](target-accordion.md) |
+| `events` | events, event | unknown | `ucsc/events` | [`target-events.md`](target-events.md) |
+| `content-sharer` | content sharer, sharer | unknown | `ucsc/content-sharer` | [`target-content-sharer.md`](target-content-sharer.md) |
+| `feedback` | feedback | unknown | `ucsc/feedback` | [`target-feedback.md`](target-feedback.md) |
 
 ## ucsc-blocks plugin
 
@@ -25,8 +25,8 @@ Maintained by the UCSC Web team. Block namespace: `ucsc/*`. Source: `public/wp-c
 
 | Target | Aliases | Block name | Reference |
 | --- | --- | --- | --- |
-| `calendar-feed` | calendar feed, ics, ical, ics feed | `ucsc/calendar-feed` | [`calendar-feed.md`](calendar-feed.md) |
-| `ucsc-events` | ucsc events, events block | `ucsc/events` | [`ucsc-events.md`](ucsc-events.md) |
+| `calendar-feed` | calendar feed, ics, ical, ics feed | `ucsc/calendar-feed` | [`target-calendar-feed.md`](target-calendar-feed.md) |
+| `ucsc-events` | ucsc events, events block | `ucsc/events` | [`target-ucsc-events.md`](target-ucsc-events.md) |
 
 ## ucsc-custom-functionality plugin
 
@@ -35,13 +35,13 @@ namespace: `ucsc-custom-functionality/*`.
 
 | Target | Aliases | Block name (dev) | Block name (rendered) | Reference |
 | --- | --- | --- | --- | --- |
-| `news` | news, news block | unknown | `ucsc-custom-functionality/news-block` | [`news.md`](news.md) |
+| `news` | news, news block | unknown | `ucsc-custom-functionality/news-block` | [`target-news.md`](target-news.md) |
 
 ## Two-team naming conventions
 
 The two plugins use different block namespaces. This matters for detection,
 survey scripts, and per-block site lists. See
-[`../domain/references/detection.md`](../domain/references/detection.md) for
+[`domain-detection.md`](domain-detection.md) for
 rendered-HTML fingerprint patterns and the detection reference.
 
 If the user names a target that is not listed, treat the name as a proposed new

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-skill_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-plugin_root="$(cd "$skill_dir/../../../.." && pwd)"
-out_dir="$skill_dir/assets"
+maintainer_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+plugin_root="$(cd "$maintainer_dir/../.." && pwd)"
+out_dir="$maintainer_dir/references"
 
 main_source="$plugin_root/README.md"
-deck_source="$plugin_root/skills/maintainer/assets/ucsc_wp_block_dev_presentation.md"
-main_out="$out_dir/ucsc_wp_block_dev_main.md"
-deck_out="$out_dir/ucsc_wp_block_dev_presentation.md"
+deck_source="$maintainer_dir/assets/ucsc_wp_block_dev_presentation.md"
+main_out="$out_dir/generate-docs-main.md"
+deck_out="$out_dir/generate-docs-presentation.md"
 generated_date="$(date +%Y-%m-%d)"
 
-mkdir -p "$out_dir"
+mkdir -p "$out_dir"  # references/ should already exist; guard for safety
 
 if [[ ! -f "$main_source" ]]; then
   echo "FAIL missing main source: $main_source" >&2
@@ -34,7 +34,7 @@ fi
 
 {
   printf "<!-- Generated: %s from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->\n\n" "$generated_date"
-  perl -pe "s{\\*\\*Generated:\\*\\* \\d{4}-\\d{2}-\\d{2}<br />}{**Generated:** ${generated_date}<br />}; s{\\]\\(\\.\\./\\.\\./\\.\\./README\\.md\\)}{](../../../../../README.md)}g" "$deck_source"
+  perl -pe "s{\\*\\*Generated:\\*\\* \\d{4}-\\d{2}-\\d{2}<br />}{**Generated:** ${generated_date}<br />}" "$deck_source"
 } > "$deck_out"
 
 printf "PASS regenerated documentation artifacts:\n"

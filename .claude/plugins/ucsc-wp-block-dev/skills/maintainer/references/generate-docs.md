@@ -13,11 +13,10 @@ would be inappropriate.
 
 ## Artifacts
 
-The generated files live under `assets/`:
+The generated files live under `references/` (alongside this file):
 
-- `assets/ucsc_wp_block_dev_main.md` — main plugin guide generated from
-  `README.md`.
-- `assets/ucsc_wp_block_dev_presentation.md` — portable Markdown copy of the
+- `generate-docs-main.md` — main plugin guide generated from `README.md`.
+- `generate-docs-presentation.md` — portable Markdown copy of the
   maintainer-owned slide deck source.
 
 ## Regenerate
@@ -25,7 +24,7 @@ The generated files live under `assets/`:
 Run the script from the repository root:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/generate-docs/scripts/regenerate.sh
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/regenerate-docs.sh
 ```
 
 The script reads:
@@ -37,9 +36,9 @@ The script reads:
   themes.
 
 It writes the two generated Markdown artifacts under
-`skills/maintainer/references/generate-docs/assets/` and refreshes
-generated-date metadata. Treat the maintainer slide deck as canonical; do not
-edit the generated presentation copy directly.
+`skills/maintainer/references/` and refreshes generated-date metadata. Treat
+the maintainer slide deck as canonical; do not edit the generated presentation
+copy directly.
 
 ## ADR-Derived Content
 

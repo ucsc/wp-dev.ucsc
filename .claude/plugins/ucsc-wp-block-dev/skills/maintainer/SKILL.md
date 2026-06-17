@@ -7,7 +7,7 @@ description: Maintain the ucsc-wp-block-dev plugin itself — validate structure
 
 Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code —
 use `develop`/`fix`/`run` for that). For Markdown artifact regeneration, read
-[`references/generate-docs/generate-docs.md`](references/generate-docs/generate-docs.md).
+[`references/generate-docs.md`](references/generate-docs.md).
 
 Use this skill with one operation: `validate`, `test`, `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`,
@@ -160,22 +160,29 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_ref
 
 It prints one line per skill and a PASS/FAIL summary, exiting non-zero when any nested file is not linked from its `SKILL.md`. Fix a FAIL by adding a skill-relative reference (e.g. `references/foo.md`) to the skill — under a "Reference files" heading when one is warranted — or by removing the obsolete file. The pytest suite runs this same check, so a gap fails `test` too.
 
+## refactor-links
+
+When reference files are renamed or moved, update all markdown links in bulk
+rather than one by one. See
+[`references/refactor-links.md`](references/refactor-links.md) for the
+`find`/`sed` one-liner and the threshold for manual vs. bulk approach.
+
 ## generate-docs
 
 Regenerate portable Markdown documentation artifacts for Google Docs or
 Confluence. Read
-[`references/generate-docs/generate-docs.md`](references/generate-docs/generate-docs.md),
+[`references/generate-docs.md`](references/generate-docs.md),
 then run:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/references/generate-docs/scripts/regenerate.sh
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/regenerate-docs.sh
 ```
 
 This writes generated artifacts under
-`skills/maintainer/references/generate-docs/assets/`, including
-[`references/generate-docs/assets/ucsc_wp_block_dev_main.md`](references/generate-docs/assets/ucsc_wp_block_dev_main.md)
+`skills/maintainer/references/`, including
+[`references/generate-docs-main.md`](references/generate-docs-main.md)
 and
-[`references/generate-docs/assets/ucsc_wp_block_dev_presentation.md`](references/generate-docs/assets/ucsc_wp_block_dev_presentation.md).
+[`references/generate-docs-presentation.md`](references/generate-docs-presentation.md).
 It does not publish or upload anything.
 
 ## publish
@@ -209,7 +216,7 @@ Do not restore a second deck at the repository root (ADR-018).
 ### publish docs
 
 Publishes the generated prose guide
-`skills/maintainer/references/generate-docs/assets/ucsc_wp_block_dev_main.md`
+`skills/maintainer/references/generate-docs-main.md`
 (derived from `README.md` via `generate-docs`) to its own Google Doc.
 
 **Fast path:** `bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/refresh_and_publish_docs.sh` regenerates the artifacts, runs the generate-docs contract tests, then publishes. Pass `--no-publish` to refresh and test without uploading.
@@ -220,7 +227,7 @@ to upload. The underlying publisher accepts an explicit source:
 
 ```bash
 python3 .claude/scripts/publish_to_gdoc.py \
-  --source skills/maintainer/references/generate-docs/assets/ucsc_wp_block_dev_main.md \
+  --source skills/maintainer/references/generate-docs-main.md \
   --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
 ```
 

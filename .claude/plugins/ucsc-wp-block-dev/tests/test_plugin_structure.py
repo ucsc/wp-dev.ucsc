@@ -149,23 +149,24 @@ class TestSkillFrontmatter:
         assert "invoke the specific skill directly" in hub.lower()
 
     def test_blocks_guidance_is_hidden_reference(self):
-        """Domain guidance should stay available without becoming a top-level skill."""
+        """Domain guidance should stay available without becoming a top-level skill (flat per AgentSkills spec)."""
         assert not (SKILLS_DIR / "blocks" / "SKILL.md").exists()
-        reference = SKILLS_DIR / "develop" / "references" / "domain" / "blocks.md"
+        reference = SKILLS_DIR / "develop" / "references" / "domain-blocks.md"
         assert reference.exists()
         assert not reference.read_text().startswith("---"), (
             "blocks reference should not expose skill frontmatter"
         )
 
     def test_generate_docs_guidance_is_maintainer_reference(self):
-        """Documentation generation stays available without becoming a top-level skill."""
-        reference = SKILLS_DIR / "maintainer" / "references" / "generate-docs"
+        """Documentation generation stays available without becoming a top-level skill (flat per AgentSkills spec)."""
+        refs = SKILLS_DIR / "maintainer" / "references"
+        scripts = SKILLS_DIR / "maintainer" / "scripts"
         assert not (SKILLS_DIR / "documentation" / "SKILL.md").exists()
-        assert (reference / "generate-docs.md").exists()
-        assert (reference / "scripts" / "regenerate.sh").exists()
-        assert (reference / "assets" / "ucsc_wp_block_dev_main.md").exists()
-        assert (reference / "assets" / "ucsc_wp_block_dev_presentation.md").exists()
-        assert not (reference / "generate-docs.md").read_text().startswith("---"), (
+        assert (refs / "generate-docs.md").exists()
+        assert (scripts / "regenerate-docs.sh").exists()
+        assert (refs / "generate-docs-main.md").exists()
+        assert (refs / "generate-docs-presentation.md").exists()
+        assert not (refs / "generate-docs.md").read_text().startswith("---"), (
             "generate-docs reference should not expose skill frontmatter"
         )
 
@@ -267,32 +268,63 @@ class TestSkillFrontmatter:
             assert "issue-context.md" in text
 
     def test_block_targets_are_develop_references(self):
-        targets = SKILLS_DIR / "develop" / "references" / "targets"
+        refs = SKILLS_DIR / "develop" / "references"
         expected = {
-            "campus-directory.md",
-            "class-schedule.md",
-            "course-catalog.md",
+            "target-campus-directory.md",
+            "target-class-schedule.md",
+            "target-course-catalog.md",
         }
-        assert expected <= {path.name for path in targets.glob("*.md")}
+        assert expected <= {path.name for path in refs.glob("target-*.md")}
 
         for target in ["campus-directory", "class-schedule", "course-catalog"]:
             assert not (SKILLS_DIR / target / "SKILL.md").exists()
 
         develop = (SKILLS_DIR / "develop" / "SKILL.md").read_text().lower()
         assert "require the user to choose a target" in develop
-        assert "references/targets/index.md" in develop
+        assert "references/targets.md" in develop
         assert "do not load all target references" in develop
-        assert "references/domain/blocks.md" in develop
+        assert "references/domain-blocks.md" in develop
+
+    def test_target_references_are_bidirectional(self):
+        """Every slug linked in targets.md has a target-*.md file, and vice versa."""
+        refs = SKILLS_DIR / "develop" / "references"
+        targets_text = (refs / "targets.md").read_text()
+
+        # slugs linked from the index (target-foo.md links)
+        linked = set(re.findall(r"\(target-([^)]+)\.md\)", targets_text))
+        # target-*.md files that actually exist on disk
+        on_disk = {p.stem[len("target-"):] for p in refs.glob("target-*.md")}
+
+        missing_files = linked - on_disk
+        unlinked_files = on_disk - linked
+        assert not missing_files, (
+            f"targets.md links to target files that don't exist: {sorted(missing_files)}"
+        )
+        assert not unlinked_files, (
+            f"target-*.md files exist but are not listed in targets.md: {sorted(unlinked_files)}"
+        )
+
+    def test_retrospective_has_adr077_closing_checklist(self):
+        """ADR-077 requires the retrospective to prompt for script/skill/test improvements."""
+        text = (SKILLS_DIR / "retrospective" / "SKILL.md").read_text().lower()
+        assert "script candidate" in text, "retrospective missing 'script candidate' question (ADR-077)"
+        assert "skill improvement candidate" in text, (
+            "retrospective missing 'skill improvement candidate' question (ADR-077)"
+        )
+        assert "token-reduction candidate" in text, (
+            "retrospective missing 'token-reduction candidate' question (ADR-077)"
+        )
 
     def test_maintainer_reference_regenerates_markdown_artifacts(self):
-        """Maintainer owns Markdown outputs for Google Docs and Confluence."""
-        reference = SKILLS_DIR / "maintainer" / "references" / "generate-docs"
-        text = (reference / "generate-docs.md").read_text().lower()
+        """Maintainer owns Markdown outputs for Google Docs and Confluence (flat per AgentSkills spec)."""
+        refs = SKILLS_DIR / "maintainer" / "references"
+        scripts = SKILLS_DIR / "maintainer" / "scripts"
+        text = (refs / "generate-docs.md").read_text().lower()
 
         for requirement in [
-            "assets/ucsc_wp_block_dev_main.md",
-            "assets/ucsc_wp_block_dev_presentation.md",
-            "scripts/regenerate.sh",
+            "generate-docs-main.md",
+            "generate-docs-presentation.md",
+            "regenerate-docs.sh",
             "docs/adr/index.md",
             "adr-derived content",
             "future roadmap slide",
@@ -302,16 +334,12 @@ class TestSkillFrontmatter:
         ]:
             assert requirement in text
 
-        assert (reference / "scripts" / "regenerate.sh").exists()
+        assert (scripts / "regenerate-docs.sh").exists()
 
     def test_generate_docs_draws_from_adrs(self):
         """ADR-048 requires generated docs to be reconciled with ADR context."""
         text = (
-            SKILLS_DIR
-            / "maintainer"
-            / "references"
-            / "generate-docs"
-            / "generate-docs.md"
+            SKILLS_DIR / "maintainer" / "references" / "generate-docs.md"
         ).read_text().lower()
         assert "docs/adr/index.md" in text
         assert "referenced adrs" in text
@@ -320,25 +348,20 @@ class TestSkillFrontmatter:
         assert "future roadmap slide" in text
 
     def test_maintainer_documents_generate_docs_operation(self):
-        """Documentation regeneration is an operation on maintainer, not its own skill."""
+        """Documentation regeneration is an operation on maintainer, not its own skill (flat per AgentSkills spec)."""
         text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text().lower()
         assert "## generate-docs" in text
-        assert "references/generate-docs/generate-docs.md" in text
-        assert "references/generate-docs/scripts/regenerate.sh" in text
+        assert "references/generate-docs.md" in text
+        assert "scripts/regenerate-docs.sh" in text
         assert "generate-docs` operation" in text
 
     def test_documentation_generator_writes_to_maintainer_reference(self):
-        """The regenerate script must not recreate the removed documentation skill."""
+        """The regenerate script uses flat paths per AgentSkills spec (no nested generate-docs/ dir)."""
         script = (
-            SKILLS_DIR
-            / "maintainer"
-            / "references"
-            / "generate-docs"
-            / "scripts"
-            / "regenerate.sh"
+            SKILLS_DIR / "maintainer" / "scripts" / "regenerate-docs.sh"
         ).read_text()
-        assert 'plugin_root="$(cd "$skill_dir/../../../.." && pwd)"' in script
-        assert 'out_dir="$skill_dir/assets"' in script
+        assert 'plugin_root="$(cd "$maintainer_dir/../.." && pwd)"' in script
+        assert 'out_dir="$maintainer_dir/references"' in script
         assert "skills/documentation" not in script
 
     def test_run_records_the_wp_dev_launch_recipe(self):
@@ -585,6 +608,19 @@ class TestAdrIndex:
                 f"{adr_file.name} has invalid status: '{fm['status']}'"
             )
 
+    def test_adr_files_have_required_sections(self):
+        """Every ADR must have ## Context and ## Decision sections."""
+        adr_files = sorted(ADR_DIR.glob("ADR-*.md"))
+        missing = []
+        for adr_file in adr_files:
+            text = adr_file.read_text()
+            headings = re.findall(r"^## (.+)", text, re.MULTILINE)
+            if "Context" not in headings:
+                missing.append(f"{adr_file.name}: missing '## Context'")
+            if "Decision" not in headings:
+                missing.append(f"{adr_file.name}: missing '## Decision'")
+        assert not missing, "ADR template violations:\n" + "\n".join(f"  {m}" for m in missing)
+
     def test_fix_token_study_is_multi_pronged_and_measured(self):
         """ADR-026 must optimize full fix sessions without weakening correctness gates."""
         text = (ADR_DIR / "ADR-026-study-multi-pronged-fix-token-reduction.md").read_text().lower()
@@ -701,6 +737,12 @@ class TestFileLayout:
                 assert re.match(r"^[a-z0-9-]+$", d.name), (
                     f"Skill directory name '{d.name}' does not follow canonical lowercase pattern"
                 )
+
+    def test_token_usage_log_exists(self):
+        """ADR-076: logs/token-usage.log must exist so token-heavy ops can be recorded."""
+        assert (PLUGIN_ROOT / "logs" / "token-usage.log").exists(), (
+            "logs/token-usage.log missing — create it per ADR-076"
+        )
 
     def test_gitignore_ignores_venv_and_pycache(self):
         """Verify .gitignore includes rules to ignore python caches and virtual environment."""

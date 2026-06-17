@@ -16,8 +16,8 @@ GDOC_URL="https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0n
 # scripts/ -> maintainer -> skills -> plugin root; project root is three more up.
 PLUGIN_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 PROJECT_ROOT="$(cd "$PLUGIN_ROOT/../../.." && pwd)"
-REGEN="$PLUGIN_ROOT/skills/maintainer/references/generate-docs/scripts/regenerate.sh"
-GUIDE="$PLUGIN_ROOT/skills/maintainer/references/generate-docs/assets/ucsc_wp_block_dev_main.md"
+REGEN="$PLUGIN_ROOT/skills/maintainer/scripts/regenerate-docs.sh"
+GUIDE="$PLUGIN_ROOT/skills/maintainer/references/generate-docs-main.md"
 PUBLISHER="$PROJECT_ROOT/.claude/scripts/publish_to_gdoc.py"
 NO_PUBLISH=0
 [ "${1:-}" = "--no-publish" ] && NO_PUBLISH=1

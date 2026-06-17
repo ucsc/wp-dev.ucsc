@@ -45,10 +45,12 @@ Append to the closest existing reference file. Prefer these targets in order:
 |---|---|
 | PHP test pattern, stub recipe, guard-condition checklist | `test/references/create.md` |
 | Running PHP or Jest tests via Docker | `test/references/run.md` |
-| WordPress routing, FSE theme, block rendering | `develop/references/domain/blocks.md` |
+| WordPress routing, FSE theme, block rendering | `develop/references/domain-blocks.md` |
 | Fix diagnostic, known transient/cache edge case | `fix/SKILL.md` recovery or gotchas section |
 | Run / environment / Docker edge case | `run/SKILL.md` Recovery section |
-| Broad domain knowledge spanning multiple skills | `develop/references/domain/blocks.md` |
+| Broad domain knowledge spanning multiple skills | `develop/references/domain-blocks.md` |
+| Onboarding a new block target | `develop/references/domain-add-target.md` |
+| Bulk link updates after file renames/moves | `maintainer/references/refactor-links.md` |
 
 Use a concise bullet under a clearly named `## Lessons Learned` or existing
 `## Gotchas` heading. If no such heading exists, add one at the end of the file.
@@ -68,7 +70,23 @@ ADR-NNN-short-slug.md
 With proper frontmatter (`title`, `status: Accepted`, `date`), then add it to
 `docs/adr/index.md`. See existing ADRs for the format.
 
-### 5. Verify Nothing Is Broken
+### 5. Consider Scripts and Skill Improvements (ADR-077)
+
+Ask three questions before closing (answer in one sentence each; skip if
+nothing applies):
+
+1. **Script candidate** — Was there a multi-step manual operation that could be
+   automated? If yes, write a script under `skills/<skill>/scripts/` and link
+   it from `SKILL.md`.
+2. **Skill improvement candidate** — Was there guidance the AI re-derived that
+   should be captured in a reference file or `SKILL.md` section? If yes, add it.
+3. **Token-reduction candidate** — Did a token-heavy operation (see ADR-076 log
+   at `logs/token-usage.log`) surface something a cheaper structural test could
+   catch? If yes, add or improve the test.
+
+If none apply, state "no script/skill/test improvements this session" and move on.
+
+### 6. Verify Nothing Is Broken
 
 Run the reference checker to confirm no unreferenced files were added:
 
@@ -79,7 +97,7 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_ref
 If a new reference file was added (not just an existing file updated), also
 link it from the owning skill's `SKILL.md`.
 
-### 6. Report
+### 7. Report
 
 Tell the user:
 - Which file(s) were updated and what was added (one line each).

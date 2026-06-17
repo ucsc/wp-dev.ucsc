@@ -20,7 +20,7 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/`:
 - **Tests**: `src/blocks/__tests__/*.test.js`, config at `jest-unit.config.js` + `jest-setup.js`
 - **Build output**: `build/index.js`, `build/index.asset.php`
 
-Stack versions and resolved dependencies: see [`references/stack-profile.md`](references/stack-profile.md). For detailed block architecture notes, see [`references/blocks-reference.md`](references/blocks-reference.md).
+Stack versions and resolved dependencies: see [`domain-stack-profile.md`](domain-stack-profile.md). For detailed block architecture notes, see [`domain-blocks-reference.md`](domain-blocks-reference.md).
 
 ## Core Conventions
 

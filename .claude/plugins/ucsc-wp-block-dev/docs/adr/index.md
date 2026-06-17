@@ -80,3 +80,6 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-072](ADR-072-skill-display-format.md) | Standardized detailed skill display format for maintainers | Accepted | 2026-06-16 |
 | [ADR-073](ADR-073-use-claude-for-plugin-operations.md) | Always use .claude for plugin operations; ignore .agents config | Accepted | 2026-06-17 |
 | [ADR-074](ADR-074-verify-skill-block-coverage-scope.md) | verify skill block coverage scope — start with ucsc-gutenberg-blocks, extend to ucsc-blocks on onboarding | Accepted | 2026-06-17 |
+| [ADR-075](ADR-075-prefer-single-agent-mode.md) | prefer single-agent mode — avoid multi-agent pipelines unless the task requires parallelism | Accepted | 2026-06-17 |
+| [ADR-076](ADR-076-token-burn-log.md) | track token-heavy operations in a usage log for retrospective review | Accepted | 2026-06-17 |
+| [ADR-077](ADR-077-lessons-learned-to-scripts-and-skills.md) | always consider lessons learned and token-reduction opportunities via scripts and skill improvements | Accepted | 2026-06-17 |

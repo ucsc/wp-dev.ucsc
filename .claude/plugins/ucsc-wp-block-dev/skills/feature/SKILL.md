@@ -50,9 +50,9 @@ defined. Preserve the target, requirements, acceptance criteria, and Jira
 context during that handoff.
 
 For `ucsc-gutenberg-blocks` domain guidance, read
-[`../develop/references/domain/blocks.md`](../develop/references/domain/blocks.md)
+[`../develop/references/domain-blocks.md`](../develop/references/domain-blocks.md)
 inside the selected workflow. Resolve block-specific context through
-[`../develop/references/targets/index.md`](../develop/references/targets/index.md)
+[`../develop/references/targets.md`](../develop/references/targets.md)
 rather than a top-level target skill.
 
 ## Complete

@@ -24,7 +24,7 @@ read
 before investigating.
 
 Resolve known block targets through
-[`../develop/references/targets/index.md`](../develop/references/targets/index.md)
+[`../develop/references/targets.md`](../develop/references/targets.md)
 and read only the selected target reference.
 
 ## 1. Secure the Target and Fix Description

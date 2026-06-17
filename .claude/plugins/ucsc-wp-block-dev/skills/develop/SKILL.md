@@ -27,31 +27,31 @@ When GitHub CLI tooling is needed for pull request creation or inspection, read
 
 Before using tools, require the user to choose a target. Resolve known slugs and
 aliases through
-[`references/targets/index.md`](references/targets/index.md), then read only the
+[`references/targets.md`](references/targets.md), then read only the
 selected target reference. Do not load all target references.
 
 Target references (ucsc-gutenberg-blocks):
 
-- [`references/targets/accordion.md`](references/targets/accordion.md)
-- [`references/targets/campus-directory.md`](references/targets/campus-directory.md)
-- [`references/targets/class-schedule.md`](references/targets/class-schedule.md)
-- [`references/targets/content-sharer.md`](references/targets/content-sharer.md)
-- [`references/targets/course-catalog.md`](references/targets/course-catalog.md)
-- [`references/targets/events.md`](references/targets/events.md)
-- [`references/targets/feedback.md`](references/targets/feedback.md)
-- [`references/targets/news.md`](references/targets/news.md)
+- [`references/target-accordion.md`](references/target-accordion.md)
+- [`references/target-campus-directory.md`](references/target-campus-directory.md)
+- [`references/target-class-schedule.md`](references/target-class-schedule.md)
+- [`references/target-content-sharer.md`](references/target-content-sharer.md)
+- [`references/target-course-catalog.md`](references/target-course-catalog.md)
+- [`references/target-events.md`](references/target-events.md)
+- [`references/target-feedback.md`](references/target-feedback.md)
+- [`references/target-news.md`](references/target-news.md)
 
 Target references (ucsc-blocks):
 
-- [`references/targets/calendar-feed.md`](references/targets/calendar-feed.md)
-- [`references/targets/ucsc-events.md`](references/targets/ucsc-events.md)
+- [`references/target-calendar-feed.md`](references/target-calendar-feed.md)
+- [`references/target-ucsc-events.md`](references/target-ucsc-events.md)
 
 Domain references:
 
-- [`references/domain/blocks.md`](references/domain/blocks.md)
-- [`references/domain/references/blocks-reference.md`](references/domain/references/blocks-reference.md)
-- [`references/domain/references/detection.md`](references/domain/references/detection.md)
-- [`references/domain/references/stack-profile.md`](references/domain/references/stack-profile.md)
+- [`references/domain-blocks.md`](references/domain-blocks.md)
+- [`references/domain-blocks-reference.md`](references/domain-blocks-reference.md)
+- [`references/domain-detection.md`](references/domain-detection.md)
+- [`references/domain-stack-profile.md`](references/domain-stack-profile.md)
 
 ## 1. Secure the Target and Feature Description
 
@@ -64,6 +64,8 @@ If either input is missing, ask one concise question for all missing inputs and 
 
 For an unlisted target, confirm its canonical slug and scope before proceeding.
 Add a target reference only when the resulting domain guidance will be reused.
+Follow the onboarding checklist at
+[`references/domain-add-target.md`](references/domain-add-target.md).
 
 After the required intake is complete, clarify implementation details as needed:
 
