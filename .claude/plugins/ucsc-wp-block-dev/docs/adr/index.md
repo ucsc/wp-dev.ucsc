@@ -72,3 +72,9 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-064](ADR-064-agent-backed-checks-are-opt-in.md) | Agent-backed maintainer checks are opt-in, not default | Accepted | 2026-06-16 |
 | [ADR-065](ADR-065-new-adr-script.md) | Introduce automated ADR creation script new_adr.sh | Accepted | 2026-06-16 |
 | [ADR-066](ADR-066-test-driver.md) | Introduce test/driver.sh script for automated test suites | Accepted | 2026-06-16 |
+| [ADR-067](ADR-067-sync-inventory.md) | Introduce sync_inventory.sh script to enforce skill inventory consistency | Accepted | 2026-06-16 |
+| [ADR-068](ADR-068-shared-scripts-and-skills.md) | Allow establishing shared scripts in a shared skill folder | Accepted | 2026-06-16 |
+| [ADR-069](ADR-069-full-paths-for-generated-files.md) | Offer full path for code review results and context summaries | Accepted | 2026-06-16 |
+| [ADR-070](ADR-070-align-frontmatter-allowlist-with-official-skills-spec.md) | Align frontmatter allowlist with official Claude Code skills specification | Accepted | 2026-06-16 |
+| [ADR-071](ADR-071-skill-details-developer-view.md) | Add skill-details operation to show per-skill frontmatter and invocation settings | Accepted | 2026-06-16 |
+| [ADR-072](ADR-072-skill-display-format.md) | Standardized detailed skill display format for maintainers | Accepted | 2026-06-16 |

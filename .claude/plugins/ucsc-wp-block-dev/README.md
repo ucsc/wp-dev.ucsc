@@ -19,14 +19,15 @@ directly.
 
 | Skill | Purpose |
 |---|---|
-| `hub` | List every available skill and command (`:hub`) — enumeration only |
+| `develop` | Add or modify block code directly, or invoked by feature/fix after scope is defined |
 | `feature` | Add new behavior through the preferred feature workflow |
-| `develop` | Use the existing development workflow during migration |
 | `fix` | Fix a described problem in a specified target block, GUI, or app |
-| `test` | Create or run focused PHP, Jest, or end-to-end tests |
+| `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
-| `verify` | Verify a code change in the running WordPress editor or frontend |
+| `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites |
+| `test` | Create or run focused PHP, Jest, or end-to-end tests |
+| `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
 
 `develop/references/issue-context.md` provides shared Jira and issue
 normalization guidance for `develop`, `feature`, and `fix`.

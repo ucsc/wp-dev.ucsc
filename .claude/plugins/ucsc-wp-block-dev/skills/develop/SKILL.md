@@ -1,6 +1,6 @@
 ---
 name: develop
-description: Implementation core for ucsc-gutenberg-blocks block development. Invoked by the `feature` and `fix` skills after scope is defined; do not trigger directly for new feature or fix requests. Handles PHP class, template, JS editor, REST, and build steps.
+description: Add or modify ucsc-gutenberg-blocks block code — PHP class, template, JS editor, REST, and build steps. Use directly for implementation work, or invoked automatically by the `feature` and `fix` skills after scope is defined.
 ---
 
 # Develop — Add a Block or Feature
@@ -32,14 +32,20 @@ selected target reference. Do not load all target references.
 
 Target references:
 
+- [`references/targets/accordion.md`](references/targets/accordion.md)
 - [`references/targets/campus-directory.md`](references/targets/campus-directory.md)
 - [`references/targets/class-schedule.md`](references/targets/class-schedule.md)
+- [`references/targets/content-sharer.md`](references/targets/content-sharer.md)
 - [`references/targets/course-catalog.md`](references/targets/course-catalog.md)
+- [`references/targets/events.md`](references/targets/events.md)
+- [`references/targets/feedback.md`](references/targets/feedback.md)
+- [`references/targets/news.md`](references/targets/news.md)
 
 Domain references:
 
 - [`references/domain/blocks.md`](references/domain/blocks.md)
 - [`references/domain/references/blocks-reference.md`](references/domain/references/blocks-reference.md)
+- [`references/domain/references/detection.md`](references/domain/references/detection.md)
 - [`references/domain/references/stack-profile.md`](references/domain/references/stack-profile.md)
 
 ## 1. Secure the Target and Feature Description

@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Build and run wp-dev.ucsc, then verify a ucsc-gutenberg-blocks code change or acceptance criterion in the live WordPress editor or frontend. Use when asked to verify, confirm, demonstrate, or prove that a block change works; do not substitute unit tests or type checks for runtime verification.
+description: Build and run wp-dev.ucsc, then do a live DOM test of a ucsc-gutenberg-blocks code change or acceptance criterion in the running WordPress editor or frontend. Use when asked to verify, confirm, demonstrate, or prove that a block change works; do not substitute unit tests or type checks for live DOM testing.
 ---
 
 # Verify In The Running App

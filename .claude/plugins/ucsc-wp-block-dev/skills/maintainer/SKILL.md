@@ -11,8 +11,8 @@ use `develop`/`fix`/`run` for that). For Markdown artifact regeneration, read
 
 Use this skill with one operation: `validate`, `test`, `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`,
-`publish` (`slides`/`docs`/`all`), or `all`. Run all commands below from the
-repo root.
+`publish` (`slides`/`docs`/`all`), `new-adr`, `sync-inventory`,
+`skill-details`, or `all`. Run all commands below from the repo root.
 
 To work on the plugin itself, launch Claude Code from the repo root with the
 plugin loaded directly from its development directory:
@@ -30,7 +30,7 @@ Keep token use low: run the validator and tests rather than reading every file b
 
 Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`, `publish` (`slides`/`docs`/`all`), and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`, `publish` (`slides`/`docs`/`all`), `new-adr`, `sync-inventory`, `skill-details`, and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 ## Anthropic plugin-dev tools
 
@@ -234,6 +234,28 @@ Automatically allocates the next available ADR number, creates a new ADR markdow
 bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <slug> "<title>"
 ```
 
+## sync-inventory
+
+Enforces skill inventory consistency across all documentation and testing assets by treating the directories in `skills/` as the source of truth. Run the script:
+
+```bash
+# Check for any drift (dry-run check)
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/sync_inventory.sh --check
+
+# Reconcile and regenerate all files automatically
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/sync_inventory.sh --write
+```
+
+## skill-details
+
+Live developer view of every skill's actual frontmatter and invocation settings (ADR-071). Shows `user-invocable`, `model-invocable`, `discoverable`, `disable-model-invocation`, `allowed-tools`, `context`, `agent`, and any extra fields — resolved to their actual values, not static defaults. Flags any skill that differs from the all-defaults baseline.
+
+```bash
+python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/skill_details.py
+```
+
+Run after any `SKILL.md` frontmatter change to confirm the invocation posture is what you intended. The `hub` static grid is a snapshot; this script is the authoritative live source.
+
 ## all
 
 Run the token-frugal deterministic checks only: `test` first (fast, deterministic), then `check-references`. Report a single combined summary.
@@ -248,6 +270,10 @@ Contribution candidates are also excluded from `all`; run
 may be incomplete.
 
 ## Skill visibility and invocation (hidden skills)
+
+For detailed reference rules on plugin skill visibility, see [`references/skill-visibility.md`](references/skill-visibility.md).
+
+Official skills reference: `https://code.claude.com/docs/en/skills`
 
 Claude Code exposes two frontmatter booleans that control *how* a skill can be
 invoked. Know what they do before deciding how to "hide" a skill:
@@ -270,15 +296,13 @@ Note the defaults are `user-invocable: true` and
 `disable-model-invocation: false`; writing those values explicitly does nothing,
 so only add a field when you mean to flip it.
 
-### How this plugin actually hides skills
+### How this plugin currently hides skills
 
-This plugin **does not use either field.** The structural test
-`test_frontmatter_uses_portable_agent_skills_fields` restricts canonical
-`SKILL.md` frontmatter to `name` and `description` only (portable Agent Skills
-core fields; see ADR-005, superseded by ADR-011). Adding `user-invocable` or
-`disable-model-invocation` to a `skills/*/SKILL.md` would **fail `test`.**
-
-Instead, "hidden" is achieved by convention:
+Per ADR-070, the structural test `test_frontmatter_uses_portable_agent_skills_fields`
+now accepts the full official Claude Code frontmatter field set, so
+`user-invocable` and `disable-model-invocation` are permitted in any
+`skills/*/SKILL.md`. Despite this, the plugin currently achieves hiding by
+convention rather than frontmatter:
 
 - **`maintainer`** is a hidden *manual* skill (ADR-046): it stays a live,
   type-able skill but is removed from the public workflow tables in `README`,
@@ -288,10 +312,27 @@ Instead, "hidden" is achieved by convention:
   ("Invoked by the `feature` and `fix` skills after scope is defined; do not
   trigger directly"), not by `disable-model-invocation`.
 
-If a future change genuinely needs frontmatter-enforced visibility, first widen
-the allow-list in `test_frontmatter_uses_portable_agent_skills_fields` and
-record the decision in a new ADR superseding the ADR-005/011 frontmatter
-convention — otherwise `test` and `validate` will reject the skill.
+To use frontmatter-enforced visibility, add the field and document the
+decision in an ADR — the test will no longer reject it.
+
+### Platform capabilities worth knowing when authoring skills
+
+- **1,536-char truncation cap** — the combined `description` + `when_to_use`
+  text is truncated at 1,536 characters in the skill listing. Put the key
+  trigger phrase first in `description`; use `when_to_use` for secondary
+  phrases that don't fit.
+- **`when_to_use`** — optional field appended to `description` in the listing;
+  useful for adding trigger phrases without bloating the primary description.
+- **`${CLAUDE_SKILL_DIR}`** — expands to the skill's own directory at runtime.
+  Reference bundled scripts with this variable so paths survive regardless of
+  where the session starts (e.g. `` !`bash ${CLAUDE_SKILL_DIR}/scripts/foo.sh` ``).
+- **Dynamic context injection** — a line beginning with `` !`command` `` (or a
+  fenced ` ```! ` block) runs the command *before* Claude sees the skill and
+  inlines its output. Use to inject live state (current branch, build status,
+  etc.) directly into a skill prompt without extra tool calls.
+- **`context: fork` + `agent`** — runs the skill in an isolated subagent; the
+  skill body becomes the subagent's prompt. Candidate pattern if `validate` or
+  `review-skills` are ever converted from manual Agent-tool calls.
 
 ## When the manifest or skills change
 
@@ -314,6 +355,7 @@ After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate
 - **Publishing is per-target.** Each `publish` target has its own destination
   Google Doc; `publish_to_gdoc.py --source <md> --doc <url>` publishes any
   markdown, and each fast-path script holds its own `GDOC_URL` (ADR-063).
+- **Markdown links to local filesystem absolute paths (`file://`) must be excluded in tests.** When referencing generated local files (e.g., code reviews) via absolute paths, always format them using the `file://` scheme (e.g., `file:///path/to/file`). The link check test (`test_all_markdown_links_resolve` in `test_plugin_structure.py`) is configured to ignore links starting with `file://` so they are not parsed as relative paths and incorrectly flagged as broken.
 - **Superseding an ADR can leave a stale test.** Tests sometimes assert a
   decision's literal wording (e.g. a commit-syntax string). When an ADR is
   superseded — including by concurrent/external work — `grep` the tests for

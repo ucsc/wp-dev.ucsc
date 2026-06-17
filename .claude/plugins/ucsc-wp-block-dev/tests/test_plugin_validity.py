@@ -192,13 +192,20 @@ class TestSkillRouting:
             names.append(name)
 
     def test_frontmatter_is_portable(self):
-        """Skills expose only the Agent Skills core metadata."""
+        """Skills use only official Claude Code skills frontmatter fields (ADR-070)."""
+        allowed = {
+            "name", "description", "when_to_use", "argument-hint", "arguments",
+            "disable-model-invocation", "user-invocable", "allowed-tools",
+            "disallowed-tools", "model", "effort", "context", "agent",
+            "hooks", "paths", "shell",
+        }
         for skill_dir in sorted(SKILLS_DIR.iterdir()):
             if not (skill_dir / "SKILL.md").exists():
                 continue
             fm = self._read_frontmatter(skill_dir)
-            assert set(fm) == {"name", "description"}, (
-                f"{skill_dir.name} has host-specific frontmatter: {set(fm)}"
+            extra = set(fm) - allowed
+            assert not extra, (
+                f"{skill_dir.name} has unrecognized frontmatter keys: {extra}"
             )
 
     def test_wp_keywords_in_descriptions(self):

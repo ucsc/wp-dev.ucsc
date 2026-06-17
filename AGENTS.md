@@ -47,3 +47,6 @@ reference.
 - Prefer focused validation first, then broaden testing when shared behavior or
   multiple blocks are affected.
 - Use conventional commit wording when suggesting or creating commits.
+- Never run `git push`, `git push --force`, `git push --force-with-lease`, or
+  equivalent remote-write operations. Provide the exact command or PR URL for
+  the user to run instead.

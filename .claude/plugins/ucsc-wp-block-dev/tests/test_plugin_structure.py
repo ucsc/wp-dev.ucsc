@@ -24,9 +24,10 @@ EXPECTED_LIVE_SKILLS = {
     "fix",
     "hub",
     "maintainer",
-    "review",
     "retrospective",
+    "review",
     "run",
+    "survey",
     "test",
     "verify",
 }
@@ -215,8 +216,13 @@ class TestSkillFrontmatter:
             )
 
     def test_frontmatter_uses_portable_agent_skills_fields(self, skill_files):
-        """Canonical skills use only the portable Agent Skills core fields."""
-        allowed = {"name", "description"}
+        """Canonical skills use only official Claude Code skills frontmatter fields (ADR-070)."""
+        allowed = {
+            "name", "description", "when_to_use", "argument-hint", "arguments",
+            "disable-model-invocation", "user-invocable", "allowed-tools",
+            "disallowed-tools", "model", "effort", "context", "agent",
+            "hooks", "paths", "shell",
+        }
         for path in skill_files:
             text = path.read_text()
             fm_match = re.match(r"^---\n(.+?)\n---", text, re.DOTALL)
@@ -665,7 +671,7 @@ class TestFileLayout:
             text = path.read_text(errors="ignore")
             links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
             for link in links:
-                if link.startswith(("http://", "https://", "mailto:", "#")):
+                if link.startswith(("http://", "https://", "mailto:", "file://", "#")):
                     continue
                 link_path_str = link.split("#")[0]
                 if not link_path_str:
