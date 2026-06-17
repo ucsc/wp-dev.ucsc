@@ -19,6 +19,15 @@ rendered namespace: `ucsc/*`.
 | `content-sharer` | content sharer, sharer | unknown | `ucsc/content-sharer` | [`content-sharer.md`](content-sharer.md) |
 | `feedback` | feedback | unknown | `ucsc/feedback` | [`feedback.md`](feedback.md) |
 
+## ucsc-blocks plugin
+
+Maintained by the UCSC Web team. Block namespace: `ucsc/*`. Source: `public/wp-content/plugins/ucsc-blocks/`. Multi-block, single-plugin architecture using `@wordpress/scripts`.
+
+| Target | Aliases | Block name | Reference |
+| --- | --- | --- | --- |
+| `calendar-feed` | calendar feed, ics, ical, ics feed | `ucsc/calendar-feed` | [`calendar-feed.md`](calendar-feed.md) |
+| `ucsc-events` | ucsc events, events block | `ucsc/events` | [`ucsc-events.md`](ucsc-events.md) |
+
 ## ucsc-custom-functionality plugin
 
 Maintained by a separate UCSC team. Dev namespace: unknown. Production rendered

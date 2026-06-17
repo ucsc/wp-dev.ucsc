@@ -30,7 +30,7 @@ aliases through
 [`references/targets/index.md`](references/targets/index.md), then read only the
 selected target reference. Do not load all target references.
 
-Target references:
+Target references (ucsc-gutenberg-blocks):
 
 - [`references/targets/accordion.md`](references/targets/accordion.md)
 - [`references/targets/campus-directory.md`](references/targets/campus-directory.md)
@@ -40,6 +40,11 @@ Target references:
 - [`references/targets/events.md`](references/targets/events.md)
 - [`references/targets/feedback.md`](references/targets/feedback.md)
 - [`references/targets/news.md`](references/targets/news.md)
+
+Target references (ucsc-blocks):
+
+- [`references/targets/calendar-feed.md`](references/targets/calendar-feed.md)
+- [`references/targets/ucsc-events.md`](references/targets/ucsc-events.md)
 
 Domain references:
 
