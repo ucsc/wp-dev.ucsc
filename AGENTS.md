@@ -17,21 +17,20 @@ skill's complete `SKILL.md` before acting.
 
 | Skill | Use for |
 | --- | --- |
-| `map` | Identify the active app or block and route a new request. |
-| `feature` | Add new block behavior through the preferred feature workflow. |
-| `develop` | Add a Gutenberg block, feature, API, or editor workflow. |
-| `fix` | Diagnose and repair a reported bug or regression. |
-| `review` | Review a diff, branch, file, pull request, or Jira-scoped change. |
-| `test` | Create or run focused PHP, Jest, or end-to-end tests. |
-| `run` | Build, launch, watch, open, or interact with the local WordPress app. |
-| `verify` | Confirm acceptance criteria in the running editor or frontend. |
-| `documentation` | Regenerate Markdown guide and slide-deck artifacts for Google Docs or Confluence. |
-| `blocks` | Apply domain guidance for the `ucsc-gutenberg-blocks` plugin. |
-| `maintainer` | Maintain, validate, test, review contributions, promote candidates, or document the `ucsc-wp-block-dev` skill set itself. |
+| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). |
+| `feature` | Define and implement new block behavior, blocks, or editor/frontend enhancements. |
+| `fix` | Debug and fix a described defect in a specified block, GUI, or app. |
+| `hub` | List all available skills and commands. Use when unsure which skill applies. |
+| `maintainer` | Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides. |
+| `retrospective` | Capture session lessons into skill and script files at the end of a working session. |
+| `review` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
+| `run` | Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment. |
+| `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites. |
+| `test` | Create or run automated PHP, Jest, or e2e tests. |
+| `verify` | Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend. |
 
 For block-specific work, resolve the target through
-`develop/references/targets/index.md` and read only the selected target
-reference.
+`develop/references/targets.md` and read only the selected target reference.
 
 ## Working Rules
 

@@ -1,7 +1,8 @@
 #!/bin/bash
 # sync_inventory.sh — enforces inventory consistency by treating skills/*/ as the
-# source of truth and checking (or updating) the README, hub listing, slide deck
-# presentation table, and the python test suite skill expectations.
+# source of truth and checking (or updating) the README, root AGENTS.md, hub
+# listing, slide deck presentation table, and the python test suite skill
+# expectations.
 #
 # Usage:
 #   bash sync_inventory.sh [--check]    # Dry-run check for drift (default)
@@ -26,6 +27,7 @@ if not SCRIPT_DIR:
     SCRIPT_DIR = os.path.abspath(os.path.join(os.getcwd(), "skills", "maintainer", "scripts"))
 
 PLUGIN_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(PLUGIN_DIR, "..", "..", ".."))
 skills_dir = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
 # Parse arguments
@@ -175,7 +177,44 @@ else:
     print(f"  [FAIL] README.md not found at {readme_path}")
     success = False
 
-# 2. Sync skills/hub/SKILL.md
+# 2. Sync root AGENTS.md
+agents_path = os.path.join(PROJECT_ROOT, "AGENTS.md")
+if os.path.exists(agents_path):
+    agents_content = open(agents_path).read()
+
+    lines = [
+        "| Skill | Use for |",
+        "| --- | --- |"
+    ]
+    for s in live_skills:
+        desc = METADATA.get(s, {}).get("agents_md") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
+        lines.append(f"| `{s}` | {desc} |")
+
+    pattern = r"(\| Skill \| Use for \|\s*\n\| --- \| --- \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
+    match = re.search(pattern, agents_content, re.DOTALL)
+    if match:
+        current_body = match.group(2).strip()
+        expected_body = "\n".join(lines[2:]).strip()
+        if current_body != expected_body:
+            if write_mode:
+                new_table = match.group(1) + expected_body
+                new_content = agents_content[:match.start()] + new_table + agents_content[match.end():]
+                with open(agents_path, "w") as f:
+                    f.write(new_content)
+                print("  [ OK ] AGENTS.md skill routing table updated")
+            else:
+                print("  [FAIL] AGENTS.md skill routing table is out of sync")
+                success = False
+        else:
+            print("  [ OK ] AGENTS.md skill routing table is in sync")
+    else:
+        print("  [FAIL] AGENTS.md: skill routing table not found")
+        success = False
+else:
+    print(f"  [FAIL] AGENTS.md not found at {agents_path}")
+    success = False
+
+# 3. Sync skills/hub/SKILL.md
 hub_path = os.path.join(skills_dir, "hub", "SKILL.md")
 if os.path.exists(hub_path):
     hub_content = open(hub_path).read()
@@ -242,7 +281,7 @@ else:
     print(f"  [FAIL] skills/hub/SKILL.md not found")
     success = False
 
-# 3. Sync Presentation Deck
+# 4. Sync Presentation Deck
 deck_path = os.path.join(skills_dir, "maintainer", "assets", "ucsc_wp_block_dev_presentation.md")
 if os.path.exists(deck_path):
     deck_content = open(deck_path).read()
@@ -282,7 +321,7 @@ else:
     print(f"  [FAIL] Presentation deck not found at {deck_path}")
     success = False
 
-# 4. Sync tests/test_plugin_structure.py
+# 5. Sync tests/test_plugin_structure.py
 tests_path = os.path.join(PLUGIN_DIR, "tests", "test_plugin_structure.py")
 if os.path.exists(tests_path):
     tests_content = open(tests_path).read()

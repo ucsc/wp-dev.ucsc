@@ -100,6 +100,21 @@ Or using the virtual environment:
 cd .claude/plugins/ucsc-wp-block-dev && ../ucsc-wp-block-dev-venv/bin/pytest -q
 ```
 
+If the host lacks Python/pytest, run the deterministic suite in Docker using
+the local Node image's Python. This installs pytest only inside the ephemeral
+container and keeps host Python out of the workflow (ADR-050):
+
+```bash
+docker run --rm -v "$PWD:/workspace" -w /workspace node:22.5.1 bash -lc \
+  'apt-get update >/tmp/apt-update.log && \
+   apt-get install -y python3-pytest >/tmp/apt-install.log && \
+   python3 -m pytest -q .claude/plugins/ucsc-wp-block-dev/tests'
+```
+
+Claude CLI-dependent tests are skipped in this container unless `claude` is
+available inside the image; that is expected for deterministic structural
+validation.
+
 Some tests skip gracefully when the `claude` CLI is unavailable — that is expected in CI.
 
 ## review-skills
@@ -269,7 +284,10 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <slu
 
 ## sync-inventory
 
-Enforces skill inventory consistency across all documentation and testing assets by treating the directories in `skills/` as the source of truth. Run the script:
+Enforces skill inventory consistency across all documentation and testing assets
+by treating the directories in `skills/` as the source of truth. Per ADR-080,
+this includes the root `AGENTS.md` routing table so Codex sees the live skill
+set before plugin work begins. Run the script:
 
 ```bash
 # Check for any drift (dry-run check)
@@ -389,10 +407,10 @@ After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate
 - **Adding or removing a skill touches an inventory sync set — move them
   together or `test` fails.** The set is: the README skills table, the `hub`
   listing, the slide deck skill table (`skills/maintainer/assets/…presentation.md`),
-  `EXPECTED_LIVE_SKILLS` in `tests/test_plugin_structure.py` (plus any
-  hardcoded skill lists in tests, e.g. `test_plugin_validity.py`), and the
-  generated `generate-docs` assets (run `generate-docs` to refresh). Then run
-  `check-references` and `test`.
+  the root `AGENTS.md` routing table, `EXPECTED_LIVE_SKILLS` in
+  `tests/test_plugin_structure.py` (plus any hardcoded skill lists in tests,
+  e.g. `test_plugin_validity.py`), and the generated `generate-docs` assets
+  (run `generate-docs` to refresh). Then run `check-references` and `test`.
 - **Publishing is per-target.** Each `publish` target has its own destination
   Google Doc; `publish_to_gdoc.py --source <md> --doc <url>` publishes any
   markdown, and each fast-path script holds its own `GDOC_URL` (ADR-063).
