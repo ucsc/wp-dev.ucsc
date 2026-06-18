@@ -19,9 +19,7 @@ directly.
 
 | Skill | Purpose |
 |---|---|
-| `develop` | Add or modify block code directly, or invoked by feature/fix after scope is defined |
-| `feature` | Add new behavior through the preferred feature workflow |
-| `fix` | Fix a described problem in a specified target block, GUI, or app |
+| `develop` | Add or modify block code directly; use `develop/feature` for new behavior and `develop/fix` for defect repair |
 | `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
@@ -30,10 +28,10 @@ directly.
 | `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
 
 `develop/references/issue-context.md` provides shared Jira and issue
-normalization guidance for `develop`, `feature`, and `fix`.
+normalization guidance for `develop`, `develop/feature`, and `develop/fix`.
 
 Domain guidance for `ucsc-gutenberg-blocks` is intentionally hidden from the
-top-level skill list and lives at `develop/references/domain/blocks.md`.
+top-level skill list and lives at `develop/references/domain-blocks.md`.
 
 Block-specific guidance lives under `develop/references/targets/`. The
 `develop` workflow requires a target and loads only the selected target
@@ -49,7 +47,7 @@ Retrospectives are also hidden from the public workflow list. Type
 session should be saved into skill references.
 
 Use the maintainer `generate-docs` reference at
-`maintainer/references/generate-docs/generate-docs.md` to regenerate portable
+`maintainer/references/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or
 Confluence. Use `maintainer generate-docs` for regeneration and
 `maintainer publish` (`slides`/`docs`/`all`) only when publishing the guide or

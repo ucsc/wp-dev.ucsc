@@ -16,7 +16,7 @@ detects blocks through two mechanisms:
 
 1. `<!-- wp:blockname -->` HTML comments in `content.rendered` (static blocks)
 2. Rendered-HTML fingerprint matching for dynamic blocks (all UCSC blocks are
-   dynamic — see `references/domain/references/detection.md`)
+   dynamic — see `skills/develop/references/domain-detection.md`)
 
 ## Outputs
 
@@ -107,7 +107,7 @@ block names. Re-running the survey with the current script eliminates these.
 All UCSC custom blocks are dynamic and strip `<!-- wp: -->` comments. Detection
 relies on rendered-HTML fingerprints defined in `DYNAMIC_BLOCK_PATTERNS` in the
 survey script. The canonical fingerprint registry is in
-`skills/develop/references/domain/references/detection.md`.
+`skills/develop/skills/develop/references/domain-detection.md`.
 
 If a block is not being detected, check whether its rendered HTML fingerprint
 has changed (e.g., after a block update that changes element IDs or CSS classes).

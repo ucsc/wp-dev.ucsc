@@ -41,3 +41,22 @@ cd .claude/plugins/ucsc-wp-block-dev && ../ucsc-wp-block-dev-venv/bin/pytest -q 
 The AgentSkills flat-reference rule (ADR: `test_no_deeply_nested_skill_support_files`)
 means bulk renames should only be needed during structural refactors, not
 routine maintenance.
+
+## Moving a top-level skill to a sub-skill (ADR-081)
+
+When a skill is moved from `skills/<name>/` to `skills/<parent>/<name>/`:
+
+1. **Update relative paths inside the moved SKILL.md** — `../parent/references/` becomes `../references/` (one level closer).
+2. **Reference the sub-skill from the parent SKILL.md** — add a `## Sub-workflows` section linking `<name>/SKILL.md`.
+3. **Update `sync_inventory.sh` METADATA** — the hardcoded dict still has entries for the old skill name; update or remove them and update the parent skill's `readme`/`hub`/`agents_md` copy. Run `--write` after.
+4. **Update `test_plugin_validity.py`** — `test_core_skills_present` has its own hardcoded skill list separate from `test_plugin_structure.py`; both must be updated.
+5. **Update hub, README, AGENTS.md, slide deck** — `sync_inventory.sh --write` handles these once METADATA is correct.
+6. **Check for prose backtick paths** — `test_all_markdown_links_resolve` only catches `[label](link)` hyperlinks; backtick prose paths like `` `skill/references/foo.md` `` can silently drift. Run the plugin-validator agent after a structural refactor to catch these.
+
+## Detecting stale prose paths
+
+The automated link test misses paths written as inline code (`` `path/to/file.md` ``) rather than markdown links. After any structural refactor, grep for the old path fragment across all markdown files:
+
+```bash
+grep -rn "old/path/fragment" .claude/plugins/ucsc-wp-block-dev --include="*.md"
+```

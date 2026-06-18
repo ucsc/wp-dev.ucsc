@@ -121,9 +121,7 @@ references:
 
 | Skill | Trigger | Purpose |
 | :--- | :--- | :--- |
-| **`develop`** | Block code changes | Adds or modifies PHP class, template, JS editor, REST, and build steps. |
-| **`feature`** | New behavior | Preferred feature workflow. |
-| **`fix`** | Bug or regression | Debugs JS, PHP, REST API, or transient caching bugs. |
+| **`develop`** | Block code changes, new behavior, or bug repair | Adds or modifies PHP class, template, JS editor, REST, and build steps. Sub-workflows: feature (new behavior) and fix (defect repair). |
 | **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
 | **`review`** | Review request | Reviews a diff, branch, file, or Jira-scoped change. |
 | **`run`** | Build or launch request | Records and executes the Docker setup, build, launch, and app-driving recipe. |

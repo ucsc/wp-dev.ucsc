@@ -20,8 +20,6 @@ PLUGIN_NAME = "ucsc-wp-block-dev"
 FORBIDDEN_PLUGIN_NAME = "ucsc-" + "wordpress-block-dev"
 EXPECTED_LIVE_SKILLS = {
     "develop",
-    "feature",
-    "fix",
     "hub",
     "maintainer",
     "retrospective",
@@ -31,6 +29,7 @@ EXPECTED_LIVE_SKILLS = {
     "test",
     "verify",
 }
+EXPECTED_DEVELOP_SUB_SKILLS = {"feature", "fix"}
 EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS - {"maintainer", "retrospective"}
 
 
@@ -118,6 +117,12 @@ class TestSkillFrontmatter:
             skill_path = SKILLS_DIR / skill_name / "SKILL.md"
             assert skill_path.exists(), f"Core skill '{skill_name}' missing"
 
+    def test_develop_sub_skills_present(self):
+        """feature and fix are sub-skills nested under develop/ (ADR-081)."""
+        for skill_name in sorted(EXPECTED_DEVELOP_SUB_SKILLS):
+            skill_path = SKILLS_DIR / "develop" / skill_name / "SKILL.md"
+            assert skill_path.exists(), f"develop sub-skill '{skill_name}' missing"
+
     def test_live_skill_inventory_is_exact(self):
         """Reference-only workflows must not drift back into exported skills."""
         actual = {
@@ -145,6 +150,8 @@ class TestSkillFrontmatter:
         hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
         for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub"}):
             assert f"`{skill_name}`" in hub, f"hub is missing skill '{skill_name}'"
+        for skill_name in sorted(EXPECTED_DEVELOP_SUB_SKILLS):
+            assert skill_name in hub, f"hub is missing develop sub-skill '{skill_name}'"
         # hub enumerates; it does not route (ADR-061).
         assert "invoke the specific skill directly" in hub.lower()
 
@@ -171,7 +178,8 @@ class TestSkillFrontmatter:
         )
 
     def test_reference_directories_do_not_define_nested_skills(self):
-        """Progressive references are markdown files, not nested plugin skills."""
+        """Progressive references are markdown files, not nested plugin skills (ADR-032).
+        Exception: declared sub-skill directories under develop/ are permitted (ADR-081)."""
         nested_skill_files = [
             path
             for skill_dir in SKILLS_DIR.iterdir()
@@ -180,6 +188,14 @@ class TestSkillFrontmatter:
             if (skill_dir / "references").exists()
         ]
         assert nested_skill_files == []
+
+    def test_develop_sub_skills_are_referenced_from_develop(self):
+        """ADR-081: sub-skills nested under develop/ must be referenced from develop/SKILL.md."""
+        develop_text = (SKILLS_DIR / "develop" / "SKILL.md").read_text()
+        for skill_name in sorted(EXPECTED_DEVELOP_SUB_SKILLS):
+            assert f"{skill_name}/SKILL.md" in develop_text, (
+                f"develop/SKILL.md does not reference sub-skill '{skill_name}/SKILL.md'"
+            )
 
     def test_contrib_candidates_are_outside_live_skills(self):
         assert (CONTRIB_DIR / "README.md").exists()
@@ -239,19 +255,19 @@ class TestSkillFrontmatter:
                 )
 
     def test_workflow_skills_support_universal_input_resolution(self):
-        handlers = [
-            "develop",
-            "feature",
-            "fix",
-            "maintainer",
-            "review",
-            "run",
-            "test",
-            "verify",
+        handler_paths = [
+            SKILLS_DIR / "develop" / "SKILL.md",
+            SKILLS_DIR / "develop" / "feature" / "SKILL.md",
+            SKILLS_DIR / "develop" / "fix" / "SKILL.md",
+            SKILLS_DIR / "maintainer" / "SKILL.md",
+            SKILLS_DIR / "review" / "SKILL.md",
+            SKILLS_DIR / "run" / "SKILL.md",
+            SKILLS_DIR / "test" / "SKILL.md",
+            SKILLS_DIR / "verify" / "SKILL.md",
         ]
 
-        for skill_name in handlers:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        for path in handler_paths:
+            text = path.read_text().lower()
             assert "## universal command intake" in text
             assert "target" in text
             assert "natural-language" in text
@@ -263,8 +279,13 @@ class TestSkillFrontmatter:
         assert reference.exists()
         assert not (SKILLS_DIR / "issue-context" / "SKILL.md").exists()
 
-        for skill_name in ["develop", "feature", "fix"]:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text()
+        skill_paths = {
+            "develop": SKILLS_DIR / "develop" / "SKILL.md",
+            "feature": SKILLS_DIR / "develop" / "feature" / "SKILL.md",
+            "fix": SKILLS_DIR / "develop" / "fix" / "SKILL.md",
+        }
+        for skill_name, path in skill_paths.items():
+            text = path.read_text()
             assert "issue-context.md" in text
 
     def test_block_targets_are_develop_references(self):
@@ -413,7 +434,7 @@ class TestSkillFrontmatter:
 
     def test_fix_requires_user_provided_concrete_problem_before_investigation(self):
         """ADR-007's clarification gate must remain explicit in the fix skill."""
-        text = (SKILLS_DIR / "fix" / "SKILL.md").read_text().lower()
+        text = (SKILLS_DIR / "develop" / "fix" / "SKILL.md").read_text().lower()
         gate_start = text.index("## 1. secure the target and fix description")
         reproduce_start = text.index("## 2. reproduce first")
         gate = text[gate_start:reproduce_start]
@@ -425,8 +446,13 @@ class TestSkillFrontmatter:
 
     def test_fix_feature_and_develop_prompt_for_jira_up_front(self):
         """ADR-008 prompts for Jira early while keeping it non-blocking."""
-        for skill_name in ["fix", "feature", "develop"]:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        skill_paths = {
+            "develop": SKILLS_DIR / "develop" / "SKILL.md",
+            "feature": SKILLS_DIR / "develop" / "feature" / "SKILL.md",
+            "fix": SKILLS_DIR / "develop" / "fix" / "SKILL.md",
+        }
+        for skill_name, path in skill_paths.items():
+            text = path.read_text().lower()
             normalized = re.sub(r"\s+", " ", text)
             assert "jira id" in normalized
             assert "up front" in normalized
@@ -436,7 +462,7 @@ class TestSkillFrontmatter:
             assert "atlassian mcp tools are unavailable" in normalized
             assert "paste the ticket details" in normalized
 
-        fix_text = (SKILLS_DIR / "fix" / "SKILL.md").read_text().lower()
+        fix_text = (SKILLS_DIR / "develop" / "fix" / "SKILL.md").read_text().lower()
         assert "same clarification" in fix_text
 
     def test_issue_context_fetches_jira_or_requests_pasted_details(self):
@@ -451,11 +477,11 @@ class TestSkillFrontmatter:
     def test_fix_and_develop_require_target_and_work_description(self):
         """ADR-009's two-part intake gate must remain explicit."""
         expectations = {
-            "fix": "fix description",
-            "develop": "feature description",
+            SKILLS_DIR / "develop" / "fix" / "SKILL.md": "fix description",
+            SKILLS_DIR / "develop" / "SKILL.md": "feature description",
         }
-        for skill_name, description_label in expectations.items():
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        for path, description_label in expectations.items():
+            text = path.read_text().lower()
             intake = text.split("## 2.", 1)[0]
 
             assert "**target**" in intake
@@ -467,16 +493,26 @@ class TestSkillFrontmatter:
 
     def test_jira_prompt_may_repeat_at_phase_completion(self):
         """ADR-010 must keep the completion prompt optional and non-blocking."""
-        for skill_name in ["fix", "develop"]:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        skill_paths = [
+            SKILLS_DIR / "develop" / "fix" / "SKILL.md",
+            SKILLS_DIR / "develop" / "SKILL.md",
+        ]
+        for path in skill_paths:
+            text = path.read_text().lower()
             assert "completion summary may ask for it again" in text
             assert "do not repeat the prompt when an id is already known" in text
             assert "do not treat a missing id as incomplete work" in text
 
     def test_fix_feature_develop_and_review_offer_commit_syntax_without_git_operations(self):
         """Commit syntax is offered while staging/commit stays manual and push is forbidden (ADR-051, ADR-055)."""
-        for skill_name in ["fix", "feature", "develop", "review"]:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        skill_paths = [
+            SKILLS_DIR / "develop" / "fix" / "SKILL.md",
+            SKILLS_DIR / "develop" / "feature" / "SKILL.md",
+            SKILLS_DIR / "develop" / "SKILL.md",
+            SKILLS_DIR / "review" / "SKILL.md",
+        ]
+        for path in skill_paths:
+            text = path.read_text().lower()
             normalized = re.sub(r"\s+", " ", text)
             assert "offer to generate conventional commit syntax" in normalized
             assert "generate message text only if the user accepts" in normalized
@@ -488,8 +524,14 @@ class TestSkillFrontmatter:
 
     def test_editing_workflows_warn_on_non_feature_branches(self):
         """ADR-047 requires a branch warning before code edits on shared branches."""
-        for skill_name in ["fix", "feature", "develop", "review"]:
-            text = (SKILLS_DIR / skill_name / "SKILL.md").read_text().lower()
+        skill_paths = [
+            SKILLS_DIR / "develop" / "fix" / "SKILL.md",
+            SKILLS_DIR / "develop" / "feature" / "SKILL.md",
+            SKILLS_DIR / "develop" / "SKILL.md",
+            SKILLS_DIR / "review" / "SKILL.md",
+        ]
+        for path in skill_paths:
+            text = path.read_text().lower()
             normalized = re.sub(r"\s+", " ", text)
             assert "current git branch" in normalized
             assert "`main`" in normalized

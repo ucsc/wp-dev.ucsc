@@ -15,7 +15,7 @@ feature request; and optional Jira key/URL from the full input. Ask one concise 
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read
-[`../develop/references/issue-context.md`](../develop/references/issue-context.md)
+[`../references/issue-context.md`](../references/issue-context.md)
 before defining the feature.
 
 Before using tools, require:
@@ -50,9 +50,9 @@ defined. Preserve the target, requirements, acceptance criteria, and Jira
 context during that handoff.
 
 For `ucsc-gutenberg-blocks` domain guidance, read
-[`../develop/references/domain-blocks.md`](../develop/references/domain-blocks.md)
+[`../references/domain-blocks.md`](../references/domain-blocks.md)
 inside the selected workflow. Resolve block-specific context through
-[`../develop/references/targets.md`](../develop/references/targets.md)
+[`../references/targets.md`](../references/targets.md)
 rather than a top-level target skill.
 
 ## Complete

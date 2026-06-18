@@ -22,8 +22,8 @@ the public workflow table below (ADR-046).
 | Skill | user-invocable | model-invocable | Discoverable | Documented in hub |
 |---|---|---|---|---|
 | `develop` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `feature` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `fix` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `develop/feature` | sub-workflow | sub-workflow | via develop | ✓ public |
+| `develop/fix` | sub-workflow | sub-workflow | via develop | ✓ public |
 | `hub` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `review` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `run` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
@@ -42,9 +42,7 @@ to hide from the menu while keeping model discoverability.
 
 | Skill | Purpose |
 |---|---|
-| `develop` | Add or modify block code (PHP, template, JS editor, REST, build) — use directly or invoked by `feature`/`fix`. |
-| `feature` | Define and implement new block behavior, blocks, or editor/frontend enhancements. |
-| `fix` | Debug and fix a described defect in a specified block, GUI, or app. |
+| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows `develop/feature` and `develop/fix` scope new behavior and defect repair respectively. |
 | `review` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
 | `run` | Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment. |
 | `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites. |
@@ -56,10 +54,10 @@ to hide from the menu while keeping model discoverability.
 Reachable by typing the name directly; omitted from the routed workflow list.
 
 - `maintainer` — Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides (ADR-046).
-- `retrospective` — Capture session lessons into skill and script files. Offered at the end of fix, feature, review, and run sessions (ADR-059).
+- `retrospective` — Capture session lessons into skill and script files. Offered at the end of develop, review, and run sessions (ADR-059).
 
 ## Routing
 
 To act on a request rather than list options, invoke the specific skill directly
-(e.g. `ucsc-wp-block-dev:fix <target> <description>`), or simply describe the
+(e.g. `ucsc-wp-block-dev:develop <target> <description>`), or simply describe the
 goal and let Claude select the skill from its description (ADR-061).

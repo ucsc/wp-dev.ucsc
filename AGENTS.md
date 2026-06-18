@@ -17,9 +17,7 @@ skill's complete `SKILL.md` before acting.
 
 | Skill | Use for |
 | --- | --- |
-| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). |
-| `feature` | Define and implement new block behavior, blocks, or editor/frontend enhancements. |
-| `fix` | Debug and fix a described defect in a specified block, GUI, or app. |
+| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows: `develop/feature` for new behavior, `develop/fix` for defect repair. |
 | `hub` | List all available skills and commands. Use when unsure which skill applies. |
 | `maintainer` | Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides. |
 | `retrospective` | Capture session lessons into skill and script files at the end of a working session. |

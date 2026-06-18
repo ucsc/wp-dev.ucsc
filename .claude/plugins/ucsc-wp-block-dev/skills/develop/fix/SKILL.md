@@ -20,11 +20,11 @@ when missing or conflicting information blocks the fix workflow.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read
-[`../develop/references/issue-context.md`](../develop/references/issue-context.md)
+[`../references/issue-context.md`](../references/issue-context.md)
 before investigating.
 
 Resolve known block targets through
-[`../develop/references/targets.md`](../develop/references/targets.md)
+[`../references/targets.md`](../references/targets.md)
 and read only the selected target reference.
 
 ## 1. Secure the Target and Fix Description

@@ -1,11 +1,18 @@
 ---
 name: develop
-description: Add or modify ucsc-gutenberg-blocks block code — PHP class, template, JS editor, REST, and build steps. Use directly for implementation work, or invoked automatically by the `feature` and `fix` skills after scope is defined.
+description: Add or modify ucsc-gutenberg-blocks block code — PHP class, template, JS editor, REST, and build steps. Includes `feature` and `fix` sub-workflows for scoped new behavior or defect repair; invoke develop directly for implementation after scope is already known.
 ---
 
 # Develop — Add a Block or Feature
 
 Guided flow for adding a new Gutenberg block or extending an existing one in `ucsc-gutenberg-blocks`.
+
+## Sub-workflows
+
+For scoped work, prefer the appropriate sub-workflow over invoking `develop` directly:
+
+- [`feature/SKILL.md`](feature/SKILL.md) — define and implement new behavior (new blocks, editor enhancements, behavior additions).
+- [`fix/SKILL.md`](fix/SKILL.md) — reproduce and repair a described defect in a specified target.
 
 Primarily touches `classes/` and `src/blocks/`.
 

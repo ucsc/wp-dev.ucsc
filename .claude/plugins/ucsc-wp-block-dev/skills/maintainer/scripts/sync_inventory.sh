@@ -37,25 +37,11 @@ write_mode = "--write" in sys.argv
 # If a new skill is added, it will fall back to using its frontmatter description.
 METADATA = {
     "develop": {
-        "readme": "Add or modify block code directly, or invoked by feature/fix after scope is defined",
-        "hub": "Add or modify block code (PHP, template, JS editor, REST, build) — use directly or invoked by `feature`/`fix`.",
-        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build).",
-        "deck_trigger": "Block code changes",
-        "deck_desc": "Adds or modifies PHP class, template, JS editor, REST, and build steps."
-    },
-    "feature": {
-        "readme": "Add new behavior through the preferred feature workflow",
-        "hub": "Define and implement new block behavior, blocks, or editor/frontend enhancements.",
-        "agents_md": "Define and implement new block behavior, blocks, or editor/frontend enhancements.",
-        "deck_trigger": "New behavior",
-        "deck_desc": "Preferred feature workflow."
-    },
-    "fix": {
-        "readme": "Fix a described problem in a specified target block, GUI, or app",
-        "hub": "Debug and fix a described defect in a specified block, GUI, or app.",
-        "agents_md": "Debug and fix a described defect in a specified block, GUI, or app.",
-        "deck_trigger": "Bug or regression",
-        "deck_desc": "Debugs JS, PHP, REST API, or transient caching bugs."
+        "readme": "Add or modify block code directly; use `develop/feature` for new behavior and `develop/fix` for defect repair",
+        "hub": "Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows `develop/feature` and `develop/fix` scope new behavior and defect repair respectively.",
+        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows: `develop/feature` for new behavior, `develop/fix` for defect repair.",
+        "deck_trigger": "Block code changes, new behavior, or bug repair",
+        "deck_desc": "Adds or modifies PHP class, template, JS editor, REST, and build steps. Sub-workflows: feature (new behavior) and fix (defect repair)."
     },
     "hub": {
         "readme": "List every available skill and command (`:hub`) — enumeration only",
@@ -73,7 +59,7 @@ METADATA = {
     },
     "retrospective": {
         "readme": None,
-        "hub": "Capture session lessons into skill and script files. Offered at the end of fix, feature, review, and run sessions (ADR-059).",
+        "hub": "Capture session lessons into skill and script files. Offered at the end of develop, review, and run sessions (ADR-059).",
         "agents_md": "Capture session lessons into skill and script files at the end of a working session.",
         "deck_trigger": "Post-session capture",
         "deck_desc": "Capture session lessons into skill and script files."
