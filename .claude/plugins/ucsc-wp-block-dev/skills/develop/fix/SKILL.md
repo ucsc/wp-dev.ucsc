@@ -1,6 +1,6 @@
 ---
 name: fix
-description: Debug and fix a user-identified problem in the ucsc-gutenberg-blocks WordPress plugin. Before investigating, require the target block, GUI, or app and a plain-language description of what needs fixing; prefer but do not require a Jira ID.
+description: This skill should be used when the user asks to "fix a block", "debug an issue", "something is broken", "block not showing", "wrong output", or reports any defect in a ucsc-gutenberg-blocks block, GUI, or app. Require the target and a plain-language problem description before investigating.
 ---
 
 # Fix — Debug a Block Issue

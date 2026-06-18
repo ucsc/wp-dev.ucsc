@@ -51,7 +51,7 @@ When a skill is moved from `skills/<name>/` to `skills/<parent>/<name>/`:
 3. **Update `sync_inventory.sh` METADATA** — the hardcoded dict still has entries for the old skill name; update or remove them and update the parent skill's `readme`/`hub`/`agents_md` copy. Run `--write` after.
 4. **Update `test_plugin_validity.py`** — `test_core_skills_present` has its own hardcoded skill list separate from `test_plugin_structure.py`; both must be updated.
 5. **Update hub, README, AGENTS.md, slide deck** — `sync_inventory.sh --write` handles these once METADATA is correct.
-6. **Check for prose backtick paths** — `test_all_markdown_links_resolve` only catches `[label](link)` hyperlinks; backtick prose paths like `` `skill/references/foo.md` `` can silently drift. Run the plugin-validator agent after a structural refactor to catch these.
+6. **Check for prose backtick paths** — `test_all_markdown_links_resolve` only catches markdown hyperlinks (text-plus-href format); backtick prose paths like `` `skill/references/foo.md` `` can silently drift. Run the plugin-validator agent after a structural refactor to catch these.
 
 ## Detecting stale prose paths
 

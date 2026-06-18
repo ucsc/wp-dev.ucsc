@@ -1,6 +1,6 @@
 ---
 name: feature
-description: Define and implement new behavior for the ucsc-gutenberg-blocks WordPress plugin. Use for feature requests, new Gutenberg blocks, editor or frontend enhancements, and behavior changes that are not fixes for existing defects.
+description: This skill should be used when the user asks to "add new behavior", "create a new block", "add a feature", "implement editor controls", "add frontend output", or describes new functionality for ucsc-gutenberg-blocks that is not a defect fix.
 ---
 
 # Feature Workflow

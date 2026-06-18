@@ -87,3 +87,5 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-079](ADR-079-plugin-dev-companion-plugin.md) | plugin-dev from claude-plugins-official is the required companion for Tier 2 maintainer operations | Accepted | 2026-06-17 |
 | [ADR-080](ADR-080-agents-md-skill-inventory.md) | Keep AGENTS.md synchronized with live skill inventory | Accepted | 2026-06-17 |
 | [ADR-081](ADR-081-sub-skill-directories-under-skill.md) | Sub-skill directories nested under a parent skill are permitted | Accepted | 2026-06-18 |
+| [ADR-082](ADR-082-move-survey-under-develop.md) | Survey is a develop sub-skill | Accepted | 2026-06-18 |
+| [ADR-083](ADR-083-move-retrospective-under-maintainer.md) | Retrospective is a maintainer sub-skill | Accepted | 2026-06-18 |

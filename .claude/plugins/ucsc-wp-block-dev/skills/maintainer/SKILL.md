@@ -329,69 +329,7 @@ may be incomplete.
 
 ## Skill visibility and invocation (hidden skills)
 
-For detailed reference rules on plugin skill visibility, see [`references/skill-visibility.md`](references/skill-visibility.md).
-
-Official skills reference: `https://code.claude.com/docs/en/skills`
-
-Claude Code exposes two frontmatter booleans that control *how* a skill can be
-invoked. Know what they do before deciding how to "hide" a skill:
-
-| Field | Default | When set to the non-default | Effect |
-|---|---|---|---|
-| `user-invocable` | `true` | `user-invocable: false` | Hides the skill from the `/` slash-command menu. The user can no longer invoke it by name; **the model can still auto-invoke it** from its description. |
-| `disable-model-invocation` | `false` | `disable-model-invocation: true` | The model will **not** auto-trigger the skill from its description; **the user can still run it** explicitly via `/<skill>`. |
-
-Combined behavior:
-
-| `user-invocable` | `disable-model-invocation` | Who can invoke |
-|---|---|---|
-| `true` (default) | `false` (default) | User (slash menu) **and** model (auto) — fully public |
-| `false` | `false` | Model only — auto-invoked, hidden from the slash menu |
-| `true` | `true` | User only — manual `/<skill>`, no model auto-trigger |
-| `false` | `true` | Effectively unreachable — avoid |
-
-Note the defaults are `user-invocable: true` and
-`disable-model-invocation: false`; writing those values explicitly does nothing,
-so only add a field when you mean to flip it.
-
-### How this plugin currently hides skills
-
-Per ADR-070, the structural test `test_frontmatter_uses_portable_agent_skills_fields`
-now accepts the full official Claude Code frontmatter field set, so
-`user-invocable` and `disable-model-invocation` are permitted in any
-`skills/*/SKILL.md`. Despite this, the plugin currently achieves hiding by
-convention rather than frontmatter:
-
-- **`maintainer`** is a hidden *manual* skill (ADR-046): it stays a live,
-  type-able skill but is removed from the public workflow tables in `README`,
-  `hub`, and the slide deck so it does not clutter the product-facing list.
-  Hiding is documentation-level, not frontmatter-level.
-- **`develop`** is kept from direct triggering by **description wording**
-  ("Invoked by the `feature` and `fix` skills after scope is defined; do not
-  trigger directly"), not by `disable-model-invocation`.
-
-To use frontmatter-enforced visibility, add the field and document the
-decision in an ADR — the test will no longer reject it.
-
-### Platform capabilities worth knowing when authoring skills
-
-- **1,536-char truncation cap** — the combined `description` + `when_to_use`
-  text is truncated at 1,536 characters in the skill listing. Put the key
-  trigger phrase first in `description`; use `when_to_use` for secondary
-  phrases that don't fit.
-- **`when_to_use`** — optional field appended to `description` in the listing;
-  useful for adding trigger phrases without bloating the primary description.
-- **`${CLAUDE_SKILL_DIR}`** — expands to the skill's own directory at runtime.
-  Reference bundled scripts with this variable so paths survive regardless of
-  where the session starts. To inject output at load time, prefix a line with `!`
-  followed by a backtick-wrapped shell command (e.g. `!` + `` `bash …/scripts/run.sh` ``).
-- **Dynamic context injection** — a line beginning with `!` and a backtick-wrapped
-  command (or a fenced ` ```! ` block) runs the command *before* Claude sees the skill and
-  inlines its output. Use to inject live state (current branch, build status,
-  etc.) directly into a skill prompt without extra tool calls.
-- **`context: fork` + `agent`** — runs the skill in an isolated subagent; the
-  skill body becomes the subagent's prompt. Candidate pattern if `validate` or
-  `review-skills` are ever converted from manual Agent-tool calls.
+For frontmatter fields (`user-invocable`, `disable-model-invocation`), combined behavior tables, platform capabilities (`when_to_use`, dynamic context injection, `context: fork`), and how this plugin currently hides skills, see [`references/skill-visibility.md`](references/skill-visibility.md).
 
 ## When the manifest or skills change
 
@@ -399,27 +337,7 @@ After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate
 
 ## Maintenance gotchas
 
-- **Claim the ADR number before writing.** Concurrent edits (or a linter) can add
-  an ADR with the next sequential number while you work, so a fresh `ADR-NNN`
-  file can collide. Before creating one, check **both** `docs/adr/index.md` and
-  `ls docs/adr/`; if your number was taken, renumber the file, its title/heading,
-  every in-body reference, and the index row.
-- **Adding or removing a skill touches an inventory sync set — move them
-  together or `test` fails.** The set is: the README skills table, the `hub`
-  listing, the slide deck skill table (`skills/maintainer/assets/…presentation.md`),
-  the root `AGENTS.md` routing table, `EXPECTED_LIVE_SKILLS` in
-  `tests/test_plugin_structure.py` (plus any hardcoded skill lists in tests,
-  e.g. `test_plugin_validity.py`), and the generated `generate-docs` assets
-  (run `generate-docs` to refresh). Then run `check-references` and `test`.
-- **Publishing is per-target.** Each `publish` target has its own destination
-  Google Doc; `publish_to_gdoc.py --source <md> --doc <url>` publishes any
-  markdown, and each fast-path script holds its own `GDOC_URL` (ADR-063).
-- **Markdown links to local filesystem absolute paths (`file://`) must be excluded in tests.** When referencing generated local files (e.g., code reviews) via absolute paths, always format them using the `file://` scheme (e.g., `file:///path/to/file`). The link check test (`test_all_markdown_links_resolve` in `test_plugin_structure.py`) is configured to ignore links starting with `file://` so they are not parsed as relative paths and incorrectly flagged as broken.
-- **Superseding an ADR can leave a stale test.** Tests sometimes assert a
-  decision's literal wording (e.g. a commit-syntax string). When an ADR is
-  superseded — including by concurrent/external work — `grep` the tests for
-  phrases tied to the old ADR, update the assertions to the current wording, and
-  re-point the test docstring to the superseding ADR(s). A superseded ADR whose
-  test still asserts the old text fails `test` even though the skills are
-  correct (e.g. ADR-029's `git add`/`commit`/`push` literal after the git-ops
-  rework).
+See [`references/maintenance-gotchas.md`](references/maintenance-gotchas.md) for the full list. Critical items:
+
+- **Claim the ADR number before writing** — check both `docs/adr/index.md` and `ls docs/adr/` before creating a new ADR file.
+- **Skill inventory sync set** — adding/removing a skill requires updating README, hub, slide deck, AGENTS.md, and two test files together. Run `sync_inventory.sh --write` first.

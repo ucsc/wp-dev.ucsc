@@ -1,6 +1,6 @@
 ---
 name: hub
-description: List the ucsc-wp-block-dev plugin's skills and commands. Use when the user asks what this plugin can do, to list or show available skills or commands, or invokes `:hub`. Enumeration only — it lists skills; to act on a request, invoke the relevant skill directly.
+description: This skill should be used when the user asks to "list skills", "what can you do", "show available commands", "what WordPress block skills are available", or invokes `:hub`. Enumeration only — lists the plugin inventory without routing; to act, invoke the relevant skill directly.
 ---
 
 # Hub — ucsc-wp-block-dev skill list

@@ -1,6 +1,6 @@
 ---
 name: develop
-description: Add or modify ucsc-gutenberg-blocks block code — PHP class, template, JS editor, REST, and build steps. Includes `feature` and `fix` sub-workflows for scoped new behavior or defect repair; invoke develop directly for implementation after scope is already known.
+description: This skill should be used when the user asks to "add a block", "create a Gutenberg block", "implement a feature", "modify block code", "extend a block", or when feature/fix scope is already defined and implementation is ready to begin on ucsc-gutenberg-blocks.
 ---
 
 # Develop — Add a Block or Feature
@@ -98,152 +98,16 @@ ls src/blocks/
 
 Read the nearest match — PHP class and JS file. Use its patterns for class structure, REST registration, transient caching, and block registration. Do not invent new patterns.
 
-## 3. PHP Class
+## 3–8. Implement the Block
 
-Create `classes/<BlockName>.php`:
+Read [`references/block-templates.md`](references/block-templates.md) for the canonical skeletons for each file. Apply them in order:
 
-```php
-<?php
-
-class BlockName {
-    public function __construct() {
-        add_action('init', array($this, 'adminAssets'));
-    }
-
-    public function adminAssets() {
-        register_block_type('ucscblocks/block-name', array(
-            'editor_script' => 'ucscblocks',
-            'render_callback' => array($this, 'theHTML'),
-        ));
-    }
-
-    public function theHTML($attributes) {
-        $example = esc_html($attributes['exampleAttr'] ?? '');
-        ob_start();
-        require plugin_dir_path(__FILE__) . '../templates/block-name.php';
-        return ob_get_clean();
-    }
-}
-```
-
-- One class per block.
-- Constructor hooks into `init` via `add_action` — never register blocks directly in the constructor.
-- Block namespace is `ucscblocks/*` (not `ucsc/*`).
-- `editor_script` references the shared `ucscblocks` handle enqueued in `index.php`.
-- `theHTML()` validates attributes, then delegates to a template.
-- Escape all output. Never echo unescaped user or API data.
-
-## 4. Template
-
-Create `templates/block-name.php` for substantial markup:
-
-```php
-<?php
-// Variables set before require: $example, $data
-?>
-<div class="wp-block-ucscblocks-block-name">
-    <?php echo esc_html($example); ?>
-</div>
-```
-
-Keep logic minimal in templates — compute values in the render method, pass as local variables.
-
-## 5. Block JS (editor side)
-
-Create `src/blocks/BlockName.js`. The module must export a function — `src/index.js` calls it to register:
-
-```js
-import { InspectorControls } from '@wordpress/block-editor';
-import { Panel, PanelBody, TextControl } from '@wordpress/components';
-
-const BlockName = () => {
-    wp.blocks.registerBlockType('ucscblocks/block-name', {
-        title: 'Block Name',
-        icon: 'admin-generic',
-        category: 'common',
-        attributes: {
-            exampleAttr: { type: 'string', default: '' },
-        },
-        edit: ({ attributes, setAttributes }) => {
-            return (
-                <>
-                    <InspectorControls key="setting">
-                        <Panel>
-                            <PanelBody title="Settings">
-                                <TextControl
-                                    label="Example"
-                                    value={attributes.exampleAttr}
-                                    onChange={(val) => setAttributes({ exampleAttr: val })}
-                                />
-                            </PanelBody>
-                        </Panel>
-                    </InspectorControls>
-                    <div>Block preview</div>
-                </>
-            );
-        },
-        save: () => {
-            return null;
-        },
-    });
-};
-
-export default BlockName;
-```
-
-- Uses `wp.blocks.registerBlockType` (global), not an ES import of `registerBlockType`.
-- Block namespace is `ucscblocks/*`.
-- Category is `common` (existing convention).
-- Module exports a function; `src/index.js` imports and calls it.
-
-## 6. Register in index.js
-
-Add an import and call to `src/index.js`:
-
-```js
-import BlockName from './blocks/BlockName';
-
-// ... alongside existing calls:
-BlockName();
-```
-
-## 7. Register in index.php
-
-Add require and instantiation to `index.php`:
-
-```php
-require_once plugin_dir_path(__FILE__) . 'classes/BlockName.php';
-new BlockName();
-```
-
-Place next to the other block registrations.
-
-## 8. REST API (if needed)
-
-If the block needs its own endpoint, add a method to the PHP class:
-
-```php
-public function __construct() {
-    add_action('init', array($this, 'adminAssets'));
-    add_action('rest_api_init', array($this, 'register_routes'));
-}
-
-public function register_routes() {
-    register_rest_route('ucsc/v1', '/block-name/data', [
-        'methods' => 'GET',
-        'callback' => [$this, 'get_data'],
-        'permission_callback' => '__return_true',
-    ]);
-}
-
-public function get_data($request) {
-    $cached = get_transient('ucsc_block_name_data');
-    if ($cached !== false) return $cached;
-    // fetch ...
-    set_transient('ucsc_block_name_data', $data, HOUR_IN_SECONDS);
-    return $data;
-}
-```
+3. **PHP Class** — `classes/<BlockName>.php` (constructor, `adminAssets`, `theHTML` render callback)
+4. **Template** — `templates/block-name.php` (markup only; compute values in `theHTML`, not the template)
+5. **Block JS** — `src/blocks/BlockName.js` (exports a function that calls `wp.blocks.registerBlockType`)
+6. **index.js** — import and call the new module alongside existing registrations
+7. **index.php** — `require_once` the new class and instantiate it
+8. **REST API** — add `rest_api_init` hook and `register_routes` / `get_data` methods if the block needs its own endpoint
 
 ## 9. Validate
 
