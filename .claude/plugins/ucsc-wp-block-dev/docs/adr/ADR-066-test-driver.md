@@ -1,10 +1,10 @@
 ---
-title: "ADR-066: Introduce test/driver.sh script for automated test suites"
+title: "ADR-066: Introduce validate/driver.sh script for automated test suites"
 status: Accepted
 date: 2026-06-16
 ---
 
-# ADR-066: Introduce test/driver.sh script for automated test suites
+# ADR-066: Introduce validate/driver.sh script for automated test suites
 
 ## Status
 
@@ -13,11 +13,11 @@ Accepted
 ## Context
 
 The plugin establishes high-value patterns with token-frugal driver scripts: `run/driver.sh` and `verify/driver.sh`. They run entire development phases in a single call and print a compact summary, while redirection of verbose logs to log files reduces the agent's token consumption.
-However, a gap remained: the `test` skill still required running separate commands for PHP, Jest, or e2e tests and reading their full, verbose stdout.
+However, a gap remained: the `validate` skill still required running separate commands for PHP, Jest, or e2e tests and reading their full, verbose stdout.
 
 ## Decision
 
-We will introduce a test driver at `skills/test/driver.sh` to match the established driver conventions:
+We will introduce a validate driver at `skills/validate/driver.sh` to match the established driver conventions:
 
 1. The script accepts subcommands: `php`, `jest`, `e2e`, and `all` (default).
 2. It detects the `wp-dev.ucsc` root and plugin paths.

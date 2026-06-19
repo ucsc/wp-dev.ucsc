@@ -18,6 +18,13 @@ read
 [`../references/issue-context.md`](../references/issue-context.md)
 before defining the feature.
 
+# Note on relative references
+The references above use a relative path into `develop/references/`. This is an
+intentional dependency but fragile to directory moves/renames. Consider
+promoting shared references (issue-context.md, targets.md) to a plugin-level
+`skills/shared/references/` to avoid breakage. Maintain awareness when
+renaming directories.
+
 Before using tools, require:
 
 - **Target:** the block, GUI, or app that will change.
@@ -45,9 +52,7 @@ Before editing, check the current Git branch. Per ADR-047, if it is `main`,
 branch named `dev/developer_name/ISSUE-1234_short_desc`. Do not create or
 switch branches unless the user explicitly asks.
 
-Use the `develop` skill as the shared implementation core after the feature is
-defined. Preserve the target, requirements, acceptance criteria, and Jira
-context during that handoff.
+Delegate implementation to the `develop` skill after the feature is defined. Invoke the develop skill explicitly with the resolved target, desired outcome, and acceptance criteria (for example: `develop <target> "Implement X" --jira ISSUE-1234`). Preserve the target, requirements, acceptance criteria, and Jira context during that handoff.
 
 For `ucsc-gutenberg-blocks` domain guidance, read
 [`../references/domain-blocks.md`](../references/domain-blocks.md)

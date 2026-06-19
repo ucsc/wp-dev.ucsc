@@ -31,13 +31,13 @@ Always prefer running tests using the test driver in a single token-frugal call:
 
 ```bash
 # Run all tests (PHP + Jest)
-bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh all
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/driver.sh all
 
 # Run only PHP tests
-bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh php
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/driver.sh php
 
 # Run only Jest unit tests
-bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh jest
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/driver.sh jest
 ```
 
 ## Running PHP Tests (Manual/Fallback)

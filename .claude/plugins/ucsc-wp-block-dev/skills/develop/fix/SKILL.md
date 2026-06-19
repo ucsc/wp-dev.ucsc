@@ -23,6 +23,13 @@ read
 [`../references/issue-context.md`](../references/issue-context.md)
 before investigating.
 
+# Note on relative references
+The references above use a relative path into `develop/references/`. This is an
+intentional dependency but fragile to directory moves/renames. Consider
+promoting shared references (issue-context.md, targets.md) to a plugin-level
+`skills/shared/references/` to avoid breakage. Maintain awareness when
+renaming directories.
+
 Resolve known block targets through
 [`../references/targets.md`](../references/targets.md)
 and read only the selected target reference.

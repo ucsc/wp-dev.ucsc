@@ -32,7 +32,7 @@ directly.
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
 | `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites |
-| `test` | Create or run focused PHP, Jest, or end-to-end tests |
+| `validate` | Create or run focused PHP, Jest, or end-to-end tests |
 | `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
 
 `develop/references/issue-context.md` provides shared Jira and issue
@@ -97,7 +97,7 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
 bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
 
 # Run PHP and Jest automated test suites in Docker
-bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh all
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/driver.sh all
 ```
 
 The raw commands below are the underlying steps those drivers automate:
@@ -203,7 +203,7 @@ Or run the full check (tests + validation):
 
 Use the `maintainer` skill with the `all` operation.
 
-The `all` flow also runs `check-references`, which enforces ADR-032 — every supporting file under a skill directory must be linked from that skill's `SKILL.md`. The pytest suite enforces the same invariant, so unreferenced reference/asset/script files fail `test` too.
+The `all` flow also runs `check-references`, which enforces ADR-032 — every supporting file under a skill directory must be linked from that skill's `SKILL.md`. The pytest suite enforces the same invariant, so unreferenced reference/asset/script files fail `validate` too.
 
 To validate without the skill, ask Claude to "validate the plugin at `.claude/plugins/ucsc-wp-block-dev`" — it will launch the `plugin-dev:plugin-validator` agent. Run the bundled tests directly with:
 

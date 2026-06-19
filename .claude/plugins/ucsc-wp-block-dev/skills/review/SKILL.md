@@ -17,6 +17,15 @@ When GitHub CLI tooling is needed for pull request creation or inspection, read
 [`../develop/references/github.md`](../develop/references/github.md) before
 proceeding.
 
+# Note on relative references
+The references above use a relative path into `develop/references/`. This is an
+intentional dependency but fragile to directory moves/renames. Consider
+promoting shared references (issue-context.md, targets.md) to a plugin-level
+`skills/shared/references/` to avoid breakage. If you keep relative paths,
+include an explicit comment documenting the dependency so future refactors
+won't silently break skill references.
+
+
 Prioritize actionable findings:
 
 1. Runtime bugs and behavior regressions.

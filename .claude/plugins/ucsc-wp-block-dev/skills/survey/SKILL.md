@@ -109,6 +109,10 @@ relies on rendered-HTML fingerprints defined in `DYNAMIC_BLOCK_PATTERNS` in the
 survey script. The canonical fingerprint registry is in
 `skills/develop/skills/develop/references/domain-detection.md`.
 
+# Note on relative references
+This skill references `develop/references/` paths (e.g., domain-detection.md). This is an intentional but fragile cross-skill dependency. Consider promoting shared references to `skills/shared/references/` or add a short comment explaining the dependency so moving or renaming `develop/` won't silently break the skill references.
+
+
 If a block is not being detected, check whether its rendered HTML fingerprint
 has changed (e.g., after a block update that changes element IDs or CSS classes).
 

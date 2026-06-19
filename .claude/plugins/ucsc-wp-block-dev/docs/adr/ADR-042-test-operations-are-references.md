@@ -1,10 +1,10 @@
 ---
-title: "ADR-042: Test operations are references under test"
+title: "ADR-042: Test operations are references under validate"
 status: Accepted
 date: 2026-06-15
 ---
 
-# ADR-042: Test operations are references under test
+# ADR-042: Test operations are references under validate
 
 ## Status
 
@@ -18,11 +18,11 @@ criteria intake, but their execution details and completion output differ.
 
 ## Decision
 
-Keep `test` as the single top-level automated-test entry point. It resolves the
+Keep `validate` as the single top-level automated-test entry point. It resolves the
 target, test type, and operation, then loads exactly one operation reference:
 
-- `skills/test/references/create.md`
-- `skills/test/references/run.md`
+- `skills/validate/references/create.md`
+- `skills/validate/references/run.md`
 
 `create` owns adding or modifying coverage and emitting check-in text. `run`
 owns executing existing tests and never emits check-in text unless coverage

@@ -62,7 +62,7 @@ For data-backed blocks, verify the appropriate integration:
 
 Compare a block's rendered DOM between the local dev site and a production site. Both pages must contain the same block type configured with the same division/department and block settings. The script fetches each page, extracts the block container, normalizes away ephemeral differences (nonces, cache-busters, timestamps), and diffs the structure.
 
-The script lives in `_WP_tools` alongside the other reporting and regression tools. When `--prod` and `--block` are omitted, both are auto-detected from the dev page content:
+The script lives in `_WP_tools` alongside the other reporting and regression tools. Note: that external hardcoded path is fragile. A plugin-local wrapper exists at `skills/verify/scripts/compare_blocks.sh` which prefers a plugin-local copy and falls back to `~/_code/_WP_tools/compare_blocks.sh`. If neither is available the wrapper prints concise manual steps and exits non-zero. When `--prod` and `--block` are omitted, both are auto-detected from the dev page content:
 
 ```bash
 bash ~/\_code/\_WP\_tools/compare_blocks.sh \
@@ -85,6 +85,8 @@ Use `--chrome` for JS-rendered DOM (headless Chrome `--dump-dom`) instead of cur
 Known blocks: `class-schedule`, `course-catalog`, `campus-directory`, `accordion`, `accordion-wrapper`, `content-sharer`, `feedback`.
 
 A MATCH result means the block DOM is identical after normalization. DIFFERS means the diff found changes — review the output to determine if the differences are expected (e.g. different live data, different block settings) or indicate a rendering bug.
+
+Reference: plugin-local wrapper at `scripts/compare_blocks.sh` (see `skills/verify/scripts/compare_blocks.sh`).
 
 ## Result
 

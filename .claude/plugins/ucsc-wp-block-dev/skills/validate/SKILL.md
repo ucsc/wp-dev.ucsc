@@ -1,5 +1,5 @@
 ---
-name: test
+name: validate
 description: Create or run automated PHP, Jest, or e2e tests for a ucsc-gutenberg-blocks block, feature, fix, or Jira acceptance criterion. Use `verify` instead when proving behavior in the live running editor or frontend — `test` is for automated test suites only.
 allowed-tools:
   - bash
@@ -11,7 +11,7 @@ allowed-tools:
   - wp
 ---
 
-# Test
+# Validate
 
 ## Universal Command Intake
 
@@ -22,7 +22,7 @@ Apply ADR-011: resolve the test target, natural-language test goal, and optional
 For a token-frugal, single-call run of the automated tests, use the test driver:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/test/driver.sh [php|jest|e2e|all]
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/driver.sh [php|jest|e2e|all]
 ```
 
 It prints a compact summary and logs verbosely to a logfile, matching the convention established by the `run` and `verify` drivers.
