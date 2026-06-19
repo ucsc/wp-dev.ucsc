@@ -6,5 +6,8 @@
     "name": "UCSC ITS",
     "email": "henryh@ucsc.edu"
   },
-  "keywords": ["wordpress", "gutenberg", "blocks", "ucsc", "php", "webpack", "jest", "wp-scripts", "campuspress"]
+  "keywords": ["wordpress", "gutenberg", "blocks", "ucsc", "php", "webpack", "jest", "wp-scripts", "campuspress"],
+  "repository": "https://github.com/ucsc/ucsc-wp-block-dev",
+  "homepage": "https://github.com/ucsc/ucsc-wp-block-dev#readme",
+  "license": "MIT"
 }

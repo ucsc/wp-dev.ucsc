@@ -1,6 +1,15 @@
 ---
 name: maintainer
 description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, review or promote contributed skills, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, contribution review, slide publishing, or release readiness.
+allowed-tools:
+  - bash
+  - grep
+  - python
+  - docker
+  - docker-compose
+  - wp
+  - jq
+  - sed
 ---
 
 # Maintainer — ucsc-wp-block-dev
@@ -26,6 +35,10 @@ effect without installing from a marketplace.
 
 Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003 and ADR-058 (single-agent mode by default).
 
+## Maintainer checklist
+
+Use `references/maintainer-checklist.md` for a compact reviewer checklist that consolidates plugin-dev and skill-creator best practices. Run it before `validate` or `publish` operations.
+
 Per ADR-073, all plugin operations are scoped to `.claude/plugins/ucsc-wp-block-dev/`. Ignore `.agents/` — it holds legacy tooling unrelated to this plugin.
 
 ## Universal Command Intake
@@ -34,6 +47,7 @@ Apply ADR-011: resolve the plugin target, natural-language maintenance request, 
 
 Per ADR-020, when the user enters maintainer mode **without an explicit operation** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available operations as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `generate-docs`, `publish` (`slides`/`docs`/`all`), `new-adr`, `sync-inventory`, `skill-details`, and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen operation only after they pick. When the user already named an operation (e.g. `maintainer test`), honor it directly without prompting. Once an operation is running, ask one concise question only when missing or conflicting information prevents useful work.
 
+When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
 ## Anthropic plugin-dev tools
 
 `plugin-dev` is the required companion plugin for all Tier 2 operations (ADR-079).

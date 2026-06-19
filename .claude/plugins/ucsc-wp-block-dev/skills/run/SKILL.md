@@ -1,6 +1,13 @@
 ---
 name: run
 description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and test for automated tests.
+allowed-tools:
+  - bash
+  - docker
+  - docker-compose
+  - wp
+  - curl
+  - jq
 ---
 
 # Run wp-dev.ucsc

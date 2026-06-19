@@ -1,6 +1,14 @@
 ---
 name: test
 description: Create or run automated PHP, Jest, or e2e tests for a ucsc-gutenberg-blocks block, feature, fix, or Jira acceptance criterion. Use `verify` instead when proving behavior in the live running editor or frontend — `test` is for automated test suites only.
+allowed-tools:
+  - bash
+  - python
+  - docker
+  - docker-compose
+  - npm
+  - yarn
+  - wp
 ---
 
 # Test

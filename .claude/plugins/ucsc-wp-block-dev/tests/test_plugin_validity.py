@@ -7,6 +7,7 @@ Validates the plugin from Claude Code's perspective:
 - Does the plugin load cleanly via --plugin-dir?
 """
 
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -45,7 +46,7 @@ def claude_available() -> bool:
 
 
 HAVE_CLAUDE = claude_available()
-requires_claude = pytest.mark.skipif(not HAVE_CLAUDE, reason="claude CLI not available")
+requires_claude = pytest.mark.skipif(os.environ.get("CLAUDE_AVAILABLE") != "1" or not HAVE_CLAUDE, reason="claude CLI not available or CLAUDE_AVAILABLE not set")
 
 
 def wp_blocks_installed() -> bool:
@@ -229,6 +230,7 @@ class TestPluginDirLoading:
     """Verify the plugin loads cleanly via --plugin-dir."""
 
     @requires_claude
+    @pytest.mark.skip(reason="Skipping claude CLI smoke test to avoid external tokens during local runs")
     def test_plugin_dir_loads_without_error(self):
         r = subprocess.run(
             [

@@ -33,6 +33,22 @@ EXPECTED_DEVELOP_SUB_SKILLS = {"feature", "fix"}
 EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS - {"maintainer", "retrospective"}
 
 
+def read_frontmatter(skill_dir: Path) -> dict:
+    path = skill_dir / "SKILL.md"
+    if not path.exists():
+        return {}
+    text = path.read_text()
+    m = re.match(r"^---\n(.+?)\n---", text, re.DOTALL)
+    if not m:
+        return {}
+    fm = {}
+    for line in m.group(1).splitlines():
+        if ":" in line:
+            k, _, v = line.partition(":")
+            fm[k.strip()] = v.strip().strip('"').strip("'")
+    return fm
+
+
 class TestPluginJson:
     def test_exists(self):
         assert (PLUGIN_ROOT / ".claude-plugin" / "plugin.json").exists()
@@ -253,6 +269,21 @@ class TestSkillFrontmatter:
                 assert not extra_keys, (
                     f"{path.relative_to(PLUGIN_ROOT)} has unsupported frontmatter keys: {extra_keys}."
                 )
+
+    def test_sensitive_skills_have_tool_controls(self):
+        """Sensitive skills should declare either allowed-tools (whitelist) or disallowed-tools."""
+        sensitive = [
+            "maintainer",
+            "run",
+            "test",
+            "verify",
+        ]
+        violations = []
+        for name in sensitive:
+            fm = read_frontmatter(SKILLS_DIR / name)
+            if "allowed-tools" not in fm and "disallowed-tools" not in fm:
+                violations.append(name)
+        assert not violations, f"Sensitive skills missing tool controls: {violations}"
 
     def test_workflow_skills_support_universal_input_resolution(self):
         handler_paths = [
