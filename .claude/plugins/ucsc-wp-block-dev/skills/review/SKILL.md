@@ -5,6 +5,10 @@ description: Review a WordPress block diff, branch, file, pull request, or Jira-
 
 # Review Mode
 
+## Implements
+
+implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS
+
 ## Universal Command Intake
 
 Apply ADR-011: resolve the review target, natural-language review focus, and optional Jira key/URL from the full input. Infer the current diff when no target is supplied and it is unambiguous. Ask one concise question only when the review surface cannot be determined safely.

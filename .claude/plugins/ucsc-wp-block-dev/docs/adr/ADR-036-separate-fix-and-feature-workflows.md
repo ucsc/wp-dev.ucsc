@@ -14,11 +14,13 @@ A fix begins with incorrect behavior and needs evidence-based debugging before a
 
 ## Decision
 
-Support `fix` and `feature` as distinct user-facing commands with unique pre-implementation workflows and a shared implementation core.
+Support `fix` and `feature` as distinct user-facing modes of the `develop`
+skill, with unique pre-implementation workflows and a shared implementation
+core. Menu and hub surfaces list them as `develop feature` and `develop fix`.
 
 ### Fix workflow
 
-The `fix` command must:
+The `develop fix` mode must:
 
 1. Secure the target and problem description.
 2. Reproduce or otherwise gather evidence for the problem.
@@ -31,7 +33,7 @@ The diagnosis must distinguish observed evidence from inference. If new evidence
 
 ### Feature workflow
 
-The `feature` command must:
+The `develop feature` mode must:
 
 1. Secure the target and initial feature request.
 2. Clarify requirements, expected behavior, constraints, and acceptance criteria.
@@ -56,7 +58,9 @@ After approval, both commands use the same general implementation discipline:
 
 The test offer is distinct from automatically creating tests. If accepted, route to the test workflow with the target, change-set context, and whether the work is a fix or feature preserved.
 
-`feature` is the canonical command name for new behavior. Existing `develop` references may remain as a compatibility alias during migration, but routing, documentation, and future workflow language should prefer `feature`.
+`develop feature` is the canonical mode name for new behavior. Routing,
+documentation, and future workflow language should present feature and fix as
+modes of `develop`, not as independent top-level skills.
 
 ## Consequences
 

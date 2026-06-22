@@ -5,6 +5,10 @@ description: Capture lessons learned from the current working session into the u
 
 # Retrospective — Capture Lessons Into Skills
 
+## Implements
+
+implements: ADR-049-RETROSPECTIVE-AFTER-TASKS, ADR-059-RETROSPECTIVE-SKILL-ENRICHMENT, ADR-077-RETROSPECTIVE-LESSONS, ADR-083-MAINTAINER-RETROSPECTIVE
+
 Run this at the end of any meaningful work session to persist what was learned
 before the context window closes. Keep it token-light: grep before reading,
 write only what isn't already documented.
@@ -46,7 +50,7 @@ Append to the closest existing reference file. Prefer these targets in order:
 | PHP test pattern, stub recipe, guard-condition checklist | `test/references/create.md` |
 | Running PHP or Jest tests via Docker | `test/references/run.md` |
 | WordPress routing, FSE theme, block rendering | `develop/references/domain-blocks.md` |
-| Fix diagnostic, known transient/cache edge case | `fix/SKILL.md` recovery or gotchas section |
+| Fix diagnostic, known transient/cache edge case | `develop/fix/SKILL.md` recovery or gotchas section |
 | Run / environment / Docker edge case | `run/SKILL.md` Recovery section |
 | Broad domain knowledge spanning multiple skills | `develop/references/domain-blocks.md` |
 | Onboarding a new block target | `develop/references/domain-add-target.md` |

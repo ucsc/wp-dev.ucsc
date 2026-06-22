@@ -17,14 +17,14 @@ skill's complete `SKILL.md` before acting.
 
 | Skill | Use for |
 | --- | --- |
-| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows: `develop/feature` for new behavior, `develop/fix` for defect repair. |
+| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). Modes appear as distinct menu lines: `develop feature` (new behavior) and `develop fix` (defect repair). |
 | `hub` | List all available skills and commands. Use when unsure which skill applies. |
-| `maintainer` | Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides. |
-| `retrospective` | Capture session lessons into skill and script files at the end of a working session. |
+| `maintainer` | Maintain the plugin itself. Invoke as `/ucsc-wp-block-dev:maintainer` for validation, skill upkeep, ADRs, docs, and release readiness; sub-workflow `maintainer/retrospective` captures session lessons. |
 | `review` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
 | `run` | Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment. |
-| `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites. |
-| `test` | Create or run automated PHP, Jest, or e2e tests. |
+| `validate` | Create or run automated PHP, Jest, or e2e tests. Modes appear as distinct menu lines. |
+| `validate create` | Create automated PHP, Jest, or e2e tests. |
+| `validate run` | Run existing automated PHP, Jest, or e2e tests. |
 | `verify` | Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend. |
 
 For block-specific work, resolve the target through

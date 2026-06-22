@@ -5,6 +5,10 @@ description: This skill should be used when the user asks to "add new behavior",
 
 # Feature Workflow
 
+## Implements
+
+implements: ADR-008-FEATURE-JIRA, ADR-009-FEATURE-INTAKE, ADR-010-FEATURE-JIRA-REPEAT, ADR-036-FEATURE-WORKFLOW, ADR-059-FEATURE-RETROSPECTIVE
+
 Use this as the preferred workflow for new behavior. Use `fix` when existing
 behavior is incorrect.
 

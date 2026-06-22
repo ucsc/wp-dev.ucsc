@@ -114,19 +114,23 @@ style: |
 
 ## **The Plugin Skills Landscape**
 
-The plugin features **11 portable skills** plus progressively disclosed shared
+The plugin features **public skills and modes** plus progressively disclosed shared
 references:
 
 **Workflow skills:**
 
-| Skill | Trigger | Purpose |
+| Skill or mode | Trigger | Purpose |
 | :--- | :--- | :--- |
-| **`develop`** | Block code changes, new behavior, or bug repair | Adds or modifies PHP class, template, JS editor, REST, and build steps. Sub-workflows: feature (new behavior) and fix (defect repair). |
+| **`develop`** | Block code changes, new behavior, or bug repair | Adds or modifies PHP class, template, JS editor, REST, and build steps. |
+| **`develop feature`** | New behavior | Defines requirements and implements a feature, editor enhancement, or new block. |
+| **`develop fix`** | Bug repair | Reproduces, diagnoses, and repairs a described block defect. |
 | **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
+| **`maintainer`** | Plugin maintenance | User-invocable as `/ucsc-wp-block-dev:maintainer`; validates and improves the plugin, skills, ADRs, docs, and release readiness. |
 | **`review`** | Review request | Reviews a diff, branch, file, or Jira-scoped change. |
 | **`run`** | Build or launch request | Records and executes the Docker setup, build, launch, and app-driving recipe. |
-| **`survey`** | "survey" | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites. |
-| **`test`** | Test creation or execution | Creates or runs PHP, Jest, or end-to-end tests. |
+| **`validate`** | Validation / test creation or execution | Creates or runs PHP, Jest, or end-to-end tests. |
+| **`validate create`** | Test creation | Creates PHP, Jest, or end-to-end tests. |
+| **`validate run`** | Test execution | Runs existing PHP, Jest, or end-to-end tests. |
 | **`verify`** | Acceptance verification | Live DOM test of a change in the running WordPress editor or frontend. |
 
 **Hidden reference material:**
@@ -136,13 +140,13 @@ references:
 | **`develop/references/domain/blocks.md`** | Progressive disclosure | Domain reference loaded by workflow skills when working on the WP plugin. |
 | **`maintainer/references/generate-docs/generate-docs.md`** | Progressive disclosure | Documentation regeneration reference owned by the maintainer workflow. |
 
-**Hidden manual skill:** type `maintainer` directly for plugin maintenance,
-validation, contribution review, reference checks, and slide publishing.
-Type `retrospective` directly to capture lessons learned into skill references
-after fix, feature, review, or run sessions.
+**Maintainer skill:** invoke `/ucsc-wp-block-dev:maintainer` for plugin
+maintenance, validation, contribution review, reference checks, and slide
+publishing. Use `maintainer/retrospective` to capture lessons learned into skill
+references after fix, feature, review, or run sessions.
 
-`develop/references/issue-context.md` is shared by `develop`, `feature`, and
-`fix` when Jira, Confluence, or pasted issue context is present.
+`develop/references/issue-context.md` is shared by `develop`, `develop feature`,
+and `develop fix` when Jira, Confluence, or pasted issue context is present.
 
 Block-specific target guidance lives under `develop/references/targets/`.
 `develop` requires a target and loads only the selected reference.
@@ -156,8 +160,10 @@ Claude routes targets, natural-language requests, and optional Jira context to t
 | Skill | Outcome |
 | :--- | :--- |
 | **Develop** | Add or change Gutenberg block behavior. |
-| **Fix** | Diagnose and repair a block problem. |
-| **Test** | Create or run PHP, Jest, or end-to-end tests. |
+| **Develop feature** | Define and implement new behavior. |
+| **Develop fix** | Diagnose and repair a block problem. |
+| **Validate create** | Create PHP, Jest, or end-to-end tests. |
+| **Validate run** | Run PHP, Jest, or end-to-end tests. |
 | **Review** | Review a diff, branch, file, block, or Jira change. |
 | **Run** | Build, launch, and drive `wp-dev.ucsc`. |
 | **Verify** | Confirm behavior in the running editor or frontend. |

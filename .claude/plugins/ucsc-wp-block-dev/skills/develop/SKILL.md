@@ -7,12 +7,16 @@ description: This skill should be used when the user asks to "add a block", "cre
 
 Guided flow for adding a new Gutenberg block or extending an existing one in `ucsc-gutenberg-blocks`.
 
-## Sub-workflows
+## Implements
 
-For scoped work, prefer the appropriate sub-workflow over invoking `develop` directly:
+implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION
 
-- [`feature/SKILL.md`](feature/SKILL.md) — define and implement new behavior (new blocks, editor enhancements, behavior additions).
-- [`fix/SKILL.md`](fix/SKILL.md) — reproduce and repair a described defect in a specified target.
+## Modes
+
+For scoped work, prefer the appropriate mode over invoking `develop` directly:
+
+- `develop feature` ([`feature/SKILL.md`](feature/SKILL.md)) — define and implement new behavior (new blocks, editor enhancements, behavior additions).
+- `develop fix` ([`fix/SKILL.md`](fix/SKILL.md)) — reproduce and repair a described defect in a specified target.
 
 Primarily touches `classes/` and `src/blocks/`.
 

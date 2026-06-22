@@ -1,23 +1,45 @@
-ADR-087: Rename `test` skill to `validate`
+---
+title: "ADR-087: Rename test skill to validate"
+status: Accepted
+date: 2026-06-18
+related: ["ADR-031", "ADR-066", "ADR-078"]
+---
 
-Status: Accepted
-Date: 2026-06-18
+# ADR-087: Rename `test` skill to `validate`
 
-Context
+## Status
 
-The plugin skills inventory used `test` for automated test suite runs. To better reflect intent and to align with maintainer/validate naming (validate equals asserting correctness, including CI and manual checks), the skill is renamed to `validate`.
+Accepted
 
-Decision
+## Context
 
-Rename skill directory `skills/test` to `skills/validate`, update skill frontmatter and references, and update user-facing docs to refer to `validate`.
+The plugin skill inventory used `test` for automated test-suite runs (PHP, Jest,
+e2e). The name read narrowly and collided conceptually with the maintainer
+`validate` operation and the broader idea of asserting correctness. The skill has
+several modes (`create`, `run`) and is the automated-test counterpart to the live
+`verify` skill.
 
-Consequences
+## Decision
 
-- Backwards-incompatible for scripts or bookmarks referencing the old path; maintainers should update saved driver invocations.
-- Improves clarity: `validate` covers running automated tests and validation checks; `verify` remains for live runtime verification.
+Retire the top-level `test` skill and use `validate` as the top-level skill name.
 
-Follow-ups
+- Rename `skills/test/` to `skills/validate/`, keep its modes (`create`, `run`)
+  and references (`references/create.md`, `references/run.md`). Menu and hub
+  surfaces list those modes as distinct lines: `validate create` and
+  `validate run`.
+- The phase driver is `skills/validate/validate_driver.sh`.
+- Update skill frontmatter, references, inventory tables (README, hub, AGENTS.md,
+  slide deck via `sync_inventory.sh`), structural tests, and prose in `run` and
+  `verify` that pointed at the old `test` skill.
+- `verify` remains for live runtime verification; `validate` covers automated
+  tests and validation checks.
 
-- Update any external integrations or CI jobs that reference the old path.
-- Add a short note in release/upgrade docs about the path change.
+## Consequences
 
+- **Positive:** Clearer intent; `validate` covers automated tests and checks,
+  `verify` covers live behavior.
+- **Negative:** Backwards-incompatible for scripts or bookmarks referencing the
+  old `skills/test/` path or `test` skill name; saved driver invocations must be
+  updated.
+- **Negative:** Inventory surfaces and several hardcoded test references had to be
+  updated together to keep the suite green.

@@ -51,7 +51,7 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-043](ADR-043-documentation-skill-generates-markdown-artifacts.md) | Documentation skill generates portable Markdown artifacts | Superseded | 2026-06-15 |
 | [ADR-044](ADR-044-domain-guidance-is-a-develop-reference.md) | Domain guidance is a develop reference | Accepted | 2026-06-15 |
 | [ADR-045](ADR-045-documentation-is-a-maintainer-reference.md) | Generate docs is a maintainer reference | Accepted | 2026-06-15 |
-| [ADR-046](ADR-046-maintainer-is-a-hidden-manual-skill.md) | Maintainer is a hidden manual skill | Accepted | 2026-06-15 |
+| [ADR-046](ADR-046-maintainer-is-a-hidden-manual-skill.md) | Maintainer is a hidden manual skill | Superseded | 2026-06-15 |
 | [ADR-047](ADR-047-warn-before-editing-on-non-feature-branches.md) | Warn before editing on non-feature branches | Accepted | 2026-06-16 |
 | [ADR-048](ADR-048-generate-docs-uses-adrs-and-roadmap.md) | Generate docs uses ADRs and includes a roadmap | Accepted | 2026-06-16 |
 | [ADR-049](ADR-049-perform-retrospective-after-tasks.md) | Perform a retrospective after tasks to save lessons learned | Superseded | 2026-06-15 |
@@ -87,5 +87,11 @@ Architecture decisions for the `ucsc-wp-block-dev` Claude Code plugin.
 | [ADR-079](ADR-079-plugin-dev-companion-plugin.md) | plugin-dev from claude-plugins-official is the required companion for Tier 2 maintainer operations | Accepted | 2026-06-17 |
 | [ADR-080](ADR-080-agents-md-skill-inventory.md) | Keep AGENTS.md synchronized with live skill inventory | Accepted | 2026-06-17 |
 | [ADR-081](ADR-081-sub-skill-directories-under-skill.md) | Sub-skill directories nested under a parent skill are permitted | Accepted | 2026-06-18 |
-| [ADR-082](ADR-082-move-survey-under-develop.md) | Survey is a develop sub-skill | Accepted | 2026-06-18 |
+| [ADR-082](ADR-082-move-survey-under-develop.md) | Survey is a develop sub-skill | Superseded | 2026-06-18 |
 | [ADR-083](ADR-083-move-retrospective-under-maintainer.md) | Retrospective is a maintainer sub-skill | Accepted | 2026-06-18 |
+| [ADR-084](ADR-084-select-block-target-workflow.md) | Make selecting a block target the primary workflow | Accepted | 2026-06-18 |
+| [ADR-085](ADR-085-maintainer-target-plugin.md) | Treat maintainer mode target as the plugin itself | Accepted | 2026-06-18 |
+| [ADR-086](ADR-086_maintainer_conventions.md) | ADR and skill conventions (filename, combine-default, implements, launcher) | Accepted | 2026-06-18 |
+| [ADR-087](ADR-087-rename-test-skill-to-validate.md) | Rename test skill to validate | Accepted | 2026-06-18 |
+| [ADR-088](ADR-088-skill-modes-in-public-menu.md) | Skill modes appear as public menu lines | Accepted | 2026-06-22 |
+| [ADR-089](ADR-089_maintainer_public-slash.md) | Maintainer is a user-only slash skill with modes | Accepted | 2026-06-22 |

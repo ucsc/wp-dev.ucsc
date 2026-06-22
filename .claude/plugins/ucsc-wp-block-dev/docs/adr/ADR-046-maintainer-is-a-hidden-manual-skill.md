@@ -1,14 +1,16 @@
 ---
 title: "ADR-046: Maintainer is a hidden manual skill"
-status: Accepted
+status: Superseded
 date: 2026-06-15
+superseded_by: "ADR-089"
 ---
 
 # ADR-046: Maintainer is a hidden manual skill
 
 ## Status
 
-Accepted
+Superseded by ADR-089. `maintainer` is now a public, user-invocable slash
+entry while remaining guarded from model auto-invocation.
 
 ## Context
 

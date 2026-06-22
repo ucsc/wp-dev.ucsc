@@ -1,6 +1,6 @@
 ---
 name: run
-description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and test for automated tests.
+description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and validate for automated tests.
 allowed-tools:
   - bash
   - docker
@@ -11,6 +11,10 @@ allowed-tools:
 ---
 
 # Run wp-dev.ucsc
+
+## Implements
+
+implements: ADR-002-RUN-WP-DEV, ADR-030-RUN-SEPARATION, ADR-073-RUN-CLAUDE-ONLY
 
 Follow this recorded project recipe instead of rediscovering the launch process. Work from the `wp-dev.ucsc` root.
 
@@ -110,7 +114,7 @@ Do not stop at container health when the user asks to see the application workin
 5. Report what was observed in the running app (or the HTML output if fetching headlessly).
 
 Use the `verify` skill when the goal is to prove a code change or acceptance
-criterion. Use the `test` skill for Jest, PHP, or other automated tests.
+criterion. Use the `validate` skill for Jest, PHP, or other automated tests.
 
 ## Recovery
 

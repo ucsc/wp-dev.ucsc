@@ -5,6 +5,10 @@ description: This skill should be used when the user asks to "fix a block", "deb
 
 # Fix — Debug a Block Issue
 
+## Implements
+
+implements: ADR-007-FIX-PROBLEM, ADR-008-FIX-JIRA, ADR-009-FIX-INTAKE, ADR-010-FIX-JIRA-REPEAT, ADR-026-FIX-TOKEN-STUDY, ADR-036-FIX-WORKFLOW, ADR-059-FIX-RETROSPECTIVE
+
 Systematic flow for diagnosing and fixing failures in `ucsc-gutenberg-blocks`.
 
 Primarily touches `classes/` and `src/`.

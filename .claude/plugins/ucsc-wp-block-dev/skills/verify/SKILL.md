@@ -12,6 +12,10 @@ allowed-tools:
 
 # Verify In The Running App
 
+## Implements
+
+implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE
+
 Verify behavior against the live `wp-dev.ucsc` application, following the
 recorded launch recipe in the `run` skill.
 
@@ -27,7 +31,7 @@ Apply ADR-011: resolve the target block or app surface, natural-language expecte
 4. Open the canonical app at `https://wp-dev.ucsc/wp-admin/`.
 
 Do not use Jest, PHP tests, lint, type checks, or a successful build as proof
-that the user-facing behavior works. Those checks belong to the `test` skill.
+that the user-facing behavior works. Those checks belong to the `validate` skill.
 
 ## Deterministic Pre-Checks — `driver.sh`
 
@@ -87,6 +91,7 @@ Known blocks: `class-schedule`, `course-catalog`, `campus-directory`, `accordion
 A MATCH result means the block DOM is identical after normalization. DIFFERS means the diff found changes — review the output to determine if the differences are expected (e.g. different live data, different block settings) or indicate a rendering bug.
 
 Reference: plugin-local wrapper at `scripts/compare_blocks.sh` (see `skills/verify/scripts/compare_blocks.sh`).
+A self-contained local-only variant that does not fall back to an external `_WP_tools` path is available at `scripts/compare_blocks_local.sh` (see `skills/verify/scripts/compare_blocks_local.sh`).
 
 ## Result
 

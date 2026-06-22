@@ -17,18 +17,22 @@ directly.
 
 **On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
 
-| Skill | Purpose |
+| Skill or mode | Purpose |
 |---|---|
-| `develop` | Add or modify block code directly; use `develop/feature` for new behavior and `develop/fix` for defect repair |
+| `develop` | Add or modify block code directly |
+| `develop feature` | Mode of `develop` for defining and implementing new behavior |
+| `develop fix` | Mode of `develop` for reproducing and repairing defects |
 | `hub` | List every available skill and command (`:hub`) — enumeration only |
+| `maintainer` | Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
-| `survey` | Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites |
-| `validate` | Create or run focused PHP, Jest, or end-to-end tests |
+| `validate` | Create or run automated PHP, Jest, or e2e tests |
+| `validate create` | Mode of `validate` for creating automated PHP, Jest, or e2e tests |
+| `validate run` | Mode of `validate` for running existing automated PHP, Jest, or e2e tests |
 | `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
 
 `develop/references/issue-context.md` provides shared Jira and issue
-normalization guidance for `develop`, `develop/feature`, and `develop/fix`.
+normalization guidance for `develop`, `develop feature`, and `develop fix`.
 
 Domain guidance for `ucsc-gutenberg-blocks` is intentionally hidden from the
 top-level skill list and lives at `develop/references/domain-blocks.md`.
@@ -37,14 +41,14 @@ Block-specific guidance lives under `develop/references/targets/`. The
 `develop` workflow requires a target and loads only the selected target
 reference.
 
-Maintenance is intentionally hidden from the public workflow list. Type
-`maintainer` directly when you need to validate structure, run tests, review or
+Use `maintainer` when you need to validate structure, run tests, review or
 promote contributed skills, verify ADR consistency, or check skill reference
-integrity.
+integrity. The skill is user-invocable only; model auto-invocation is disabled.
 
-Retrospectives are also hidden from the public workflow list. Type
-`retrospective` directly when lessons from a fix, feature, review, or run
-session should be saved into skill references.
+Retrospectives are a `maintainer` sub-workflow at `maintainer/retrospective`,
+kept off the public workflow list. Reach them through `maintainer`, or by
+describing the goal at the end of a fix, feature, review, or run session, when
+lessons should be saved into skill references (ADR-083).
 
 Use the maintainer `generate-docs` reference at
 `maintainer/references/generate-docs.md` to regenerate portable
@@ -76,10 +80,10 @@ integration through `maintainer promote-contrib <candidate>`. Drafts under
 ## Local development
 
 See the `run` skill for the recorded setup and launch recipe, `verify` for live
-behavior checks, and `test` for automated tests. The environment README owns
+behavior checks, and `validate` for automated tests. The environment README owns
 clean setup; the product plugin README owns its test commands.
 
-For the routine lifecycle, the `run`, `verify`, and `test` skills ship a token-frugal `driver.sh` that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
+For the routine lifecycle, the `run`, `verify`, and `validate` skills ship a token-frugal driver that runs a whole phase in a single call and prints a compact PASS/FAIL summary (verbose output goes to a logfile it names on exit):
 
 ```bash
 # Build + launch + smoke in one call (inspect → build → launch → smoke)
@@ -89,7 +93,7 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
 bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
 
 # Run PHP and Jest automated test suites in Docker
-bash .claude/plugins/ucsc-wp-block-dev/skills/validate/driver.sh all
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/validate_driver.sh all
 ```
 
 The raw commands below are the underlying steps those drivers automate:

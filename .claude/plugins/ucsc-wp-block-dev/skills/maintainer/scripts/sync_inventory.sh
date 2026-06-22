@@ -37,11 +37,25 @@ write_mode = "--write" in sys.argv
 # If a new skill is added, it will fall back to using its frontmatter description.
 METADATA = {
     "develop": {
-        "readme": "Add or modify block code directly; use `develop/feature` for new behavior and `develop/fix` for defect repair",
-        "hub": "Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows `develop/feature` and `develop/fix` scope new behavior and defect repair respectively.",
-        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build). Sub-workflows: `develop/feature` for new behavior, `develop/fix` for defect repair.",
+        "readme": "Add or modify block code directly",
+        "hub": "Add or modify block code (PHP, template, JS editor, REST, build).",
+        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build). Modes appear as distinct menu lines: `develop feature` (new behavior) and `develop fix` (defect repair).",
         "deck_trigger": "Block code changes, new behavior, or bug repair",
-        "deck_desc": "Adds or modifies PHP class, template, JS editor, REST, and build steps. Sub-workflows: feature (new behavior) and fix (defect repair)."
+        "deck_desc": "Adds or modifies PHP class, template, JS editor, REST, and build steps."
+    },
+    "develop feature": {
+        "readme": "Mode of `develop` for defining and implementing new behavior",
+        "hub": "Mode of `develop` for defining and implementing new behavior.",
+        "agents_md": None,
+        "deck_trigger": "New behavior",
+        "deck_desc": "Defines requirements and implements a feature, editor enhancement, or new block."
+    },
+    "develop fix": {
+        "readme": "Mode of `develop` for reproducing and repairing defects",
+        "hub": "Mode of `develop` for reproducing and repairing defects.",
+        "agents_md": None,
+        "deck_trigger": "Bug repair",
+        "deck_desc": "Reproduces, diagnoses, and repairs a described block defect."
     },
     "hub": {
         "readme": "List every available skill and command (`:hub`) — enumeration only",
@@ -51,18 +65,11 @@ METADATA = {
         "deck_desc": "Enumerates the available skills and commands; does not route (ADR-060)."
     },
     "maintainer": {
-        "readme": None,
-        "hub": "Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides (ADR-046).",
-        "agents_md": "Maintain the plugin itself: validate, test, review/promote contrib skills, check references, generate docs, publish slides.",
+        "readme": "Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness",
+        "hub": "Maintain the plugin itself for validation, skill upkeep, ADRs, docs, and release readiness.",
+        "agents_md": "Maintain the plugin itself. Invoke as `/ucsc-wp-block-dev:maintainer` for validation, skill upkeep, ADRs, docs, and release readiness; sub-workflow `maintainer/retrospective` captures session lessons.",
         "deck_trigger": "Plugin maintenance",
-        "deck_desc": "Validate, test, check references, generate docs, publish slides."
-    },
-    "retrospective": {
-        "readme": None,
-        "hub": "Capture session lessons into skill and script files. Offered at the end of develop, review, and run sessions (ADR-059).",
-        "agents_md": "Capture session lessons into skill and script files at the end of a working session.",
-        "deck_trigger": "Post-session capture",
-        "deck_desc": "Capture session lessons into skill and script files."
+        "deck_desc": "User-invocable as `/ucsc-wp-block-dev:maintainer`; validates and improves the plugin, skills, ADRs, docs, and release readiness."
     },
     "review": {
         "readme": "Review a diff, branch, file, block, or Jira-scoped change",
@@ -78,19 +85,26 @@ METADATA = {
         "deck_trigger": "Build or launch request",
         "deck_desc": "Records and executes the Docker setup, build, launch, and app-driving recipe."
     },
-    "survey": {
-        "readme": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites",
-        "hub": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites.",
-        "agents_md": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites.",
-        "deck_trigger": '"survey"',
-        "deck_desc": "Run and interpret the WordPress block survey to audit UCSC custom block usage across CampusPress sites."
-    },
-    "test": {
-        "readme": "Create or run focused PHP, Jest, or end-to-end tests",
+    "validate": {
+        "readme": "Create or run automated PHP, Jest, or e2e tests",
         "hub": "Create or run automated PHP, Jest, or e2e tests.",
-        "agents_md": "Create or run automated PHP, Jest, or e2e tests.",
-        "deck_trigger": "Test creation or execution",
+        "agents_md": "Create or run automated PHP, Jest, or e2e tests. Modes appear as distinct menu lines.",
+        "deck_trigger": "Validation / test creation or execution",
         "deck_desc": "Creates or runs PHP, Jest, or end-to-end tests."
+    },
+    "validate create": {
+        "readme": "Mode of `validate` for creating automated PHP, Jest, or e2e tests",
+        "hub": "Mode of `validate` for creating automated PHP, Jest, or e2e tests.",
+        "agents_md": "Create automated PHP, Jest, or e2e tests.",
+        "deck_trigger": "Test creation",
+        "deck_desc": "Creates PHP, Jest, or end-to-end tests."
+    },
+    "validate run": {
+        "readme": "Mode of `validate` for running existing automated PHP, Jest, or e2e tests",
+        "hub": "Mode of `validate` for running existing automated PHP, Jest, or e2e tests.",
+        "agents_md": "Run existing automated PHP, Jest, or e2e tests.",
+        "deck_trigger": "Test execution",
+        "deck_desc": "Runs existing PHP, Jest, or end-to-end tests."
     },
     "verify": {
         "readme": "Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend",
@@ -130,16 +144,22 @@ if os.path.exists(readme_path):
     
     # Generate README table
     lines = [
-        "| Skill | Purpose |",
+        "| Skill or mode | Purpose |",
         "|---|---|"
     ]
     for s in live_skills:
-        if s in ["maintainer", "retrospective"]:
+        if s in ["retrospective"]:
             continue
         desc = METADATA.get(s, {}).get("readme") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
         lines.append(f"| `{s}` | {desc} |")
+        if s == "develop":
+            for mode in ["develop feature", "develop fix"]:
+                lines.append(f"| `{mode}` | {METADATA[mode]['readme']} |")
+        if s == "validate":
+            for mode in ["validate create", "validate run"]:
+                lines.append(f"| `{mode}` | {METADATA[mode]['readme']} |")
     
-    pattern = r"(\| Skill \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
+    pattern = r"(\| Skill or mode \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match = re.search(pattern, readme_content, re.DOTALL)
     if match:
         current_body = match.group(2).strip()
@@ -175,6 +195,9 @@ if os.path.exists(agents_path):
     for s in live_skills:
         desc = METADATA.get(s, {}).get("agents_md") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
         lines.append(f"| `{s}` | {desc} |")
+        if s == "validate":
+            for mode in ["validate create", "validate run"]:
+                lines.append(f"| `{mode}` | {METADATA[mode]['agents_md']} |")
 
     pattern = r"(\| Skill \| Use for \|\s*\n\| --- \| --- \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match = re.search(pattern, agents_content, re.DOTALL)
@@ -207,27 +230,24 @@ if os.path.exists(hub_path):
     
     # Public workflows table
     lines = [
-        "| Skill | Purpose |",
+        "| Skill or mode | Purpose |",
         "|---|---|"
     ]
     for s in live_skills:
         if s in ["hub", "maintainer", "retrospective"]:
             continue
         desc = METADATA.get(s, {}).get("hub") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-        lines.append(f"| `{s}` | {desc} |")
+        if desc:
+            lines.append(f"| `{s}` | {desc} |")
+        if s == "develop":
+            for mode in ["develop feature", "develop fix"]:
+                lines.append(f"| `{mode}` | {METADATA[mode]['hub']} |")
+        if s == "validate":
+            for mode in ["validate create", "validate run"]:
+                lines.append(f"| `{mode}` | {METADATA[mode]['hub']} |")
         
-    pattern_pub = r"(## Public workflows\s*\n\s*\| Skill \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
+    pattern_pub = r"(## Public workflows\s*\n\s*\| Skill or mode \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match_pub = re.search(pattern_pub, hub_content, re.DOTALL)
-    
-    # Hidden manual skills list
-    hidden_lines = []
-    for s in live_skills:
-        if s in ["maintainer", "retrospective"]:
-            desc = METADATA.get(s, {}).get("hub") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-            hidden_lines.append(f"- `{s}` — {desc}")
-            
-    pattern_hid = r"(## Hidden manual skills\s*\n\s*Reachable by typing the name directly; omitted from the routed workflow list\.\s*\n\s*)(.*?)(?=\n\n|\n[^-\s]|\Z)"
-    match_hid = re.search(pattern_hid, hub_content, re.DOTALL)
     
     pub_ok = False
     if match_pub:
@@ -235,33 +255,20 @@ if os.path.exists(hub_path):
         expected_pub = "\n".join(lines[2:]).strip()
         pub_ok = current_pub == expected_pub
         
-    hid_ok = False
-    if match_hid:
-        current_hid = match_hid.group(2).strip()
-        expected_hid = "\n".join(hidden_lines).strip()
-        hid_ok = current_hid == expected_hid
-        
-    if pub_ok and hid_ok:
+    if pub_ok:
         print("  [ OK ] skills/hub/SKILL.md is in sync")
     else:
         if write_mode:
             new_content = hub_content
-            if not pub_ok and match_pub:
+            if match_pub:
                 new_pub = match_pub.group(1) + expected_pub
                 new_content = new_content[:match_pub.start()] + new_pub + new_content[match_pub.end():]
-                # Re-search hidden because index shifted
-                match_hid = re.search(pattern_hid, new_content, re.DOTALL)
-            if not hid_ok and match_hid:
-                new_hid = match_hid.group(1) + expected_hid
-                new_content = new_content[:match_hid.start()] + new_hid + new_content[match_hid.end():]
             with open(hub_path, "w") as f:
                 f.write(new_content)
             print("  [ OK ] skills/hub/SKILL.md updated")
         else:
             if not pub_ok:
                 print("  [FAIL] skills/hub/SKILL.md public workflows table is out of sync")
-            if not hid_ok:
-                print("  [FAIL] skills/hub/SKILL.md hidden manual skills list is out of sync")
             success = False
 else:
     print(f"  [FAIL] skills/hub/SKILL.md not found")
@@ -273,17 +280,24 @@ if os.path.exists(deck_path):
     deck_content = open(deck_path).read()
     
     lines = [
-        "| Skill | Trigger | Purpose |",
+        "| Skill or mode | Trigger | Purpose |",
         "| :--- | :--- | :--- |"
     ]
     for s in live_skills:
-        if s in ["maintainer", "retrospective"]:
+        if s in ["retrospective"]:
             continue
         trigger = METADATA.get(s, {}).get("deck_trigger") or f'"{s}"'
         desc = METADATA.get(s, {}).get("deck_desc") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-        lines.append(f"| **`{s}`** | {trigger} | {desc} |")
+        if desc:
+            lines.append(f"| **`{s}`** | {trigger} | {desc} |")
+        if s == "develop":
+            for mode in ["develop feature", "develop fix"]:
+                lines.append(f"| **`{mode}`** | {METADATA[mode]['deck_trigger']} | {METADATA[mode]['deck_desc']} |")
+        if s == "validate":
+            for mode in ["validate create", "validate run"]:
+                lines.append(f"| **`{mode}`** | {METADATA[mode]['deck_trigger']} | {METADATA[mode]['deck_desc']} |")
         
-    pattern = r"(\| Skill \| Trigger \| Purpose \|\s*\n\| :---\ \| :---\ \| :---\ \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
+    pattern = r"(\| Skill or mode \| Trigger \| Purpose \|\s*\n\| :---\ \| :---\ \| :---\ \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match = re.search(pattern, deck_content, re.DOTALL)
     if match:
         current_body = match.group(2).strip()

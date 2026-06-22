@@ -22,15 +22,14 @@ EXPECTED_LIVE_SKILLS = {
     "develop",
     "hub",
     "maintainer",
-    "retrospective",
     "review",
     "run",
-    "survey",
-    "test",
+    "validate",
     "verify",
-}
-EXPECTED_DEVELOP_SUB_SKILLS = {"feature", "fix"}
-EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS - {"maintainer", "retrospective"}
+   }
+EXPECTED_DEVELOP_MODES = {"feature", "fix"}
+EXPECTED_MAINTAINER_SUB_SKILLS = {"retrospective"}
+EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS
 
 
 def read_frontmatter(skill_dir: Path) -> dict:
@@ -133,11 +132,17 @@ class TestSkillFrontmatter:
             skill_path = SKILLS_DIR / skill_name / "SKILL.md"
             assert skill_path.exists(), f"Core skill '{skill_name}' missing"
 
-    def test_develop_sub_skills_present(self):
-        """feature and fix are sub-skills nested under develop/ (ADR-081)."""
-        for skill_name in sorted(EXPECTED_DEVELOP_SUB_SKILLS):
+    def test_develop_modes_present(self):
+        """feature and fix are modes nested under develop/."""
+        for skill_name in sorted(EXPECTED_DEVELOP_MODES):
             skill_path = SKILLS_DIR / "develop" / skill_name / "SKILL.md"
-            assert skill_path.exists(), f"develop sub-skill '{skill_name}' missing"
+            assert skill_path.exists(), f"develop mode '{skill_name}' missing"
+
+    def test_maintainer_sub_skills_present(self):
+        """retrospective is a sub-skill nested under maintainer/ (ADR-081, ADR-083)."""
+        for skill_name in sorted(EXPECTED_MAINTAINER_SUB_SKILLS):
+            skill_path = SKILLS_DIR / "maintainer" / skill_name / "SKILL.md"
+            assert skill_path.exists(), f"maintainer sub-skill '{skill_name}' missing"
 
     def test_live_skill_inventory_is_exact(self):
         """Reference-only workflows must not drift back into exported skills."""
@@ -148,26 +153,35 @@ class TestSkillFrontmatter:
         }
         assert actual == EXPECTED_LIVE_SKILLS
 
-    def test_public_workflow_inventory_hides_maintainer(self):
-        """The public docs advertise product workflows, while maintainer/retrospective remain manual."""
+    def test_public_workflow_inventory_lists_maintainer(self):
+        """The public docs advertise product workflows and the guarded maintainer skill."""
         readme = (PLUGIN_ROOT / "README.md").read_text()
 
         for skill_name in sorted(EXPECTED_PUBLIC_WORKFLOW_SKILLS):
             assert f"| `{skill_name}` |" in readme
 
-        assert "| `maintainer` |" not in readme
         assert "| `retrospective` |" not in readme
-        assert "maintenance is intentionally hidden" in readme.lower()
-        assert "`maintainer` directly" in readme.lower()
-        assert "`retrospective` directly" in readme.lower()
+        assert "| `survey` |" not in readme
+        assert "| `maintainer` |" in readme
+        assert "user-invocable only" in readme.lower()
+        assert "model auto-invocation is disabled" in readme.lower()
+        # retrospective is a hidden maintainer sub-skill (ADR-083).
+        assert "maintainer/retrospective" in readme.lower()
+        assert "develop/survey" not in readme.lower()
 
     def test_hub_lists_every_live_skill(self):
-        """:hub is the inventory surface; it must enumerate every live skill (ADR-060)."""
+        """:hub is the product workflow inventory; maintainer is omitted unless maintainer is active."""
         hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
-        for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub"}):
+        for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub", "maintainer"}):
             assert f"`{skill_name}`" in hub, f"hub is missing skill '{skill_name}'"
-        for skill_name in sorted(EXPECTED_DEVELOP_SUB_SKILLS):
-            assert skill_name in hub, f"hub is missing develop sub-skill '{skill_name}'"
+        for skill_name in sorted(EXPECTED_DEVELOP_MODES):
+            assert f"`develop {skill_name}`" in hub, f"hub is missing develop mode '{skill_name}'"
+        for mode_name in ["create", "run"]:
+            assert f"`validate {mode_name}`" in hub, f"hub is missing validate mode '{mode_name}'"
+        assert "`test`" not in hub
+        assert "develop/survey" not in hub
+        assert "`maintainer`" not in hub
+        assert "maintainer/retrospective" not in hub
         # hub enumerates; it does not route (ADR-061).
         assert "invoke the specific skill directly" in hub.lower()
 
@@ -205,12 +219,21 @@ class TestSkillFrontmatter:
         ]
         assert nested_skill_files == []
 
-    def test_develop_sub_skills_are_referenced_from_develop(self):
-        """ADR-081: sub-skills nested under develop/ must be referenced from develop/SKILL.md."""
+    def test_develop_modes_are_referenced_from_develop(self):
+        """Develop modes nested under develop/ must be referenced from develop/SKILL.md."""
         develop_text = (SKILLS_DIR / "develop" / "SKILL.md").read_text()
-        for skill_name in sorted(EXPECTED_DEVELOP_SUB_SKILLS):
+        for skill_name in sorted(EXPECTED_DEVELOP_MODES):
             assert f"{skill_name}/SKILL.md" in develop_text, (
-                f"develop/SKILL.md does not reference sub-skill '{skill_name}/SKILL.md'"
+                f"develop/SKILL.md does not reference mode '{skill_name}/SKILL.md'"
+            )
+        assert "survey/SKILL.md" not in develop_text
+
+    def test_maintainer_sub_skills_are_referenced_from_maintainer(self):
+        """ADR-081/ADR-083: sub-skills nested under maintainer/ must be referenced from maintainer/SKILL.md."""
+        maintainer_text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text()
+        for skill_name in sorted(EXPECTED_MAINTAINER_SUB_SKILLS):
+            assert f"{skill_name}/SKILL.md" in maintainer_text, (
+                f"maintainer/SKILL.md does not reference sub-skill '{skill_name}/SKILL.md'"
             )
 
     def test_contrib_candidates_are_outside_live_skills(self):
@@ -275,7 +298,7 @@ class TestSkillFrontmatter:
         sensitive = [
             "maintainer",
             "run",
-            "test",
+            "validate",
             "verify",
         ]
         violations = []
@@ -293,7 +316,7 @@ class TestSkillFrontmatter:
             SKILLS_DIR / "maintainer" / "SKILL.md",
             SKILLS_DIR / "review" / "SKILL.md",
             SKILLS_DIR / "run" / "SKILL.md",
-            SKILLS_DIR / "test" / "SKILL.md",
+            SKILLS_DIR / "validate" / "SKILL.md",
             SKILLS_DIR / "verify" / "SKILL.md",
         ]
 
@@ -358,7 +381,7 @@ class TestSkillFrontmatter:
 
     def test_retrospective_has_adr077_closing_checklist(self):
         """ADR-077 requires the retrospective to prompt for script/skill/test improvements."""
-        text = (SKILLS_DIR / "retrospective" / "SKILL.md").read_text().lower()
+        text = (SKILLS_DIR / "maintainer" / "retrospective" / "SKILL.md").read_text().lower()
         assert "script candidate" in text, "retrospective missing 'script candidate' question (ADR-077)"
         assert "skill improvement candidate" in text, (
             "retrospective missing 'skill improvement candidate' question (ADR-077)"
@@ -407,6 +430,15 @@ class TestSkillFrontmatter:
         assert "scripts/regenerate-docs.sh" in text
         assert "generate-docs` operation" in text
 
+    def test_maintainer_documents_adr_mode(self):
+        """ADR work is a maintainer mode; new-adr remains a legacy alias."""
+        text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text().lower()
+        assert "## adr" in text
+        assert "`adr`" in text
+        assert "`new-adr` remains a legacy alias" in text
+        assert "one adr per skill" in text
+        assert "default to updating the existing adr" in text
+
     def test_documentation_generator_writes_to_maintainer_reference(self):
         """The regenerate script uses flat paths per AgentSkills spec (no nested generate-docs/ dir)."""
         script = (
@@ -443,21 +475,21 @@ class TestSkillFrontmatter:
         assert "pass or fail for each acceptance criterion" in text
         assert "do not claim success from automated tests alone" in text
 
-    def test_test_skill_confirms_type_and_operation_before_tools(self):
-        """ADR-031 requires explicit test layer and create/run intent."""
-        text = (SKILLS_DIR / "test" / "SKILL.md").read_text().lower()
+    def test_validate_skill_confirms_type_and_mode_before_tools(self):
+        """ADR-031 requires explicit test layer and create/run intent (test skill retired -> validate)."""
+        text = (SKILLS_DIR / "validate" / "SKILL.md").read_text().lower()
         assert "**type**" in text
         assert "`php`, `jest`, or `e2e`" in text
-        assert "**operation**" in text
+        assert "**mode**" in text
         assert "`create` tests or `run` existing tests" in text
         assert "always ask one concise question only" in text
         assert "wait for the answer before using tools" in text
         assert "references/create.md" in text
         assert "references/run.md" in text
 
-    def test_test_operations_are_progressive_references(self):
-        create_ref = SKILLS_DIR / "test" / "references" / "create.md"
-        run_ref = SKILLS_DIR / "test" / "references" / "run.md"
+    def test_validate_operations_are_progressive_references(self):
+        create_ref = SKILLS_DIR / "validate" / "references" / "create.md"
+        run_ref = SKILLS_DIR / "validate" / "references" / "run.md"
         assert create_ref.exists()
         assert run_ref.exists()
         assert "check-in text" in create_ref.read_text().lower()
@@ -880,8 +912,14 @@ class TestAgentsMd:
             for path in SKILLS_DIR.iterdir()
             if path.is_dir() and (path / "SKILL.md").exists()
         }
+        allowed_modes = {
+            "develop feature",
+            "develop fix",
+            "validate create",
+            "validate run",
+        }
         listed = set(re.findall(r"^\| `([^`]+)` \|", text, re.MULTILINE))
-        stale = listed - actual_skills
+        stale = listed - actual_skills - allowed_modes
         assert not stale, (
             f"AGENTS.md routing table references retired skills: {sorted(stale)} — "
             "run sync_inventory.sh --write to regenerate"
