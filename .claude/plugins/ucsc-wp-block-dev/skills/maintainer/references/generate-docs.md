@@ -6,10 +6,10 @@ Google Docs or Confluence. It does not publish or upload anything.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the documentation request, optional target, and optional
-Jira key/URL from the full input and session context. Ask one concise question
-only when the requested artifact is ambiguous and regenerating both artifacts
-would be inappropriate.
+Resolve the documentation request, optional target, and optional Jira key/URL
+from the full input and session context. Ask one concise question only when the
+requested artifact is ambiguous and regenerating both artifacts would be
+inappropriate.
 
 ## Artifacts
 
@@ -58,9 +58,12 @@ regenerating artifacts:
 1. Review the generated files for obvious formatting issues.
 2. Run `maintainer check-references` because this reference owns a script and
    generated assets.
-3. If top-level skills changed, update `README.md`, `AGENTS.md`,
-   the `hub` skill, the maintainer slide deck, and the API signature
-   before regenerating the artifacts.
 
-Use `maintainer publish` (`slides`/`docs`/`all`) only when the user explicitly
+Per ADR-045, regeneration is **on demand only**. A skill change does not require
+or trigger a docs regeneration: when skills change, update the source-of-truth
+inventories (`README.md`, `AGENTS.md`, the `hub` skill, the maintainer slide
+deck, and the API signature) as part of that change, and regenerate these
+derived artifacts separately only when the user explicitly asks.
+
+Use `maintainer publish` (bare = both; or `guide`/`deck`) only when the user explicitly
 asks to publish the canonical slide deck or the prose guide to Google Docs.

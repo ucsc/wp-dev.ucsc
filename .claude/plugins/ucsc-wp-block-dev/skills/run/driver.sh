@@ -8,15 +8,40 @@
 #   driver.sh build     # compile src/ -> build/ via Dockerized @wordpress/scripts
 #   driver.sh launch    # docker compose up -d + activate plugin
 #   driver.sh smoke      # health: containers, wp-admin HTTP, plugin active, blocks
+#   driver.sh drive URL # headless Chrome: screenshot + post-JS DOM of a frontend URL
 #   driver.sh all       # inspect -> build -> launch -> smoke (default)
 #   driver.sh down      # stop the stack
 #
+# Plugin is autodetected from the current directory (any .../plugins/<slug>);
+# override with UCSC_PLUGIN=<slug>. ucsc-blocks and ucsc-gutenberg-blocks share
+# the one wp-dev.ucsc Docker runtime, so each builds via a -w working-dir
+# override against the same plugin_npm_start service (no per-plugin service).
 # Override the project root with WP_DEV_ROOT=/path if autodetection fails.
 # Full log path is printed on every run; read it only when a step FAILs.
 
 set -uo pipefail
 
-PLUGIN="ucsc-gutenberg-blocks"
+usage() {
+  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
+# Autodetect the plugin from the invocation directory (any path segment under
+# .../wp-content/plugins/<slug>); fall back to ucsc-gutenberg-blocks. Override
+# with UCSC_PLUGIN=<slug>. Detect from $PWD before any cd below.
+detect_plugin() {
+  case "$PWD" in
+    */wp-content/plugins/*) local rest="${PWD#*/wp-content/plugins/}"; echo "${rest%%/*}"; return 0 ;;
+  esac
+  return 1
+}
+PLUGIN="${UCSC_PLUGIN:-$(detect_plugin || echo ucsc-gutenberg-blocks)}"
 PLUGIN_CPATH="/var/www/html/wp-content/plugins/${PLUGIN}"
 APP_HOST="wp-dev.ucsc"
 APP_URL="https://${APP_HOST}/wp-admin/"
@@ -58,13 +83,24 @@ do_inspect() {
 }
 
 do_build() {
-  echo "build"
+  echo "build ($PLUGIN)"
+  local pdir="$ROOT/public/wp-content/plugins/${PLUGIN}"
+  # Each plugin has its own node_modules; install in-container on first build.
+  if [ ! -x "$pdir/node_modules/.bin/wp-scripts" ]; then
+    echo "  ...  installing node deps (first build for $PLUGIN)"
+    if ! dc -f docker-compose.yml -f docker-compose-start.yml run --rm \
+          -w "$PLUGIN_CPATH" plugin_npm_start npm ci >>"$LOG" 2>&1; then
+      fail "npm ci (see log)"; return
+    fi
+  fi
   if dc -f docker-compose.yml -f docker-compose-start.yml run --rm \
         -w "$PLUGIN_CPATH" plugin_npm_start npm run build >>"$LOG" 2>&1; then
-    if [ -f "$ROOT/public/wp-content/plugins/${PLUGIN}/build/index.js" ]; then
-      pass "build/index.js produced"
+    # Single-block plugins emit build/index.js; multi-block plugins emit
+    # build/blocks/<name>/*.js. Accept either as proof of a successful compile.
+    if [ -f "$pdir/build/index.js" ] || find "$pdir/build" -name '*.js' -type f 2>/dev/null | grep -q .; then
+      pass "build output produced"
     else
-      fail "build ran but build/index.js missing"
+      fail "build ran but no JS output under build/"
     fi
   else
     fail "npm run build (see log)"
@@ -131,6 +167,55 @@ do_smoke() {
   [ "$nblocks" -gt 0 ] && pass "$nblocks ucsc* block(s) registered" || fail "no ucsc* blocks registered"
 }
 
+# Drive a frontend URL with a real headless browser to prove client JS runs.
+# Renders the page (JS executes), writes a screenshot, and dumps the post-JS DOM
+# to the log so the caller can assert on hydrated markup (e.g. classes that
+# view.js adds). On the dev Mac the browser is Google Chrome.app; a Linux box
+# with `chromium`/`chromium-browser` works too. No login: drive public frontend
+# pages (wp-admin needs a session a headless screenshot can't supply).
+find_chrome() {
+  local c
+  for c in \
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    "/Applications/Chromium.app/Contents/MacOS/Chromium" \
+    "$(command -v chromium 2>/dev/null)" \
+    "$(command -v chromium-browser 2>/dev/null)" \
+    "$(command -v google-chrome 2>/dev/null)"; do
+    [ -n "$c" ] && [ -x "$c" ] && { echo "$c"; return 0; }
+  done
+  return 1
+}
+
+do_drive() {
+  local url="${1:-https://${APP_HOST}/}"
+  echo "drive ($url)"
+  local chrome
+  chrome="$(find_chrome)" || { fail "no Chrome/Chromium found (install or set PATH)"; return; }
+  local shot="${UCSC_SHOT:-/tmp/ucsc-drive-$(date +%Y%m%d-%H%M%S).png}"
+  # MAP resolves the vanity host to localhost; ignore-certificate-errors for the
+  # repo's self-signed cert; virtual-time-budget lets DOMContentLoaded JS run.
+  local common=( --headless=new --disable-gpu --no-sandbox
+    --ignore-certificate-errors
+    --host-resolver-rules="MAP ${APP_HOST} 127.0.0.1"
+    --virtual-time-budget=6000 )
+  if "$chrome" "${common[@]}" --window-size=1100,900 --screenshot="$shot" "$url" >>"$LOG" 2>&1 \
+     && [ -s "$shot" ]; then
+    pass "screenshot written ($shot)"
+  else
+    fail "screenshot failed (see log)"
+  fi
+  # Dump the post-JS DOM so callers can grep for hydrated markup.
+  if "$chrome" "${common[@]}" --dump-dom "$url" >"${LOG}.dom" 2>>"$LOG"; then
+    local nblocks
+    nblocks=$(grep -oE 'wp-block-ucsc-[a-z-]+' "${LOG}.dom" 2>/dev/null | sort -u | grep -c . || true)
+    [ "$nblocks" -gt 0 ] && pass "$nblocks ucsc block class(es) in rendered DOM" \
+                         || fail "no ucsc block classes in rendered DOM"
+    echo "  ...  DOM dump: ${LOG}.dom"
+  else
+    fail "dump-dom failed (see log)"
+  fi
+}
+
 do_down() { echo "down"; dc down >>"$LOG" 2>&1 && pass "stack stopped" || fail "docker compose down (see log)"; }
 
 # --- dispatch ---------------------------------------------------------------
@@ -140,9 +225,10 @@ case "$cmd" in
   build)   do_build ;;
   launch)  do_launch ;;
   smoke)   do_smoke ;;
+  drive)   do_drive "${2:-}" ;;
   down)    do_down ;;
   all)     do_inspect; do_build; do_launch; do_smoke ;;
-  *) echo "usage: driver.sh [inspect|build|launch|smoke|all|down]"; exit 2 ;;
+  *) echo "usage: driver.sh [inspect|build|launch|smoke|drive URL|all|down]"; exit 2 ;;
 esac
 
 echo "----"

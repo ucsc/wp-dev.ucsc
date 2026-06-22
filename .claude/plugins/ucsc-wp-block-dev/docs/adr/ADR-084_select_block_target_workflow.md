@@ -6,6 +6,10 @@ date: 2026-06-18
 
 # ADR-084: Make selecting a block target the primary workflow
 
+> Amended by [ADR-090](ADR-090_develop_fix_infer_block_target_from_cwd.md):
+> skills infer the block target from the current working directory before
+> falling back to the selection prompt described here.
+
 ## Context
 
 Working with ucsc-gutenberg-blocks commonly begins with the developer or maintainer identifying which block (or block surface) they intend to change, verify, or test. Many skills (develop, fix, verify, test, survey) operate on a specific block target and currently rely on ad-hoc intake patterns to determine that target.

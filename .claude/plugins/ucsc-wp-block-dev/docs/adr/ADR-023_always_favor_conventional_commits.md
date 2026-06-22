@@ -8,7 +8,7 @@ date: 2026-06-10
 
 ## Context
 
-[ADR-019](ADR-019-test-emits-conventional-commit-checkin-text.md) established Conventional Commit output for test-mode check-in text, but commit messages are produced by any workflow that lands a change (`develop`, `fix`, `review` follow-ups, maintainer edits). A single, consistent commit convention keeps history scannable and tool-friendly.
+[ADR-019](ADR-019_test_emits_conventional_commit_checkin_text.md) established Conventional Commit output for test-mode check-in text, but commit messages are produced by any workflow that lands a change (`develop`, `fix`, `review` follow-ups, maintainer edits). A single, consistent commit convention keeps history scannable and tool-friendly.
 
 ## Decision
 
@@ -17,7 +17,7 @@ Every commit message this plugin generates or suggests follows the [Conventional
 - `type` reflects the change: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`, etc.
 - `scope` is the kebab-case target (block, skill, or area), when one applies.
 - The subject is imperative and concise; details go in the body.
-- A known Jira key is referenced in a footer (`Refs: WPM-97`), not stitched into the subject, per [ADR-021](ADR-021-accept-jira-id-or-url-in-arguments.md).
+- A known Jira key is referenced in a footer (`Refs: WPM-97`), not stitched into the subject, per [ADR-021](ADR-021_accept_jira_id_or_url_in_arguments.md).
 
 This generalizes ADR-019 from test mode to all commit-message generation. Deviate only when the user explicitly asks for a different format.
 

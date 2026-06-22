@@ -11,8 +11,13 @@ implements: ADR-013-HUB-README, ADR-060-HUB-LIST-SKILLS, ADR-061-HUB-NATIVE-DISC
 
 `:hub` is the plugin's inventory: it lists what `ucsc-wp-block-dev` can do. It
 does **not** parse a request or route it — Claude routes natively from each
-skill's `description` (ADR-061). Print the tables below as-is; this is a static
-inventory, so do not scan the filesystem or spawn agents to build it (ADR-058).
+skill's `description` (ADR-061). Print the public workflow tables below as-is;
+this is a static inventory, so do not scan the filesystem or spawn agents to
+build it (ADR-058).
+
+When `:hub` is shown while the `maintainer` skill is already active, also print
+the "Maintainer workflows" section below. Otherwise omit that section; the
+general hub stays focused on product workflows (ADR-089).
 
 The plugin ships **skills only** (no separate `commands/` directory); every
 entry is invoked as `ucsc-wp-block-dev:<name>`.
@@ -45,15 +50,34 @@ to hide from the menu while keeping model discoverability.
 
 | Skill or mode | Purpose |
 |---|---|
-| `develop` | Add or modify block code (PHP, template, JS editor, REST, build). |
-| `develop feature` | Mode of `develop` for defining and implementing new behavior. |
-| `develop fix` | Mode of `develop` for reproducing and repairing defects. |
+| `develop` | Add or modify block code (PHP, template, JS editor, REST, build).<br>- `develop feature` - defining and implementing new behavior<br>- `develop fix` - reproducing and repairing defects |
 | `review` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
 | `run` | Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment. |
-| `validate` | Create or run automated PHP, Jest, or e2e tests. |
-| `validate create` | Mode of `validate` for creating automated PHP, Jest, or e2e tests. |
-| `validate run` | Mode of `validate` for running existing automated PHP, Jest, or e2e tests. |
+| `validate` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate create` - creating automated PHP, Jest, or e2e tests<br>- `validate run` - running existing automated PHP, Jest, or e2e tests |
 | `verify` | Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend. |
+
+## Maintainer Workflows
+
+Print this section only when `:hub` is shown from an active `maintainer`
+workflow.
+
+| Skill or mode | Purpose |
+|---|---|
+| `maintainer` | User-invocable plugin maintenance skill for validation, skill upkeep, ADRs, docs, and release readiness; model auto-invocation is disabled. |
+| `maintainer validate` | Run the CLI structural validator, then offer the token-heavy plugin-dev semantic review only if wanted. |
+| `maintainer self-test` | Run the bundled deterministic pytest suite for plugin structure, ADRs, references, script CLIs, and inventory; does not test the WordPress GUI app. |
+| `maintainer review-skills` | Opt-in token-heavy skill quality review through the plugin-dev skill reviewer. |
+| `maintainer review-contrib` | Review a proposal or incubator candidate under `contrib/`. |
+| `maintainer promote-contrib` | Promote a reviewed incubator candidate into the live `skills/` inventory. |
+| `maintainer check-references` | Verify each skill support file is linked from its parent `SKILL.md`. |
+| `maintainer check-adr-implements` | Verify `implements:` ADR markers resolve to active ADRs and report coverage. |
+| `maintainer generate-docs` | Regenerate portable Markdown documentation artifacts without publishing. |
+| `maintainer publish` | Publish maintainer-owned slides, docs, or both after explicit target selection. |
+| `maintainer adr` | Create or update ADRs, preferring updates to existing skill ADRs when they fit. |
+| `maintainer sync-inventory` | Reconcile README, AGENTS.md, hub, deck, and test inventory lists. |
+| `maintainer skill-details` | Show live frontmatter and invocation settings for every skill. |
+| `maintainer backlog` | Generate the combined personal worklist plus unimplemented active ADR backlog. |
+| `maintainer all` | Run token-frugal deterministic maintainer checks in order. |
 
 ## Routing
 

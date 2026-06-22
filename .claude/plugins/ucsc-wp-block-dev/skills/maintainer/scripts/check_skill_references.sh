@@ -14,6 +14,17 @@
 
 set -uo pipefail
 
+usage() {
+  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 QUIET=0
 [ "${1:-}" = "--quiet" ] && QUIET=1
 

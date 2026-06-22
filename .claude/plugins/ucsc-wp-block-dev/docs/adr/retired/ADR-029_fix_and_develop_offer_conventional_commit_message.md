@@ -8,7 +8,7 @@ date: 2026-06-10
 
 ## Context
 
-[ADR-023](ADR-023-always-favor-conventional-commits.md) defines the format for commit messages the plugin generates, but it does not require implementation workflows to offer one at completion or distinguish message generation from executing Git commands.
+[ADR-023](../ADR-023_always_favor_conventional_commits.md) defines the format for commit messages the plugin generates, but it does not require implementation workflows to offer one at completion or distinguish message generation from executing Git commands.
 
 ## Decision
 

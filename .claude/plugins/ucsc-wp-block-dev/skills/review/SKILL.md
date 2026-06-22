@@ -7,11 +7,11 @@ description: Review a WordPress block diff, branch, file, pull request, or Jira-
 
 ## Implements
 
-implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS
+implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-034-REVIEW-DEFER-MCP-LOGIN, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the review target, natural-language review focus, and optional Jira key/URL from the full input. Infer the current diff when no target is supplied and it is unambiguous. Ask one concise question only when the review surface cannot be determined safely.
+Resolve the review target, natural-language review focus, and optional Jira key/URL from the full input. Infer the current diff when no target is supplied and it is unambiguous. Ask one concise question only when the review surface cannot be determined safely.
 
 Per ADR-022, the review target may be a pull-request reference: a **GitHub PR** — a full URL such as `https://github.com/ucsc/ucsc-gutenberg-blocks/pull/169` or a bare `#<n>` (GitHub is the canonical PR host for this plugin; fetch it with the `gh` CLI) — or a **Bitbucket PR** (`https://bitbucket.org/<workspace>/<repo>/pull-requests/<n>` for related UCSC webapps repos). A Jira reference (ADR-021) and a PR reference may both be supplied — Jira gives the issue/acceptance context, the PR gives the code under review.
 
@@ -46,7 +46,7 @@ changes should normally happen on a feature branch named
 `dev/developer_name/ISSUE-1234_short_desc`. Do not create or switch branches
 unless the user explicitly asks.
 
-Per ADR-029, offer to generate Conventional Commit syntax for reviewed changes
+Per ADR-051, offer to generate Conventional Commit syntax for reviewed changes
 or review follow-up edits. Generate message text only if the user accepts.
 Manual check-in is the default: do not run `git add`, `git commit`, or
 equivalent staging/commit operations unless the user explicitly asks. Never run

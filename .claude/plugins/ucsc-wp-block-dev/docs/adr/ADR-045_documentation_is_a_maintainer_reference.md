@@ -40,6 +40,16 @@ The script writes generated Markdown artifacts under
 `skills/maintainer/references/generate-docs/assets/` and does not publish or
 upload anything.
 
+### Regeneration is on demand only (amended 2026-06-22)
+
+Documentation artifacts are regenerated **only when the user explicitly asks**
+(`maintainer generate-docs`). Adding, removing, or editing a skill does **not**
+trigger or require a docs regeneration as part of that change. When skills
+change, update the source-of-truth inventories (`README.md`, `AGENTS.md`, the
+`hub` skill, and the slide deck); regenerating the derived guide and
+presentation artifacts is a separate, on-demand step the maintainer runs when
+they actually want refreshed exportable docs.
+
 ## Consequences
 
 - The public skill inventory decreases by one skill.
@@ -47,3 +57,6 @@ upload anything.
 - The maintainer workflow owns both documentation regeneration and slide
   publishing.
 - ADR-032 continues to ensure the owning skill links every support file.
+- Skill-change workflows do not block on or auto-run docs regeneration; the
+  generated artifacts may legitimately lag the source inventories until the next
+  on-demand `generate-docs` run.

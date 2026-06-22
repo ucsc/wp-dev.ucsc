@@ -8,6 +8,7 @@ Use this when `/ucsc-wp-block-dev:maintainer` is invoked.
 2. If a mode is provided, run the matching section in `SKILL.md`.
 3. If no mode is provided, read `skill-menu-mode.md`, show that menu, and wait
    for the user to choose before running any operation.
-4. Treat `new-adr` as a legacy alias for `adr`.
+4. Treat `test` as a legacy alias for `self-test`, and `new-adr` as a legacy
+   alias for `adr`.
 5. Never start `validate`, `review-skills`, or any plugin-dev agent from a bare
    maintainer invocation.

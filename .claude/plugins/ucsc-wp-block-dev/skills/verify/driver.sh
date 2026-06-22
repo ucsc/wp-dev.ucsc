@@ -18,6 +18,17 @@
 
 set -uo pipefail
 
+usage() {
+  sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 PLUGIN="ucsc-gutenberg-blocks"
 APP_HOST="wp-dev.ucsc"
 LOG="${UCSC_VERIFY_LOG:-/tmp/ucsc-verify-$(date +%Y%m%d-%H%M%S).log}"

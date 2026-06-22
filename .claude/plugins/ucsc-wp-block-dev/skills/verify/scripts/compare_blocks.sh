@@ -2,6 +2,22 @@
 set -euo pipefail
 # compare_blocks wrapper: prefer plugin-local script, fallback to user _code/_WP_tools path,
 # and otherwise print actionable manual instructions.
+usage() {
+  cat <<'EOF'
+Usage: compare_blocks.sh --dev <dev_url> --prod <prod_url> --selector <css_selector> [--keep]
+
+Compares normalized block markup between two URLs using the plugin-local helper
+when available, falling back to the user's _WP_tools helper.
+EOF
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 PLUGIN_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 LOCAL="$PLUGIN_DIR/skills/verify/scripts/compare_blocks_local.sh"
 USER="$HOME/_code/_WP_tools/compare_blocks.sh"

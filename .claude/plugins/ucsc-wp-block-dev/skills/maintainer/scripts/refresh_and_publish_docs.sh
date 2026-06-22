@@ -10,6 +10,17 @@
 
 set -uo pipefail
 
+usage() {
+  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 # Guide's destination Google Doc (the "main doc") — ADR-063.
 GDOC_URL="https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
 

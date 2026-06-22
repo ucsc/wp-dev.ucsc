@@ -15,20 +15,21 @@ Accepted
 
 The ADR set and skill surface have grown quickly. Four conventions were requested
 together to keep decisions traceable and skills consistent. Per the combine-default
-established here, they are recorded as one ADR rather than four. This ADR is the
-first to use the new filename convention it defines (it does not rename existing
-ADRs).
+established here, they are recorded as one ADR rather than four. This ADR owns
+the filename convention and the migration of existing ADR files to that
+convention.
 
 ## Decision
 
-### A. Filename convention (new ADRs only)
+### A. Filename convention
 
-New ADRs use `ADR-NNN_<skill>_<mode>.md` — underscore-separated, lowercase —
-naming the primary skill and mode (sub-operation) the decision applies to, e.g.
-`ADR-086_maintainer_conventions.md`. Existing hyphenated `ADR-NNN-slug.md` files
-are **not** renamed. `new_adr.sh` is updated to emit the new format and to detect
-the highest ADR number across both `-` and `_` separators so numbering stays
-correct during the transition.
+ADRs use `ADR-NNNN_<skill>_<mode>_<detail>.md` — four-digit number,
+underscore-separated, lowercase — naming the primary skill, mode
+(sub-operation), and detail the decision applies to, e.g.
+`ADR-086_maintainer_conventions.md`. Legacy hyphenated three-digit files are
+renamed to the same four-digit underscore convention. `new_adr.sh` is updated
+to emit the new format and to detect the highest ADR number across older and
+current filename shapes so numbering stays correct during transition.
 
 ### B. Combine-default for new ADRs
 
@@ -45,10 +46,10 @@ Each skill `SKILL.md` and each script declares which ADR(s) it implements:
   frontmatter portable per ADR-070.
 - In scripts (`.py`, `.sh`): a comment line `# implements: ADR-086-MAINTAINER-CONVENTIONS, …`.
 
-The human-readable slug is `ADR-NNN-SKILL-MODE` (uppercase, hyphenated); the
-checker keys only on the leading `ADR-NNN`, so it resolves both new and legacy
-ADR files. `check_adr_implements.py` enforces consistency in both directions
-(see Rollout).
+The human-readable slug is `ADR-NNNN-SKILL-MODE` (uppercase, hyphenated); the
+checker keys only on the leading ADR number, so it resolves current four-digit
+ADR files and older three-digit references during migration.
+`check_adr_implements.py` enforces consistency in both directions (see Rollout).
 
 ### D. Per-skill launcher + menu mode
 
@@ -72,10 +73,11 @@ C and D are piloted on `maintainer` before wider rollout (one skill at a time).
 
 ## Consequences
 
-- **Positive:** ADR filenames advertise their skill/mode; skills and scripts trace
-  back to decisions; coverage gaps and stale references are detectable by script.
+- **Positive:** ADR filenames advertise their skill, mode, and detail; skills and
+  scripts trace back to decisions; coverage gaps and stale references are
+  detectable by script.
 - **Positive:** The combine-default slows ADR sprawl.
-- **Negative:** Two filename conventions coexist until/unless legacy ADRs are
-  renamed; tooling must tolerate both.
+- **Negative:** Existing links and tests must be migrated when the filename
+  convention changes; tooling tolerates older shapes only for transition.
 - **Negative:** Until rollout completes, forward-coverage is advisory, so the
   "every ADR implemented" goal is not yet enforced.

@@ -9,7 +9,7 @@ Guided flow for adding a new Gutenberg block or extending an existing one in `uc
 
 ## Implements
 
-implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION
+implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET
 
 ## Modes
 
@@ -24,10 +24,10 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/`.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target, natural-language feature request, and
-optional Jira key/URL from the full input and session context, regardless of
-order. Preserve explicit user instructions and ask one concise question only
-when missing or conflicting information blocks the workflow.
+Resolve the target, natural-language feature request, and optional Jira key/URL
+from the full input and session context, regardless of order. Preserve explicit
+user instructions and ask one concise question only when missing or conflicting
+information blocks the workflow.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read [`references/issue-context.md`](references/issue-context.md) and merge its
@@ -36,10 +36,16 @@ compact implementation brief into this workflow.
 When GitHub CLI tooling is needed for pull request creation or inspection, read
 [`references/github.md`](references/github.md) before proceeding.
 
-Before using tools, require the user to choose a target. Resolve known slugs and
-aliases through
-[`references/targets.md`](references/targets.md), then read only the
-selected target reference. Do not load all target references.
+Before using tools, determine the target. First **infer the block target from the
+current working directory** — e.g. a `.../src/blocks/<slug>` path segment, or a
+directory matching a slug in [`references/targets.md`](references/targets.md).
+When exactly one confident match is found, adopt it as the session target and
+state the inferred target so the user can correct it, rather than prompting. Only
+when inference is ambiguous or yields nothing, require the user to choose a target.
+An explicitly supplied target always wins over inference. Resolve known
+slugs and aliases through [`references/targets.md`](references/targets.md), then
+read only the selected target reference. Do not load all target references.
+(ADR-084 selection contract, refined by ADR-090 CWD inference.)
 
 Target references (ucsc-gutenberg-blocks):
 
@@ -115,11 +121,21 @@ Read [`references/block-templates.md`](references/block-templates.md) for the ca
 
 ## 9. Validate
 
+> **Never run `npm`, `wp-scripts`, `composer`, or PHP directly on the host.**
+> This is a laptop **dev-only** environment — all build, test, and PHP execution
+> go through Docker. Local Node/PHP is not the project toolchain (it will fail or
+> mislead), and the real WordPress server is production, not Docker. The repo
+> `README.md` is the source of truth for build/run.
+
+Build through the Dockerized `run` driver (must complete without errors):
+
 ```bash
-npm run build        # must complete without errors
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" build   # Dockerized `npm run build`
 ```
 
-Note: the plugin does not currently have a `test` script in `package.json`. If Jest tests are added in the future, run `npm test` and write tests in `src/blocks/__tests__/BlockName.test.js`.
+Note: the plugin does not currently have a `test` script in `package.json`. If
+Jest tests are added in the future, run them **in-container** (never host
+`npm test`) and write tests in `src/blocks/__tests__/BlockName.test.js`.
 
 ## 10. Complete the Feature Phase
 
@@ -128,7 +144,7 @@ in the Docker environment with the `run` skill before it is treated as ready.
 
 If applicable validation is complete and no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
 
-Per ADR-029, offer to generate Conventional Commit syntax for the completed
+Per ADR-051, offer to generate Conventional Commit syntax for the completed
 feature. Generate message text only if the user accepts. Manual check-in is the
 default: do not run `git add`, `git commit`, or equivalent staging/commit
 operations unless the user explicitly asks. Never run `git push`,

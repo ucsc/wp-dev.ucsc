@@ -6,7 +6,7 @@ date: 2026-06-15
 
 # ADR-043: Documentation Skill Generates Portable Markdown Artifacts
 
-Superseded by [ADR-045](ADR-045-documentation-is-a-maintainer-reference.md).
+Superseded by [ADR-045](../ADR-045_documentation_is_a_maintainer_reference.md).
 
 ## Context
 

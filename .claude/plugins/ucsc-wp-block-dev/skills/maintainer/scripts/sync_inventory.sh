@@ -12,6 +12,17 @@
 
 set -uo pipefail
 
+usage() {
+  sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 export SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Execute inline Python script to handle inventory synchronization
@@ -39,21 +50,21 @@ METADATA = {
     "develop": {
         "readme": "Add or modify block code directly",
         "hub": "Add or modify block code (PHP, template, JS editor, REST, build).",
-        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build). Modes appear as distinct menu lines: `develop feature` (new behavior) and `develop fix` (defect repair).",
+        "agents_md": "Add or modify block code (PHP, template, JS editor, REST, build).",
         "deck_trigger": "Block code changes, new behavior, or bug repair",
         "deck_desc": "Adds or modifies PHP class, template, JS editor, REST, and build steps."
     },
     "develop feature": {
         "readme": "Mode of `develop` for defining and implementing new behavior",
         "hub": "Mode of `develop` for defining and implementing new behavior.",
-        "agents_md": None,
+        "agents_md": "Defining and implementing new behavior",
         "deck_trigger": "New behavior",
         "deck_desc": "Defines requirements and implements a feature, editor enhancement, or new block."
     },
     "develop fix": {
         "readme": "Mode of `develop` for reproducing and repairing defects",
         "hub": "Mode of `develop` for reproducing and repairing defects.",
-        "agents_md": None,
+        "agents_md": "Reproducing and repairing defects",
         "deck_trigger": "Bug repair",
         "deck_desc": "Reproduces, diagnoses, and repairs a described block defect."
     },
@@ -88,7 +99,7 @@ METADATA = {
     "validate": {
         "readme": "Create or run automated PHP, Jest, or e2e tests",
         "hub": "Create or run automated PHP, Jest, or e2e tests.",
-        "agents_md": "Create or run automated PHP, Jest, or e2e tests. Modes appear as distinct menu lines.",
+        "agents_md": "Create or run automated PHP, Jest, or e2e tests.",
         "deck_trigger": "Validation / test creation or execution",
         "deck_desc": "Creates or runs PHP, Jest, or end-to-end tests."
     },
@@ -135,6 +146,27 @@ for d in sorted(os.listdir(skills_dir)):
 
 print(f"Syncing skills: {', '.join(live_skills)}")
 
+# Modes are grouped inside their parent skill's table cell (on new lines) rather
+# than as separate peer rows.
+MODES = {
+    "develop": ["develop feature", "develop fix"],
+    "validate": ["validate create", "validate run"],
+}
+
+
+def fold_modes(skill, key):
+    """Return a '<br>- `mode` - desc' suffix listing a skill's modes inside its
+    parent cell, or '' when the skill has no modes (or no text for this table)."""
+    out = ""
+    for mode in MODES.get(skill, []):
+        desc = METADATA.get(mode, {}).get(key)
+        if not desc:
+            continue
+        desc = re.sub(r"^Mode of `[^`]+` for ", "", desc).rstrip(".")
+        out += f"<br>- `{mode}` - {desc}"
+    return out
+
+
 success = True
 
 # 1. Sync README.md
@@ -151,13 +183,8 @@ if os.path.exists(readme_path):
         if s in ["retrospective"]:
             continue
         desc = METADATA.get(s, {}).get("readme") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
+        desc += fold_modes(s, "readme")
         lines.append(f"| `{s}` | {desc} |")
-        if s == "develop":
-            for mode in ["develop feature", "develop fix"]:
-                lines.append(f"| `{mode}` | {METADATA[mode]['readme']} |")
-        if s == "validate":
-            for mode in ["validate create", "validate run"]:
-                lines.append(f"| `{mode}` | {METADATA[mode]['readme']} |")
     
     pattern = r"(\| Skill or mode \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match = re.search(pattern, readme_content, re.DOTALL)
@@ -194,10 +221,8 @@ if os.path.exists(agents_path):
     ]
     for s in live_skills:
         desc = METADATA.get(s, {}).get("agents_md") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
+        desc += fold_modes(s, "agents_md")
         lines.append(f"| `{s}` | {desc} |")
-        if s == "validate":
-            for mode in ["validate create", "validate run"]:
-                lines.append(f"| `{mode}` | {METADATA[mode]['agents_md']} |")
 
     pattern = r"(\| Skill \| Use for \|\s*\n\| --- \| --- \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match = re.search(pattern, agents_content, re.DOTALL)
@@ -238,13 +263,8 @@ if os.path.exists(hub_path):
             continue
         desc = METADATA.get(s, {}).get("hub") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
         if desc:
+            desc += fold_modes(s, "hub")
             lines.append(f"| `{s}` | {desc} |")
-        if s == "develop":
-            for mode in ["develop feature", "develop fix"]:
-                lines.append(f"| `{mode}` | {METADATA[mode]['hub']} |")
-        if s == "validate":
-            for mode in ["validate create", "validate run"]:
-                lines.append(f"| `{mode}` | {METADATA[mode]['hub']} |")
         
     pattern_pub = r"(## Public workflows\s*\n\s*\| Skill or mode \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
     match_pub = re.search(pattern_pub, hub_content, re.DOTALL)

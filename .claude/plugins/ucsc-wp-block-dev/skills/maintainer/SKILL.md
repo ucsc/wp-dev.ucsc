@@ -18,7 +18,7 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-058-MAINTAINER-LOW-TOKEN, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH
+implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-058-MAINTAINER-LOW-TOKEN, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH
 
 This body marker traces the skill to the ADRs it implements (ADR-086, decision C).
 `scripts/check_adr_implements.py` validates that every referenced ADR is active.
@@ -29,11 +29,12 @@ use `develop`/`develop fix`/`run` for that). Invoke as `maintainer`. For
 Markdown artifact regeneration, read
 [`references/generate-docs.md`](references/generate-docs.md).
 
-Use this skill with one mode: `validate`, `test`, `review-skills`,
+Use this skill with one mode: `validate`, `self-test`, `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`,
-`generate-docs`, `publish` (`slides`/`docs`/`all`), `adr`, `sync-inventory`,
-`skill-details`, `backlog`, or `all`. `new-adr` remains a legacy alias for
-`adr`. Run all commands below from the repo root.
+`generate-docs`, `publish` (bare = both; or `guide`/`deck`), `adr`, `sync-inventory`,
+`skill-details`, `backlog`, or `all`. `test` remains a legacy alias for
+`self-test`; `new-adr` remains a legacy alias for `adr`. Run all commands below
+from the repo root.
 
 To work on the plugin itself, launch Claude Code from the repo root with the
 plugin loaded directly from its development directory:
@@ -68,11 +69,19 @@ skills:
   script/skill/test improvements (ADR-077). Reached through `maintainer` or by
   describing the goal at session end. See ADR-083.
 
+## External references
+
+- [`references/external-references.md`](references/external-references.md) —
+  upstream source-of-truth links for skill and command authoring: the Anthropic
+  `skill-creator` skill and the Claude Code slash-command docs. Consult these
+  over any in-repo paraphrase when creating or refining skills, commands, or the
+  run/verify drivers.
+
 ## Universal Command Intake
 
-Apply ADR-011: resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
+Resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available modes as options: `validate`, `test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`, `generate-docs`, `publish` (`slides`/`docs`/`all`), `adr`, `sync-inventory`, `skill-details`, `backlog`, and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen mode only after they pick. When the user already named a mode (e.g. `maintainer test`), honor it directly without prompting. Treat `new-adr` as a legacy alias for `adr`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available modes as options: `validate`, `self-test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`, `generate-docs`, `publish` (bare = both; or `guide`/`deck`), `adr`, `sync-inventory`, `skill-details`, `backlog`, and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen mode only after they pick. When the user already named a mode (e.g. `maintainer self-test` or legacy `maintainer test`), honor it directly without prompting. Treat `test` as a legacy alias for `self-test` and `new-adr` as a legacy alias for `adr`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
 ## Anthropic plugin-dev tools
@@ -112,7 +121,7 @@ claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
 ```
 
 Run this first. It checks manifest, frontmatter, naming, and file structure
-with no agent tokens. This is also exercised by `maintainer test` via the
+with no agent tokens. This is also exercised by `maintainer self-test` via the
 pytest suite.
 
 **Tier 2 — plugin-dev agent semantic review (opt-in, ~10k tokens):**
@@ -125,7 +134,15 @@ Only offer this after Tier 1 passes and a deeper qualitative review is wanted
 
 Relay only the findings that matter; fix critical errors before publishing.
 
-## test
+## self-test
+
+Run the plugin's own deterministic tests. This mode tests the
+`ucsc-wp-block-dev` Claude Code plugin: manifest contracts, skill frontmatter,
+ADR integrity, support-file references, script CLI contracts, generated-doc
+contracts, and inventory consistency. It does **not** test the WordPress GUI
+app, running Docker stack, block rendering, browser behavior, PHP block logic,
+or Jest/e2e suites; use `validate`, `run`, and `verify` for product/plugin
+runtime validation.
 
 Run the bundled pytest suite (manifest validity, skill frontmatter, ADR index consistency, file layout).
 
@@ -157,6 +174,8 @@ available inside the image; that is expected for deterministic structural
 validation.
 
 Some tests skip gracefully when the `claude` CLI is unavailable — that is expected in CI.
+
+`maintainer test` is accepted as a legacy alias for this mode.
 
 ## review-skills
 
@@ -224,7 +243,7 @@ After moving files:
 1. Update `README.md`, `AGENTS.md`, the `hub` skill, and the maintainer slide
    deck when the new skill changes those inventories.
 2. Add or update structural tests for the supported skill surface.
-3. Run `test`, `validate`, `check-references`, and `review-skills`.
+3. Run `self-test`, `validate`, `check-references`, and `review-skills`.
 4. Remove the corresponding proposal only after the promotion checks pass.
 
 If any check fails, leave the candidate in `contrib/incubator/` and report the
@@ -303,10 +322,14 @@ It does not publish or upload anything.
 
 ## publish
 
-Per ADR-063, `publish` takes a target: `slides`, `docs`, or `all`. Publishing is
-always explicit and never part of `all`.
+Per ADR-063, **bare `publish` publishes both** the guide and the deck. A specific
+output is named: `guide` (the prose docs) or `deck` (the slides). Publishing is
+always explicit and is never part of the `all` health-check mode. Legacy aliases:
+`docs` = `guide`, `slides` = `deck`, and `all` = both.
 
-### publish slides
+### publish deck
+
+(Legacy alias: `publish slides`.)
 
 The canonical Marp source is maintainer-owned:
 
@@ -324,12 +347,14 @@ Before publishing:
 Publish the verified deck to the existing Google Doc:
 
 ```bash
-python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1r5gglrwp6AXabaXqOWhzWj7qDpJZhjvUAFci0-rXIII/edit"
+python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw/edit"
 ```
 
 Do not restore a second deck at the repository root (ADR-018).
 
-### publish docs
+### publish guide
+
+(Legacy alias: `publish docs`.)
 
 Publishes the generated prose guide
 `skills/maintainer/references/generate-docs-main.md`
@@ -347,9 +372,10 @@ python3 .claude/scripts/publish_to_gdoc.py \
   --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
 ```
 
-### publish all
+### publish (both)
 
-Run `publish slides` then `publish docs`.
+Bare `publish` runs `publish deck` then `publish guide`. (Legacy alias:
+`publish all`.)
 
 ## adr
 
@@ -360,21 +386,32 @@ reasonably hold the decision.
 
 When creating a new ADR, automatically allocate the next available ADR number,
 create a markdown file with standard frontmatter and skeleton, and update the ADR
-index file. Per ADR-086, prefer the skill+mode form, which produces
-`ADR-NNN_<skill>_<mode>.md`; the legacy slug form is still accepted. Number
-detection handles both separators. Per ADR-086 decision B, default to extending
-an existing ADR and create a new one only when the user says "add" or no existing
-ADR fits.
+index file. Per ADR-086, prefer the skill+mode+detail form, which produces
+`ADR-NNN_<skill>_<mode>_<detail>.md`. The legacy two-argument slug form is still
+accepted as an alias, but it also emits a three-digit underscore filename. Number
+detection matches ADR files by their leading number regardless of separator. Per
+ADR-086 decision B, default to extending an existing ADR and create a new one
+only when the user says "add" or no existing ADR fits.
 
 ```bash
-# Preferred (ADR-086): ADR-NNN_<skill>_<mode>.md
+# Preferred (ADR-086): ADR-NNN_<skill>_<mode>_<detail>.md
 bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <skill> <mode> "<title>"
 
-# Legacy: ADR-NNN-<slug>.md
+# Legacy alias: ADR-NNN_<slug>.md
 bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <slug> "<title>"
 ```
 
 `new-adr` remains a legacy alias for this mode.
+
+### Retiring an ADR
+
+When an ADR becomes Superseded, Deprecated, or Rejected, move it out of the
+active set: set its `status:`, move the file to `docs/adr/retired/`, remove its
+row from `docs/adr/index.md`, and add a one-line entry to
+`docs/adr/adrs_retired.md` (linking into `retired/`). Active ADRs keep only
+active decisions; the `test_adr_retired.py` contract enforces this split.
+`new_adr.sh` scans `retired/` when allocating numbers, so retired numbers are
+never reused.
 
 ## sync-inventory
 
@@ -403,9 +440,21 @@ Run after any `SKILL.md` frontmatter change to confirm the invocation posture is
 
 ## all
 
-Run the token-frugal deterministic checks in order: `test` (pytest suite),
+Run the token-frugal deterministic checks in order: `self-test` (pytest suite),
 `check-references`, then the CLI structural validator. Report a single combined
 summary.
+
+**Single-command wrapper (preferred):** run the whole battery at once with
+
+```bash
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_all_plugin_tests.sh
+```
+
+It runs `self-test`, `check-references`, and `claude plugin validate --strict`
+in order, prints a per-step PASS/FAIL, and exits non-zero if any step fails.
+It skips the validate step gracefully when the `claude` CLI is unavailable.
+The individual command below remains available for running just the Tier 1
+structural check:
 
 ```bash
 # Tier 1 structural validation included in `all` (ADR-078)

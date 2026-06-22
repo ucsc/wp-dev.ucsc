@@ -16,7 +16,7 @@ When the user enters maintainer mode **without an explicit operation**, the skil
 
 It must **not** launch directly into any plugin-dev agent (`plugin-validator`, `skill-reviewer`) or other operation before the user chooses.
 
-When the user already names an operation (e.g. `maintainer test`, `maintainer validate`), the skill honors it directly without prompting. This refines the intake gate of [ADR-011](ADR-011-universal-command-intake.md) for maintainer mode and upholds the low-token-use principle of [ADR-003](ADR-003-low-token-use.md).
+When the user already names an operation (e.g. `maintainer test`, `maintainer validate`), the skill honors it directly without prompting. This refines the intake gate of [ADR-011](retired/ADR-011_universal_command_intake.md) for maintainer mode and upholds the low-token-use principle of [ADR-003](ADR-003_low_token_use.md).
 
 ## Consequences
 

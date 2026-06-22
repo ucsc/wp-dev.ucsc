@@ -169,21 +169,38 @@ class TestSkillFrontmatter:
         assert "maintainer/retrospective" in readme.lower()
         assert "develop/survey" not in readme.lower()
 
-    def test_hub_lists_every_live_skill(self):
-        """:hub is the product workflow inventory; maintainer is omitted unless maintainer is active."""
+    def test_hub_lists_public_product_workflows(self):
+        """:hub keeps maintainer out of the public workflow table unless maintainer is active."""
         hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
+        public = re.search(
+            r"## Public workflows\s*\n(.*?)(?=\n## Maintainer Workflows)",
+            hub,
+            re.DOTALL,
+        ).group(1)
         for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub", "maintainer"}):
-            assert f"`{skill_name}`" in hub, f"hub is missing skill '{skill_name}'"
+            assert f"`{skill_name}`" in public, f"hub is missing skill '{skill_name}'"
         for skill_name in sorted(EXPECTED_DEVELOP_MODES):
-            assert f"`develop {skill_name}`" in hub, f"hub is missing develop mode '{skill_name}'"
+            assert f"`develop {skill_name}`" in public, f"hub is missing develop mode '{skill_name}'"
         for mode_name in ["create", "run"]:
-            assert f"`validate {mode_name}`" in hub, f"hub is missing validate mode '{mode_name}'"
-        assert "`test`" not in hub
-        assert "develop/survey" not in hub
-        assert "`maintainer`" not in hub
-        assert "maintainer/retrospective" not in hub
+            assert f"`validate {mode_name}`" in public, f"hub is missing validate mode '{mode_name}'"
+        assert "`test`" not in public
+        assert "develop/survey" not in public
+        assert "`maintainer`" not in public
+        assert "maintainer/retrospective" not in public
         # hub enumerates; it does not route (ADR-061).
         assert "invoke the specific skill directly" in hub.lower()
+
+    def test_hub_has_maintainer_context_section(self):
+        """:hub shows maintainer details only from an active maintainer workflow (ADR-089)."""
+        hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text().lower()
+        assert "when `:hub` is shown while the `maintainer` skill is already active" in hub
+        assert "## maintainer workflows" in hub
+        assert "print this section only when `:hub` is shown from an active `maintainer`" in hub
+        assert "`maintainer` | user-invocable plugin maintenance skill" in hub
+        assert "`maintainer adr`" in hub
+        assert "`maintainer backlog`" in hub
+        assert "`maintainer self-test`" in hub
+        assert "does not test the wordpress gui app" in hub
 
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill (flat per AgentSkills spec)."""
@@ -345,13 +362,21 @@ class TestSkillFrontmatter:
     def test_block_targets_are_develop_references(self):
         refs = SKILLS_DIR / "develop" / "references"
         expected = {
+            "target-calendar-feed.md",
             "target-campus-directory.md",
             "target-class-schedule.md",
             "target-course-catalog.md",
+            "target-news.md",
         }
         assert expected <= {path.name for path in refs.glob("target-*.md")}
 
-        for target in ["campus-directory", "class-schedule", "course-catalog"]:
+        for target in [
+            "calendar-feed",
+            "campus-directory",
+            "class-schedule",
+            "course-catalog",
+            "news",
+        ]:
             assert not (SKILLS_DIR / target / "SKILL.md").exists()
 
         develop = (SKILLS_DIR / "develop" / "SKILL.md").read_text().lower()
@@ -359,6 +384,17 @@ class TestSkillFrontmatter:
         assert "references/targets.md" in develop
         assert "do not load all target references" in develop
         assert "references/domain-blocks.md" in develop
+
+        targets = (refs / "targets.md").read_text()
+        for target in [
+            "calendar-feed",
+            "campus-directory",
+            "class-schedule",
+            "course-catalog",
+            "news",
+        ]:
+            assert f"| `{target}` |" in targets
+            assert f"(target-{target}.md)" in targets
 
     def test_target_references_are_bidirectional(self):
         """Every slug linked in targets.md has a target-*.md file, and vice versa."""
@@ -694,6 +730,18 @@ class TestAdrIndex:
                 f"{adr_file.name} exists but is not referenced in index.md"
             )
 
+    def test_adr_filenames_use_current_convention(self):
+        """ADR filenames use ADR-NNN_skill_mode_detail.md shape."""
+        adr_files = sorted(ADR_DIR.glob("ADR-*.md"))
+        bad = [
+            adr_file.name
+            for adr_file in adr_files
+            if not re.match(r"^ADR-\d{3}_[a-z0-9]+(?:_[a-z0-9]+)+\.md$", adr_file.name)
+        ]
+        assert not bad, "ADR filename convention violations:\n" + "\n".join(
+            f"  {name}" for name in bad
+        )
+
     def test_adr_files_have_valid_frontmatter(self):
         """All ADR files must have valid frontmatter containing title, status, and date."""
         adr_files = sorted(ADR_DIR.glob("ADR-*.md"))
@@ -728,7 +776,7 @@ class TestAdrIndex:
 
     def test_fix_token_study_is_multi_pronged_and_measured(self):
         """ADR-026 must optimize full fix sessions without weakening correctness gates."""
-        text = (ADR_DIR / "ADR-026-study-multi-pronged-fix-token-reduction.md").read_text().lower()
+        text = (ADR_DIR / "ADR-026_study_multi_pronged_fix_token_reduction.md").read_text().lower()
         for workstream in [
             "loaded instruction size",
             "intake and routing",
@@ -745,7 +793,7 @@ class TestAdrIndex:
 
     def test_mcp_token_study_compares_startup_strategies(self):
         """ADR-027 must measure MCP savings against startup and unused-session cost."""
-        text = (ADR_DIR / "ADR-027-study-github-atlassian-mcp-token-cost.md").read_text().lower()
+        text = (ADR_DIR / "ADR-027_study_github_atlassian_mcp_token_cost.md").read_text().lower()
         for configuration in ["fallback only", "on demand", "always on"]:
             assert configuration in text
         assert "measure github and atlassian independently" in text
@@ -756,7 +804,7 @@ class TestAdrIndex:
 
     def test_mcp_activation_is_just_in_time_and_token_driven(self):
         """ADR-028 must keep the multi-purpose plugin light and activation controlled."""
-        text = (ADR_DIR / "ADR-028-start-mcp-just-in-time-when-token-efficient.md").read_text().lower()
+        text = (ADR_DIR / "ADR-028_start_mcp_just_in_time_when_token_efficient.md").read_text().lower()
         assert "multi-purpose plugin" in text
         assert "do not start github or atlassian mcp by default" in text
         assert "activate only the relevant mcp just in time" in text

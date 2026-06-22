@@ -51,3 +51,20 @@ only the operation surface changes.
 - **Negative:** `publish-slides` is renamed; references in README, the deck,
   `generate-docs.md`, and ADR-020's operation list are updated to `publish`.
 - Publishing remains explicit and is excluded from `all` (ADR unchanged).
+
+## Amendment (2026-06-22)
+
+The publish surface is refined for ergonomics:
+
+- **Bare `publish` publishes both** the guide and the deck (previously a target
+  was always required and "both" needed the explicit `all`). Publishing both is
+  the common case, so it becomes the default.
+- Specific outputs are named **`guide`** (the prose docs, formerly `docs`) and
+  **`deck`** (the slides, formerly `slides`). The terms match how the artifacts
+  are referred to in practice.
+- Backward compatible: `docs` = `guide`, `slides` = `deck`, and `all` = both
+  remain accepted aliases, so existing invocations keep working.
+
+Unchanged: publishing is still explicit (never triggered by the `all`
+health-check mode), each output keeps its own fast-path script and destination
+Google Doc, and the maintainer skill still owns the canonical deck (ADR-018).

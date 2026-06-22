@@ -8,7 +8,7 @@ date: 2026-06-10
 
 ## Context
 
-[ADR-021](ADR-021-accept-jira-id-or-url-in-arguments.md) made Jira IDs and URLs first-class arguments, but Jira tracks *issues*, not code review. For the WordPress blocks work, **issues live in Jira while pull requests live in GitHub** (e.g. `https://github.com/ucsc/wp-dev.ucsc/pull/5`). Related UCSC webapps repositories host their PRs on **Bitbucket** instead (e.g. `https://bitbucket.org/ucscwebapps/wdt-common/pull-requests/675`). Users want to paste either kind of PR reference into any command.
+[ADR-021](ADR-021_accept_jira_id_or_url_in_arguments.md) made Jira IDs and URLs first-class arguments, but Jira tracks *issues*, not code review. For the WordPress blocks work, **issues live in Jira while pull requests live in GitHub** (e.g. `https://github.com/ucsc/wp-dev.ucsc/pull/5`). Related UCSC webapps repositories host their PRs on **Bitbucket** instead (e.g. `https://bitbucket.org/ucscwebapps/wdt-common/pull-requests/675`). Users want to paste either kind of PR reference into any command.
 
 ## Decision
 
@@ -17,7 +17,7 @@ Every command handler accepts an optional pull-request reference in its argument
 - **GitHub PR** — a full URL (`https://github.com/<org>/<repo>/pull/<n>`) or a bare `#<n>` / PR number when the GitHub repo is unambiguous. GitHub is the canonical PR host for the ucsc-gutenberg-blocks / wp-dev.ucsc work; use the `gh` CLI to fetch it.
 - **Bitbucket PR** — a full URL (`https://bitbucket.org/<workspace>/<repo>/pull-requests/<n>`), used for related UCSC webapps repositories.
 
-A Jira reference and a PR reference may both appear: Jira supplies the issue/acceptance context, the PR supplies the code under review. The normalizer parses each by host and pattern and keeps them distinct; a token matching neither a Jira key/URL ([ADR-021](ADR-021-accept-jira-id-or-url-in-arguments.md)) nor a PR URL/number is part of the natural-language request.
+A Jira reference and a PR reference may both appear: Jira supplies the issue/acceptance context, the PR supplies the code under review. The normalizer parses each by host and pattern and keeps them distinct; a token matching neither a Jira key/URL ([ADR-021](ADR-021_accept_jira_id_or_url_in_arguments.md)) nor a PR URL/number is part of the natural-language request.
 
 ## Consequences
 

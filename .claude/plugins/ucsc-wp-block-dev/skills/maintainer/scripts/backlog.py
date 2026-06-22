@@ -35,6 +35,10 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import check_adr_implements as cai  # noqa: E402  (sibling script, reuse its logic)
 
 
+def print_usage() -> None:
+    print(__doc__.strip())
+
+
 def _home_subdir(env_var: str, default_under_home: str) -> Path:
     override = os.environ.get(env_var)
     if override:
@@ -81,8 +85,11 @@ def personal_backlog() -> str:
         return f"(personal worklist not found at {WORKLIST})"
     text = WORKLIST.read_text(errors="ignore")
     # Capture from the "STILL OPEN" banner through the end, dropping a trailing
-    # "Notes" footer if present. Falls back to the whole file.
-    start = text.find("STILL OPEN")
+    # "Notes" footer if present. Falls back to the whole file. Anchor on a
+    # line-start match so an inline "(see STILL OPEN)" reference in the prose
+    # above does not truncate the worklist mid-sentence.
+    m = re.search(r"^STILL OPEN", text, re.MULTILINE)
+    start = m.start() if m else -1
     tail = text[start:] if start != -1 else text
     notes = tail.rfind("\nNotes\n")
     if notes != -1:
@@ -91,6 +98,14 @@ def personal_backlog() -> str:
 
 
 def main() -> int:
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print_usage()
+        return 0
+    unknown = [arg for arg in sys.argv[1:] if arg != "--print"]
+    if unknown:
+        print(f"Unknown argument: {unknown[0]}", file=sys.stderr)
+        print("Usage: python3 backlog.py [--print]", file=sys.stderr)
+        return 2
     show = "--print" in sys.argv
     adrs = unimplemented_adrs()
     personal = personal_backlog()

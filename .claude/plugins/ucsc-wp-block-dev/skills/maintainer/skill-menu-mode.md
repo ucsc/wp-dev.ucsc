@@ -8,14 +8,14 @@ user to choose.
 | Mode | Use when |
 |---|---|
 | `validate` | Run plugin structural validation. Token-heavy Tier 2 agent review is opt-in only. |
-| `test` | Run the deterministic pytest suite. |
+| `self-test` | Run the plugin's own deterministic pytest suite (manifest, frontmatter, ADRs, references, inventory) — tests the plugin itself, not the WordPress GUI app. Legacy alias: `test`. |
 | `review-skills` | Run the token-heavy plugin-dev skill reviewer after explicit choice. |
 | `review-contrib` | Review a proposed or incubating contributed skill. |
 | `promote-contrib` | Promote an incubating skill into production. |
 | `check-references` | Verify each skill references its support files. |
 | `check-adr-implements` | Verify ADR `implements:` markers. |
 | `generate-docs` | Regenerate portable Markdown documentation artifacts. |
-| `publish` | Publish slides, docs, or all after explicit approval. |
+| `publish` | Publish both the guide and deck (bare), or a named `guide`/`deck`, after explicit approval. |
 | `adr` | Create, update, inspect, reconcile, or index ADRs. |
 | `sync-inventory` | Synchronize README, hub, AGENTS, deck, and tests with skill inventory. |
 | `skill-details` | Show live frontmatter and invocation settings. |

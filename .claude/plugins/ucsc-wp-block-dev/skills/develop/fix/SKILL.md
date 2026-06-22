@@ -17,10 +17,10 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/` unless 
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target, natural-language problem description, and
-optional Jira key/URL from the full input and session context, regardless of
-order. Preserve explicit user instructions and ask one concise question only
-when missing or conflicting information blocks the fix workflow.
+Resolve the target, natural-language problem description, and optional Jira
+key/URL from the full input and session context, regardless of order. Preserve
+explicit user instructions and ask one concise question only when missing or
+conflicting information blocks the fix workflow.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read
@@ -60,8 +60,8 @@ Do not inspect source files, logs, git history, browser or runtime state, builds
 
 Establish the smallest reproduction before changing anything:
 
-- **Jest failure** — if a `test` script exists in `package.json`, run `npm test` and capture the exact failing assertion and file
-- **Build error** — run `npm run build` and read the webpack/babel error
+- **Jest failure** — if a `test` script exists in `package.json`, run it **in-container** (never host `npm test`) and capture the exact failing assertion and file
+- **Build error** — build via Docker (`bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" build`) and read the webpack/babel error
 - **Browser block error** — open browser devtools console on the editor page; capture the exact JS error
 - **PHP/REST error** — check `wp-dev.ucsc/` logs or run `docker compose exec wpcli wp --debug`
 - **Blank/wrong output** — confirm the block is activated and the build is current
@@ -101,11 +101,21 @@ If the fix touches the attribute schema (PHP ↔ JS), update both sides together
 
 ## 6. Validate
 
+> **Never run `npm`, `wp-scripts`, `composer`, or PHP directly on the host.**
+> This is a laptop **dev-only** environment — all build, test, and PHP execution
+> go through Docker. Local Node/PHP is not the project toolchain (it will fail or
+> mislead), and the real WordPress server is production, not Docker. The repo
+> `README.md` is the source of truth for build/run.
+
+Build through the Dockerized `run` driver (must complete without errors):
+
 ```bash
-npm run build        # must complete without errors
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" build   # Dockerized `npm run build`
 ```
 
-Note: the plugin does not currently have a `test` script in `package.json`. If one exists, also run `npm test` to check for regressions.
+Note: the plugin does not currently have a `test` script in `package.json`. If
+one exists, run it **in-container** (never host `npm test`) to check for
+regressions.
 
 For PHP issues, verify in Docker:
 

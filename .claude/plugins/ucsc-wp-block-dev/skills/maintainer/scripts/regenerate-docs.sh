@@ -1,6 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: regenerate-docs.sh
+
+Regenerates maintainer documentation artifacts under
+skills/maintainer/references/. Does not publish or upload anything.
+EOF
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    echo "Unknown argument: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
+
 maintainer_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 plugin_root="$(cd "$maintainer_dir/../.." && pwd)"
 out_dir="$maintainer_dir/references"

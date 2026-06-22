@@ -36,7 +36,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
-**Generated:** 2026-06-17<br />
+**Generated:** 2026-06-22<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -267,16 +267,16 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
     * *Class Schedule:* Registers REST endpoints at `ucscgutenbergblocks/v1`.
     * *Course Catalog:* Connects to PeopleSoft XML endpoint (caches via transients).
     * *Campus Directory:* Accesses LDAP using network options.
-* **`maintainer` (Hidden Plugin Self-Upkeep):**
-  * Manually reachable by typing `maintainer`, but omitted from the public workflow list.
+* **`maintainer` (Plugin Self-Upkeep):**
+  * User-invocable as `/ucsc-wp-block-dev:maintainer`, with maintainer-only modes.
   * Launches Anthropic’s `plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer` agents.
   * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
   * Runs `check-references` to enforce that every skill support file is linked from its `SKILL.md` (ADR-032).
-  * Triggers pytest suite (verifying manifest, frontmatter constraints, and index consistency).
+  * `maintainer self-test` runs the plugin's own pytest suite (manifest, frontmatter, ADR/reference integrity, script CLI contracts, and inventory). It does not test the WordPress GUI app.
   * See the plugin [README](../../../README.md) for plugin-dev tool install and usage (ADR-013).
 * **`maintainer/references/generate-docs/generate-docs.md` (Portable Markdown Artifacts):**
   * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/generate-docs/assets/`.
-  * Keeps publishing separate; use `maintainer publish` (`slides`/`docs`/`all`) only for Google Docs upload.
+  * Keeps publishing separate; use `maintainer publish` (bare = both; or `guide`/`deck`) only for Google Docs upload.
 * **`retrospective` (Hidden Lessons-Capture Workflow):**
   * Manually reachable by typing `retrospective`, but omitted from the public workflow list.
   * Captures new patterns, gotchas, and reusable knowledge into the closest skill reference after a work session.
@@ -287,7 +287,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * Update the ADR index whenever a decision is added or superseded.
 * **Recent deck and distribution decisions:**
   * **ADR-013:** README is the canonical first-time user reference.
-  * **ADR-014:** The deck documents every top-level skill and command.
+  * **ADR-088:** Public menus list current skill modes.
   * **ADR-015:** Refresh the `Generated:` date before publishing.
   * **ADR-016:** Do not bundle Python environments or dependencies in the plugin.
   * **ADR-017:** `.agents` links to `.claude` skill source instead of maintaining copies.
@@ -296,7 +296,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * **ADR-033:** Work-list state is stored under `CLAUDE_CONFIG_DIR`, not in the repo.
   * **ADR-044:** Domain guidance lives under `develop/references/domain/`.
   * **ADR-045:** Documentation generation lives under `maintainer/references/generate-docs/`.
-  * **ADR-046:** Maintainer is a hidden manual skill.
+  * **ADR-089:** Maintainer is a user-only slash skill with modes.
   * **ADR-047:** Warn before editing on `main`, `master`, or `develop`.
   * **ADR-008:** Prompt for Jira up front; fetch via Atlassian MCP or request pasted ticket details.
 
@@ -346,11 +346,11 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
 * **Dependencies:** Auto-installed into a `.venv` next to the script: `markdown`, `google-api-python-client`, `google-auth-httplib2`, `google-auth-oauthlib`.
 * **Publish command:**
   ```bash
-  python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1r5gglrwp6AXabaXqOWhzWj7qDpJZhjvUAFci0-rXIII/edit"
+  python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw/edit"
   ```
-  This is also the implementation behind the maintainer `publish slides`
+  This is also the implementation behind the maintainer `publish deck`
   operation; `publish docs` publishes the prose guide the same way (ADR-063).
-* **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` (deck) and `refresh_and_publish_docs.sh` (guide) bump/regenerate, run the contract tests, then publish — automating the manual steps below (ADR-003/014/015/063).
+* **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` (deck) and `refresh_and_publish_docs.sh` (guide) bump/regenerate, run the contract tests, then publish — automating the manual steps below (ADR-003, ADR-015, ADR-063, ADR-088).
 * **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
 
 ---
@@ -360,10 +360,10 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
 Roadmap themes are drawn from accepted and study-oriented ADRs so planning stays tied to recorded decisions:
 
 * **Measure fix-mode token reduction** — establish benchmarks, compare evidence funnels, and preserve correctness gates while reducing loaded instruction size (ADR-026).
-* **Evaluate GitHub and Atlassian MCP startup cost** — compare fallback-only, on-demand, and always-on strategies for PR/Jira workflows (ADR-027/ADR-034).
+* **Evaluate GitHub and Atlassian MCP startup cost** — compare fallback-only, on-demand, and always-on strategies for PR/Jira workflows (ADR-027, ADR-034).
 * **Keep MCP activation just-in-time** — continue avoiding default GitHub/Atlassian MCP startup unless task value outweighs session cost (ADR-028).
 * **Refine feature-branch safety** — make branch warnings and `dev/developer_name/ISSUE-1234_short_desc` guidance easy to follow without automating Git by default (ADR-047).
-* **Grow references before skills** — prefer progressive references for domain, target, test, and documentation knowledge until a genuinely user-facing workflow emerges (ADR-040/041/042/044/045).
+* **Grow references before skills** — prefer progressive references for domain, target, test, and documentation knowledge until a genuinely user-facing workflow emerges (ADR-040, ADR-041, ADR-042, ADR-044, ADR-045).
 
 ---
 

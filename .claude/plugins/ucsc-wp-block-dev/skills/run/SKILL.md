@@ -20,7 +20,7 @@ Follow this recorded project recipe instead of rediscovering the launch process.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target app or block surface, natural-language run request, and optional Jira key/URL from the full input and session context. Ask one concise question only when the target or requested operation cannot be inferred safely.
+Resolve the target app or block surface, natural-language run request, and optional Jira key/URL from the full input and session context. Ask one concise question only when the target or requested operation cannot be inferred safely.
 
 ## Fast Path — `driver.sh`
 
@@ -32,10 +32,19 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" inspect  # non-destructive sta
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" build    # Dockerized `npm run build`
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" launch   # up -d, wait for DB, activate plugin
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" smoke    # containers, wp-admin, plugin, blocks
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" drive URL # headless Chrome: screenshot + post-JS DOM
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" down     # stop the stack
 ```
 
 If `${CLAUDE_PLUGIN_ROOT}` is unset, call the script by its in-plugin path (`skills/run/driver.sh`). The driver autodetects the `wp-dev.ucsc` root; override with `WP_DEV_ROOT=/path`.
+
+**Plugin target.** `ucsc-blocks` and `ucsc-gutenberg-blocks` share the one
+wp-dev.ucsc Docker runtime. The driver autodetects which plugin to build from the
+current directory (any `.../wp-content/plugins/<slug>` segment) and builds it via a
+per-invocation `-w` working-dir override against the shared `plugin_npm_start`
+service — no second service is needed. Override detection with `UCSC_PLUGIN=<slug>`
+(e.g. `UCSC_PLUGIN=ucsc-blocks`). Each plugin has its own `node_modules`, so the
+first `build` for a plugin runs `npm ci` in-container before compiling.
 
 Drop to the manual steps below only to drive a single phase by hand or to diagnose a driver FAIL.
 
@@ -105,16 +114,84 @@ Use `https://wp-dev.ucsc/wp-admin/` as the canonical browser URL. The developmen
 
 ## Drive The App
 
-Do not stop at container health when the user asks to see the application working.
+Do not stop at container health when the user asks to see the application
+working. **A frontend block's `view.js` only proves out when a real browser
+executes it** — `curl` returns the server HTML but never runs the script, so a
+broken wrapper-class selector (the kind of bug that makes `view.js` inert) looks
+fine in `curl` and is only caught by driving the page.
 
-1. Use the available browser tool to open `https://wp-dev.ucsc/wp-admin/`. If no visual browser tool is available and you need to verify frontend routing or block output (like FSE template fallbacks), use headless requests like `curl -ks https://wp-dev.ucsc/path/`.
-2. Log in when needed.
-3. Navigate to the relevant editor, page, or frontend route.
-4. Exercise the requested block interaction.
-5. Report what was observed in the running app (or the HTML output if fetching headlessly).
+### Agent path — `driver.sh drive` (headless Chrome)
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" drive "https://wp-dev.ucsc/<page-slug>/"
+```
+
+This renders the URL in headless Google Chrome (auto-detected at
+`/Applications/Google Chrome.app/...` on the dev Mac; `chromium`/`chromium-browser`
+on Linux), **writes a PNG screenshot** (path printed; override with `UCSC_SHOT=`),
+and **dumps the post-JS DOM** to `<log>.dom`. Read the screenshot to confirm the
+block rendered; grep the DOM dump to assert on hydrated markup that `view.js`
+added (e.g. the `clickable-item` class `ucsc-events` adds to each card):
+
+```bash
+grep -c 'ucsc-event-item clickable-item' /tmp/ucsc-run-*.log.dom
+```
+
+A nonzero count proves `view.js` ran *and* its `.wp-block-ucsc-events` selector
+matched the server-rendered wrapper — the end-to-end signal the block is wired up.
+
+Headless screenshots have **no login session**, so drive **public frontend
+pages**, not `wp-admin`. To exercise a block that needs data, publish a page
+containing it and seed its cache first (see Gotchas).
+
+### Manual fallback
+
+1. Use a visual browser tool to open `https://wp-dev.ucsc/wp-admin/` and log in
+   (`admin` / `password`) for editor-side checks a headless screenshot can't reach.
+2. For frontend routing or block output, `curl -ks https://wp-dev.ucsc/path/`
+   confirms server-rendered HTML (but not client JS — use `drive` for that).
+3. Report what was observed in the running app.
 
 Use the `verify` skill when the goal is to prove a code change or acceptance
 criterion. Use the `validate` skill for Jest, PHP, or other automated tests.
+
+## Gotchas
+
+- **`ucsc-blocks` fatals on activation without `composer install`.** Its main
+  file `require`s `vendor/yahnis-elsts/plugin-update-checker/...` at load with no
+  `file_exists` guard, so activating it before the vendor dir exists throws a
+  fatal (`Failed opening required ...plugin-update-checker.php`). Install runtime
+  deps in-container by reusing the theme's composer service with a `-w` override
+  (same pattern as the npm build — no per-plugin service needed):
+
+  ```bash
+  docker compose -f docker-compose-install.yml run --rm \
+    -w /var/www/html/wp-content/plugins/ucsc-blocks \
+    theme_composer_install install --no-dev --no-interaction
+  ```
+
+- **Seed the events cache to render cards without the live API.** `ucsc/events`
+  renders a placeholder until `ucsc_events_fetch_data()` has data; that data is a
+  transient keyed `ucsc_events_<md5(apiUrl)>`. Seed it so the block renders real
+  `.ucsc-event-item` cards offline:
+
+  ```bash
+  docker compose exec -T wpcli wp eval '
+    $api = "https://events.ucsc.edu/wp-json/tribe/v1/events";
+    $key = "ucsc_events_" . md5($api);
+    set_transient($key, array(
+      array("title"=>"Sample Event","link"=>"https://events.ucsc.edu/e/1","date"=>"July 10, 2026","venue"=>"Quarry Plaza","slug"=>"e1","featured_image"=>""),
+    ), HOUR_IN_SECONDS);
+    echo "seeded\n";'
+  ```
+
+  Clear it again with `wp transient delete --all`.
+
+- **Chrome headless against the vanity host.** The page lives at the self-signed
+  `https://wp-dev.ucsc/` vhost. `driver.sh drive` passes
+  `--host-resolver-rules="MAP wp-dev.ucsc 127.0.0.1"`, `--ignore-certificate-errors`,
+  and `--virtual-time-budget=6000` (so `DOMContentLoaded` JS runs) — you do not
+  need `/etc/hosts` edited for the headless path.
 
 ## Recovery
 

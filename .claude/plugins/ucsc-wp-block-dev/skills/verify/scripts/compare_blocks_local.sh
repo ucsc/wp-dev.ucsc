@@ -5,6 +5,17 @@ set -euo pipefail
 # Prefer using the upstream compare_blocks from _code/_WP_tools when available.
 # Usage: compare_blocks_local.sh --dev <dev_url> --prod <prod_url> --selector <css_selector> [--keep]
 
+usage() {
+  sed -n '4,6p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 DEV_URL=""
 PROD_URL=""
 SELECTOR=""

@@ -21,7 +21,7 @@ recorded launch recipe in the `run` skill.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target block or app surface, natural-language expected behavior, and optional Jira key/URL from the full input and session context. Merge available acceptance criteria. Ask one concise question only when the behavior to prove or the target surface is missing.
+Resolve the target block or app surface, natural-language expected behavior, and optional Jira key/URL from the full input and session context. Merge available acceptance criteria. Ask one concise question only when the behavior to prove or the target surface is missing.
 
 ## Build And Launch
 

@@ -12,6 +12,10 @@ import os
 import re
 import sys
 
+if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+    print(__doc__.strip())
+    raise SystemExit(0)
+
 PLUGIN_ROOT = None
 for i, arg in enumerate(sys.argv[1:]):
     if arg == "--plugin-root" and i + 2 <= len(sys.argv) - 1:

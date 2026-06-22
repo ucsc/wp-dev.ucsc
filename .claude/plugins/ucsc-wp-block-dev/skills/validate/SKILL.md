@@ -19,7 +19,7 @@ implements: ADR-019-VALIDATE-CHECKIN-TEXT, ADR-030-VALIDATE-SEPARATION, ADR-042-
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the test target, natural-language test goal, and optional Jira key/URL from the full input.
+Resolve the test target, natural-language test goal, and optional Jira key/URL from the full input.
 
 ## Test Driver
 

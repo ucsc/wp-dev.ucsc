@@ -12,11 +12,11 @@ than top-level target skills.
 
 ## Context
 
-[ADR-011](ADR-011-universal-command-intake.md) lists a "target" among the things command intake resolves, but there was no canonical list of the blocks this plugin actually targets. The three primary blocks — **Class Schedule**, **Course Catalog**, and **Campus Directory** — each have their own owning skill, render class, and external data source, and users reference them by short name. Handlers need one shared way to recognize them instead of guessing per command.
+[ADR-011](ADR-011_universal_command_intake.md) lists a "target" among the things command intake resolves, but there was no canonical list of the blocks this plugin actually targets. The three primary blocks — **Class Schedule**, **Course Catalog**, and **Campus Directory** — each have their own owning skill, render class, and external data source, and users reference them by short name. Handlers need one shared way to recognize them instead of guessing per command.
 
 ## Decision
 
-Command arguments may include a **block target** token in any position, alongside the natural-language request, optional Jira reference ([ADR-021](ADR-021-accept-jira-id-or-url-in-arguments.md)), and optional PR reference ([ADR-022](ADR-022-accept-github-and-bitbucket-pr-references.md)).
+Command arguments may include a **block target** token in any position, alongside the natural-language request, optional Jira reference ([ADR-021](../ADR-021_accept_jira_id_or_url_in_arguments.md)), and optional PR reference ([ADR-022](../ADR-022_accept_github_and_bitbucket_pr_references.md)).
 
 Known block targets are maintained in a single registry: `docs/target-blocks.md`. It records each block's slug, aliases, block name (`ucscblocks/*`), render class, owning skill, and data source. Universal command intake resolves a target token against that registry by **slug or alias** and routes to the owning skill:
 

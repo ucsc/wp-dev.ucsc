@@ -1,5 +1,5 @@
 #!/bin/bash
-# refresh_and_publish_slides.sh — one-call slide refresh + publish (ADR-014/015/018).
+# refresh_and_publish_slides.sh — one-call slide refresh + publish (ADR-015, ADR-018, ADR-088).
 # Token-frugal: 1) bump the deck's Generated: date to today, 2) run the deck-contract
 # tests, 3) publish to the canonical Google Doc. Compact PASS/FAIL output; verbose
 # detail goes to logfiles named on exit.
@@ -10,7 +10,18 @@
 
 set -uo pipefail
 
-GDOC_URL="https://docs.google.com/document/d/1r5gglrwp6AXabaXqOWhzWj7qDpJZhjvUAFci0-rXIII/edit"
+usage() {
+  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
+GDOC_URL="https://docs.google.com/document/d/1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw/edit"
 
 # scripts/ -> maintainer -> skills -> plugin root; project root is three more up.
 PLUGIN_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"

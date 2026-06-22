@@ -8,7 +8,7 @@ date: 2026-06-15
 
 ## Context
 
-While [ADR-054](ADR-054-offer-to-create-pull-requests.md) encourages offering Pull Request creation, the underlying Git push operations present risks of pushing untested or unintended changes, especially when multiple repositories (outer plugin framework vs inner plugin source) are involved.
+While [ADR-054](ADR-054_offer_to_create_pull_requests.md) encourages offering Pull Request creation, the underlying Git push operations present risks of pushing untested or unintended changes, especially when multiple repositories (outer plugin framework vs inner plugin source) are involved.
 
 Force-pushing is especially risky because it can rewrite remote branch history. Even when the user is trying to create or update a pull request, branch publication should remain a human-controlled action.
 

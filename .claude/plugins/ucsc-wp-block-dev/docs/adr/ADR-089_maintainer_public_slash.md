@@ -28,8 +28,11 @@ explicit user invocation only.
   `skills/maintainer/SKILL.md`.
 - List `maintainer` in README, AGENTS.md, and the maintainer deck as a
   user-invocable, non-model-invocable maintenance skill.
-- Omit `maintainer` from `:hub` unless the maintainer skill is already active;
-  the general hub stays focused on product workflows.
+- Omit `maintainer` from the general `:hub` public workflow table; the general
+  hub stays focused on product workflows.
+- When `:hub` is shown while the maintainer skill is already active, include a
+  separate maintainer-only section that identifies `maintainer` as
+  user-invocable and lists its modes.
 - Treat maintainer subcommands as modes. Add `adr` as the canonical mode for
   creating or updating Architecture Decision Records. Keep `new-adr` as a
   legacy alias.
@@ -46,7 +49,9 @@ explicit user invocation only.
   `/ucsc-wp-block-dev:maintainer` and `/ucsc-laravel-vue-dev:maintainer`.
 - Maintainer remains protected from automatic model routing, so product work
   should still route to `develop`, `review`, `run`, `validate`, or `verify`.
-- `:hub` does not advertise maintainer from normal product-development context.
+- `:hub` does not advertise maintainer from normal product-development context,
+  but maintainers already inside the maintainer workflow can see the available
+  maintainer modes without leaving that context.
 - Maintainer ADR work has one canonical entry point, `maintainer adr`, while old
   `maintainer new-adr` wording remains compatible.
 - ADR-046 is superseded.

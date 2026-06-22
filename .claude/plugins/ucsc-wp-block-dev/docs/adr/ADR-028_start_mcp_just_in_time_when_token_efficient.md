@@ -14,7 +14,13 @@ ADR-027 establishes how to measure the cost of GitHub and Atlassian MCP. The ope
 
 ## Decision
 
-Do not start GitHub or Atlassian MCP by default for every plugin session. Activate only the relevant MCP just in time when the current task uses that service and MCP is expected to reduce total token use or materially improve context accuracy.
+Do not start GitHub or Atlassian MCP by default for every plugin session. The
+default state is MCP server off. If a relevant MCP server is already running and
+available in the current session, it is fine to use it when it is the
+lower-cost suitable tool. If it is not already running, activate only the relevant MCP just in time.
+Start it when the current task uses that service and
+MCP is expected to reduce total token use or materially improve context
+accuracy.
 
 ### Selection
 
@@ -27,6 +33,9 @@ Do not start GitHub or Atlassian MCP by default for every plugin session. Activa
 ### Just-in-time behavior
 
 - When the relevant MCP is already available in the current session, use it directly when it is the lower-cost suitable tool.
+- Do not try to start an MCP server merely because it is configured or might be
+  useful later. Start it only after the task has a concrete need for that
+  service.
 - When it is configured but not loaded and activation requires a restart or forced plugin reload, briefly explain the benefit and session impact, then obtain explicit approval.
 - When it is not configured or authenticated, offer setup once when relevant and obtain explicit approval before installation, configuration, or authentication.
 - If approval is declined or activation fails, continue with available fallbacks without blocking the task or repeating the prompt.

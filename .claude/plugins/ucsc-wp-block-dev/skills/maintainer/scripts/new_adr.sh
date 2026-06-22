@@ -4,36 +4,47 @@
 # markdown file with frontmatter, and updates docs/adr/index.md.
 #
 # Usage:
-#   bash new_adr.sh <skill> <mode> "<title>"   # preferred: ADR-NNN_skill_mode.md
-#   bash new_adr.sh <slug> "<title>"           # legacy:    ADR-NNN-slug.md
+#   bash new_adr.sh <skill> <mode> "<title>"   # ADR-NNN_skill_mode_detail.md
+#   bash new_adr.sh <slug> "<title>"           # legacy alias, ADR-NNN_slug.md
 #
 # Example:
 #   bash new_adr.sh maintainer backlog "Track a maintainer backlog"
 
 set -uo pipefail
 
-# Per ADR-086, new ADRs use ADR-NNN_<skill>_<mode>.md (underscore, lowercase).
+usage() {
+  sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
+# Per ADR-086, new ADRs use
+# ADR-NNN_<skill>_<mode>_<detail>.md (underscore, lowercase).
 # Two call forms:
-#   new_adr.sh <skill> <mode> "<title>"   -> ADR-NNN_<skill>_<mode>.md (preferred)
-#   new_adr.sh <slug> "<title>"           -> ADR-NNN-<slug>.md (legacy hyphen)
+#   new_adr.sh <skill> <mode> "<title>"   -> ADR-NNN_<skill>_<mode>_<detail>.md
+#   new_adr.sh <slug> "<title>"           -> ADR-NNN_<slug>.md (legacy alias)
 if [ $# -lt 2 ]; then
   echo "Usage: $0 <skill> <mode> \"<title>\"   (preferred, ADR-086)"
   echo "       $0 <slug> \"<title>\"            (legacy)"
   exit 1
 fi
 
-norm() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\{1,\}/-/g' | sed 's/^-//' | sed 's/-$//'; }
+norm() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g' | sed 's/_\{1,\}/_/g' | sed 's/^_//' | sed 's/_$//'; }
 
 if [ $# -ge 3 ]; then
   SKILL=$(norm "$1")
   MODE=$(norm "$2")
   TITLE="$3"
-  NAME_PART="${SKILL}_${MODE}"
-  SEP="_"
+  DETAIL=$(norm "$TITLE")
+  NAME_PART="${SKILL}_${MODE}_${DETAIL}"
 else
   NAME_PART=$(norm "$1")
   TITLE="$2"
-  SEP="-"
 fi
 
 # Locate docs/adr/
@@ -45,10 +56,10 @@ if [ ! -d "$ADR_DIR" ]; then
   exit 2
 fi
 
-# Find the highest ADR number in the directory. Match both legacy hyphen
-# (ADR-NNN-slug.md) and new underscore (ADR-NNN_skill_mode.md) filenames so
-# numbering stays correct during the transition (ADR-086).
-last_num=$(ls "$ADR_DIR" | grep -E '^ADR-[0-9]{3}[-_]' | sed -E 's/^ADR-([0-9]{3})[-_].*/\1/' | sort -n | tail -n1)
+# Find the highest ADR number in the directory. Match ADR files by their leading
+# number (3+ digits, dash or underscore separator) so numbering stays correct
+# across older worktrees (ADR-086).
+last_num=$(ls "$ADR_DIR" "$ADR_DIR"/retired 2>/dev/null | grep -E '^ADR-[0-9]{3,}[-_]' | sed -E 's/^ADR-([0-9]{3,})[-_].*/\1/' | sort -n | tail -n1)
 
 if [ -z "$last_num" ]; then
   next_num=1
@@ -58,7 +69,7 @@ else
 fi
 
 next_str=$(printf "%03d" "$next_num")
-ADR_FILE="ADR-${next_str}${SEP}${NAME_PART}.md"
+ADR_FILE="ADR-${next_str}_${NAME_PART}.md"
 ADR_PATH="${ADR_DIR}/${ADR_FILE}"
 CURR_DATE=$(date +%Y-%m-%d)
 

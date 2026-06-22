@@ -15,12 +15,12 @@ Two checks:
      rollout completes).
 
 `implements:` markers:
-  - In SKILL.md (and other .md): a body line `implements: ADR-086-FOO, ADR-046-BAR`.
-  - In .py / .sh: a comment line `# implements: ADR-086-FOO, ADR-046-BAR`.
+  - In SKILL.md (and other .md): a body line `implements: ADR-086-FOO, ADR-089-BAR`.
+  - In .py / .sh: a comment line `# implements: ADR-086-FOO, ADR-089-BAR`.
 
-The human-readable slug is `ADR-NNN-SKILL-MODE`; only the leading `ADR-NNN` is
-used to resolve the ADR file, so both new (`ADR-NNN_skill_mode.md`) and legacy
-(`ADR-NNN-slug.md`) filenames resolve.
+The human-readable slug is `ADR-NNN-SKILL-MODE`; only the leading ADR number is
+used to resolve the ADR file. Files and references use the three-digit
+`ADR-NNN_` convention; the matcher accepts any 3+ digit leading number.
 
 Usage:
   python3 check_adr_implements.py [--strict]
@@ -28,6 +28,7 @@ Usage:
 Exit 0 when all hard checks pass, 1 otherwise.
 """
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -83,8 +84,21 @@ def collect_implements() -> dict:
     return refs
 
 
-def main() -> int:
-    strict = "--strict" in sys.argv
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Check that implements: ADR references resolve to active ADRs.",
+    )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail when any active ADR has no implements: marker.",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(sys.argv[1:] if argv is None else argv)
+    strict = args.strict
     adr_index = build_adr_index()
     refs = collect_implements()
 

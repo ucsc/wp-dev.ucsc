@@ -465,6 +465,9 @@ def main():
             print("4. Re-run this script specifying that folder:")
             print("   python3 publish_to_gdoc.py --folder <FOLDER_URL_OR_ID>")
             print("="*72 + "\n")
+        # Exit non-zero so callers (refresh_and_publish_*.sh) detect the failure
+        # instead of reporting a false PASS.
+        sys.exit(1)
     finally:
         if temp_html_path.exists():
             temp_html_path.unlink()

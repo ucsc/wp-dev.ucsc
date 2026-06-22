@@ -14,8 +14,9 @@ behavior is incorrect.
 
 ## Universal Command Intake
 
-Apply ADR-011: resolve the target block, GUI, or app; the natural-language
-feature request; and optional Jira key/URL from the full input. Ask one concise question only when missing or conflicting information prevents useful work.
+Resolve the target block, GUI, or app; the natural-language feature request;
+and optional Jira key/URL from the full input. Ask one concise question only
+when missing or conflicting information prevents useful work.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read

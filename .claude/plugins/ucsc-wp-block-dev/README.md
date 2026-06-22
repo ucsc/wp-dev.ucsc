@@ -19,16 +19,12 @@ directly.
 
 | Skill or mode | Purpose |
 |---|---|
-| `develop` | Add or modify block code directly |
-| `develop feature` | Mode of `develop` for defining and implementing new behavior |
-| `develop fix` | Mode of `develop` for reproducing and repairing defects |
+| `develop` | Add or modify block code directly<br>- `develop feature` - defining and implementing new behavior<br>- `develop fix` - reproducing and repairing defects |
 | `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `maintainer` | Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
-| `validate` | Create or run automated PHP, Jest, or e2e tests |
-| `validate create` | Mode of `validate` for creating automated PHP, Jest, or e2e tests |
-| `validate run` | Mode of `validate` for running existing automated PHP, Jest, or e2e tests |
+| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate create` - creating automated PHP, Jest, or e2e tests<br>- `validate run` - running existing automated PHP, Jest, or e2e tests |
 | `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
 
 `develop/references/issue-context.md` provides shared Jira and issue
@@ -41,9 +37,11 @@ Block-specific guidance lives under `develop/references/targets/`. The
 `develop` workflow requires a target and loads only the selected target
 reference.
 
-Use `maintainer` when you need to validate structure, run tests, review or
-promote contributed skills, verify ADR consistency, or check skill reference
-integrity. The skill is user-invocable only; model auto-invocation is disabled.
+Use `maintainer` when you need to validate structure, run plugin self-tests,
+review or promote contributed skills, verify ADR consistency, or check skill
+reference integrity. The skill is user-invocable only; model auto-invocation is disabled.
+Use `maintainer self-test` for the Claude plugin's own pytest suite; it does
+not test the WordPress GUI app.
 
 Retrospectives are a `maintainer` sub-workflow at `maintainer/retrospective`,
 kept off the public workflow list. Reach them through `maintainer`, or by
@@ -54,7 +52,7 @@ Use the maintainer `generate-docs` reference at
 `maintainer/references/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or
 Confluence. Use `maintainer generate-docs` for regeneration and
-`maintainer publish` (`slides`/`docs`/`all`) only when publishing the guide or
+`maintainer publish` (bare = both; or `guide`/`deck`) only when publishing the guide or
 deck to Google Docs.
 
 ## Contributing skills

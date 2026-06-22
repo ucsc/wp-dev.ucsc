@@ -1,5 +1,29 @@
 #!/bin/bash
 set -e
+
+usage() {
+  cat <<'EOF'
+Usage: validate_driver.sh
+
+Runs the ucsc-gutenberg-blocks PHPUnit suite inside the running wp-dev.ucsc
+container. Start Docker and the wp-dev.ucsc stack before running without --help.
+EOF
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    echo "Unknown argument: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
+
 CONTAINER=$(docker ps --filter "name=wp-dev.ucsc" --format '{{.Names}}' | head -n1)
 if [ -z "$CONTAINER" ]; then
   echo "Container named 'wp-dev.ucsc' not found. Start Docker and run the wp-dev.ucsc container, then re-run this script."

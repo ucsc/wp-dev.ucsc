@@ -23,7 +23,7 @@ Conventions:
 - `scope` is the kebab-case target block (e.g. `class-schedule`).
 - The body names the layer (PHP/Jest/Docker/Browser), the behaviors covered, and any runtime caveats (e.g. "runs in the Docker WP container").
 
-This output is the closing step of test mode; it does not gate the run and is skipped when no coverage changed (a plain test execution). Jira remains optional per [ADR-008](ADR-008-prefer-jira-id-for-fix-and-develop.md) — when a Jira key is known it is referenced in the footer.
+This output is the closing step of test mode; it does not gate the run and is skipped when no coverage changed (a plain test execution). Jira remains optional per [ADR-008](ADR-008_prefer_jira_id_for_fix_and_develop.md) — when a Jira key is known it is referenced in the footer.
 
 ## Consequences
 

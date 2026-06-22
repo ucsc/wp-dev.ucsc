@@ -7,7 +7,7 @@ description: Capture lessons learned from the current working session into the u
 
 ## Implements
 
-implements: ADR-049-RETROSPECTIVE-AFTER-TASKS, ADR-059-RETROSPECTIVE-SKILL-ENRICHMENT, ADR-077-RETROSPECTIVE-LESSONS, ADR-083-MAINTAINER-RETROSPECTIVE
+implements: ADR-059-RETROSPECTIVE-SKILL-ENRICHMENT, ADR-077-RETROSPECTIVE-LESSONS, ADR-083-MAINTAINER-RETROSPECTIVE
 
 Run this at the end of any meaningful work session to persist what was learned
 before the context window closes. Keep it token-light: grep before reading,
@@ -15,7 +15,8 @@ write only what isn't already documented.
 
 ## When To Run
 
-- At the conclusion of every fix, feature, review, or run session (per ADR-049).
+- At the conclusion of every fix, feature, review, or run session when there
+  are reusable lessons to preserve (per ADR-059).
 - When a new pattern, gotcha, or domain boundary was discovered.
 - When an existing skill reference was found to be missing, wrong, or misleading.
 
@@ -68,7 +69,7 @@ If the lesson represents a deliberate architectural or workflow decision (not
 just a tip or gotcha), create a new ADR in `docs/adr/`:
 
 ```text
-ADR-NNN-short-slug.md
+ADR-NNN_skill_mode_detail.md
 ```
 
 With proper frontmatter (`title`, `status: Accepted`, `date`), then add it to
