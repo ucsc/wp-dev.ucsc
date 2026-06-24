@@ -1,7 +1,7 @@
 ---
 name: develop
 description: This skill should be used when the user asks to "add a block", "create a Gutenberg block", "implement a feature", "modify block code", "extend a block", or when feature/fix scope is already defined and implementation is ready to begin on ucsc-gutenberg-blocks.
-argument-hint: "[feature|fix] [block] [description]"
+argument-hint: "[feature|fix] [block] [description or Jira/GitHub URL or ID]"
 ---
 
 # Develop — Add a Block or Feature
@@ -31,16 +31,19 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/`.
 
 ## Universal Command Intake
 
-Resolve the target, natural-language feature request, and optional Jira key/URL
-from the full input and session context, regardless of order. Preserve explicit
-user instructions and ask one concise question only when missing or conflicting
+Resolve the target, natural-language feature request, and an optional issue
+reference — a **Jira key/URL or a GitHub issue/PR URL or ID** — from the full
+input and session context, regardless of order. Preserve explicit user
+instructions and ask one concise question only when missing or conflicting
 information blocks the workflow.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read [`references/issue-context.md`](references/issue-context.md) and merge its
 compact implementation brief into this workflow.
 
-When GitHub CLI tooling is needed for pull request creation or inspection, read
+When a **GitHub issue or PR is supplied as the work scope**, fetch it for
+context (GitHub MCP → `gh` → REST), and when GitHub CLI tooling is needed for
+pull request creation or inspection, read
 [`references/github.md`](references/github.md) before proceeding.
 
 Before using tools, determine the target. The block target is a **persistent

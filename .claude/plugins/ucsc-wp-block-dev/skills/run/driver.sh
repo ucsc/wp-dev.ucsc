@@ -8,7 +8,7 @@
 #   driver.sh build     # compile src/ -> build/ via Dockerized @wordpress/scripts
 #   driver.sh launch    # docker compose up -d + activate plugin
 #   driver.sh smoke      # health: containers, wp-admin HTTP, plugin active, blocks
-#   driver.sh drive URL # headless Chrome: screenshot + post-JS DOM of a frontend URL
+#   driver.sh drive URL # headless Chrome: post-JS DOM + console errors of a frontend URL (UCSC_SHOT=path for an optional screenshot)
 #   driver.sh all       # inspect -> build -> launch -> smoke (default)
 #   driver.sh down      # stop the stack
 #
@@ -199,11 +199,11 @@ do_smoke() {
 }
 
 # Drive a frontend URL with a real headless browser to prove client JS runs.
-# Renders the page (JS executes), writes a screenshot, and dumps the post-JS DOM
-# to the log so the caller can assert on hydrated markup (e.g. classes that
-# view.js adds). On the dev Mac the browser is Google Chrome.app; a Linux box
-# with `chromium`/`chromium-browser` works too. No login: drive public frontend
-# pages (wp-admin needs a session a headless screenshot can't supply).
+# Renders the page (JS executes), dumps the post-JS DOM (assert on hydrated markup
+# view.js adds) and captures the page console stream to flag JS errors. A
+# screenshot is opt-in via UCSC_SHOT. On the dev Mac the browser is
+# Google Chrome.app; a Linux box with `chromium`/`chromium-browser` works too.
+# No login: drive public frontend pages (wp-admin needs a session headless can't supply).
 find_chrome() {
   local c
   for c in \
@@ -222,21 +222,22 @@ do_drive() {
   echo "drive ($url)"
   local chrome
   chrome="$(find_chrome)" || { fail "no Chrome/Chromium found (install or set PATH)"; return; }
-  local shot="${UCSC_SHOT:-/tmp/ucsc-drive-$(date +%Y%m%d-%H%M%S).png}"
   # MAP resolves the vanity host to localhost; ignore-certificate-errors for the
   # repo's self-signed cert; virtual-time-budget lets DOMContentLoaded JS run.
+  # enable-logging=stderr surfaces page console messages and uncaught JS errors
+  # as grep-able `[...:CONSOLE(n)]` / `[...:ERROR:CONSOLE(n)]` lines (ADR-097), so
+  # the DOM dump + console capture are the primary checks and the screenshot is
+  # an opt-in visual fallback (set UCSC_SHOT) rather than a token-heavy default.
   local common=( --headless=new --disable-gpu --no-sandbox
     --ignore-certificate-errors
     --host-resolver-rules="MAP ${APP_HOST} 127.0.0.1"
+    --enable-logging=stderr --v=1
     --virtual-time-budget=6000 )
-  if "$chrome" "${common[@]}" --window-size=1100,900 --screenshot="$shot" "$url" >>"$LOG" 2>&1 \
-     && [ -s "$shot" ]; then
-    pass "screenshot written ($shot)"
-  else
-    fail "screenshot failed (see log)"
-  fi
-  # Dump the post-JS DOM so callers can grep for hydrated markup.
-  if "$chrome" "${common[@]}" --dump-dom "$url" >"${LOG}.dom" 2>>"$LOG"; then
+
+  # Primary signal: post-JS DOM + console capture. This invocation's stderr is
+  # the page's console stream; grep it instead of reading a screenshot.
+  local console="${LOG}.console"
+  if "$chrome" "${common[@]}" --dump-dom "$url" >"${LOG}.dom" 2>"$console"; then
     local nblocks
     # Match both namespaces' wrapper classes: wp-block-ucsc-<name> (ucsc/*) and
     # wp-block-ucscblocks-<name> (ucsc-gutenberg-blocks' ucscblocks/*). The looser
@@ -247,6 +248,31 @@ do_drive() {
     echo "  ...  DOM dump: ${LOG}.dom"
   else
     fail "dump-dom failed (see log)"
+  fi
+
+  # Flag page console errors / uncaught JS exceptions from the console capture.
+  # `ERROR:CONSOLE` is error-level (thrown exceptions, console.error); `:CONSOLE(`
+  # counts all page console messages for context.
+  local nerr nmsg
+  nerr=$(grep -c 'ERROR:CONSOLE' "$console" 2>/dev/null || true)
+  nmsg=$(grep -c ':CONSOLE(' "$console" 2>/dev/null || true)
+  if [ "${nerr:-0}" -gt 0 ]; then
+    fail "$nerr console error(s)/JS exception(s) — see ${console}"
+    grep 'ERROR:CONSOLE' "$console" 2>/dev/null | sed 's/^/  ...  /' | head -5
+  else
+    pass "no console errors (${nmsg:-0} console msg(s)); log: ${console}"
+  fi
+
+  # Screenshot is opt-in: a visual fallback, not the default (avoids image tokens).
+  if [ -n "${UCSC_SHOT:-}" ]; then
+    if "$chrome" "${common[@]}" --window-size=1100,900 --screenshot="$UCSC_SHOT" "$url" >>"$LOG" 2>&1 \
+       && [ -s "$UCSC_SHOT" ]; then
+      pass "screenshot written ($UCSC_SHOT)"
+    else
+      fail "screenshot failed (see log)"
+    fi
+  else
+    echo "  ...  screenshot skipped (set UCSC_SHOT=<path> for a visual capture)"
   fi
 }
 

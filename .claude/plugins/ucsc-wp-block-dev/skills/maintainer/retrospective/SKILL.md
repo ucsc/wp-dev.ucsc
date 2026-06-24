@@ -1,6 +1,7 @@
 ---
 name: retrospective
-description: Capture lessons learned from the current working session into the ucsc-wp-block-dev skill files while context is still live. Use at the end of a fix, feature, review, or run session, or whenever new patterns, gotchas, or domain knowledge should be persisted. Do not use to produce a task summary for the user — use for enriching skill references only.
+description: This skill should be used when the user asks to "capture lessons learned", "update the skills from this session", "record this gotcha", "preserve this pattern", or persist reusable domain knowledge at the end of a fix, feature, review, or run session. Use it to enrich ucsc-wp-block-dev skill references, not to produce a task summary.
+argument-hint: "[lesson or target skill]"
 ---
 
 # Retrospective — Capture Lessons Into Skills

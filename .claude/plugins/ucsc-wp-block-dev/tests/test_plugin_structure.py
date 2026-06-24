@@ -179,10 +179,12 @@ class TestSkillFrontmatter:
         ).group(1)
         for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub", "maintainer"}):
             assert f"`{skill_name}`" in public, f"hub is missing skill '{skill_name}'"
+        # Public workflows is a nested list: modes appear as bare backticked
+        # names indented under their parent skill (e.g. `feature` under develop).
         for skill_name in sorted(EXPECTED_DEVELOP_MODES):
-            assert f"`develop {skill_name}`" in public, f"hub is missing develop mode '{skill_name}'"
-        for mode_name in ["create", "run"]:
-            assert f"`validate {mode_name}`" in public, f"hub is missing validate mode '{mode_name}'"
+            assert f"`{skill_name}`" in public, f"hub is missing develop mode '{skill_name}'"
+        for mode_name in ["php", "jest", "e2e"]:
+            assert f"`{mode_name}`" in public, f"hub is missing validate mode '{mode_name}'"
         assert "`test`" not in public
         assert "develop/survey" not in public
         assert "`maintainer`" not in public
@@ -196,7 +198,8 @@ class TestSkillFrontmatter:
         assert "when `:hub` is shown while the `maintainer` skill is already active" in hub
         assert "## maintainer workflows" in hub
         assert "print this section only when `:hub` is shown from an active `maintainer`" in hub
-        assert "`maintainer` | user-invocable plugin maintenance skill" in hub
+        assert "`maintainer` | `[backlog\\|adr\\|skill\\|training\\|retro" in hub
+        assert "user-invocable plugin maintenance skill" in hub
         assert "`maintainer adr`" in hub
         assert "`maintainer backlog`" in hub
         assert "`maintainer skill`" in hub
@@ -204,6 +207,65 @@ class TestSkillFrontmatter:
         assert "`maintainer retro`" in hub
         assert "`maintainer self-test`" in hub
         assert "does not test wordpress block targets or the gui app" in hub
+
+    def test_hub_argument_hints_match_frontmatter(self):
+        """Hub syntax must reproduce top-level frontmatter argument-hints."""
+        hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
+        invocation = re.search(
+            r"## Skill invocation settings\s*\n(.*?)(?=\n## Public workflows)",
+            hub,
+            re.DOTALL,
+        ).group(1)
+        public = re.search(
+            r"## Public workflows\s*\n(.*?)(?=\n## Block target)",
+            hub,
+            re.DOTALL,
+        ).group(1)
+        maintainer = re.search(
+            r"## Maintainer Workflows\s*\n(.*?)(?=\n## Routing)",
+            hub,
+            re.DOTALL,
+        ).group(1)
+
+        for name in ["develop", "hub", "review", "run", "validate", "verify"]:
+            hint = read_frontmatter(SKILLS_DIR / name).get("argument-hint")
+            assert hint, f"{name} must declare argument-hint"
+            escaped = hint.replace("|", "\\|")
+            # Skill invocation settings is a Markdown table (pipes escaped).
+            assert f"| `{name}` | `{escaped}` |" in invocation
+            # Public workflows is a nested list: `**`skill`** — `hint` — …`
+            # (a code span, so the pipes are not escaped).
+            if name not in {"hub"}:
+                assert f"**`{name}`** — `{hint}`" in public, (
+                    f"hub public list missing {name} argument hint"
+                )
+
+        hint = read_frontmatter(SKILLS_DIR / "maintainer").get("argument-hint")
+        escaped = hint.replace("|", "\\|")
+        assert f"| `maintainer` | `{escaped}` |" in maintainer
+
+    def test_mode_hints_match_skill_menus(self):
+        """Every advertised first-position mode appears in its skill menu."""
+        for name in ["develop", "validate", "maintainer"]:
+            hint = read_frontmatter(SKILLS_DIR / name).get("argument-hint", "")
+            match = re.match(r"^\[([^\]]+)\]", hint)
+            assert match, f"{name} argument-hint must begin with a mode group"
+            modes = match.group(1).split("|")
+            menu = (SKILLS_DIR / name / "skill-menu-mode.md").read_text()
+            for mode in modes:
+                assert f"`{mode}`" in menu or f"`{name} {mode}" in menu, (
+                    f"{name} advertises mode '{mode}' but its menu does not explain it"
+                )
+
+        develop_menu = (SKILLS_DIR / "develop" / "skill-menu-mode.md").read_text()
+        for mode in ["feature", "fix"]:
+            hint = read_frontmatter(SKILLS_DIR / "develop" / mode).get("argument-hint")
+            assert hint
+            escaped_hint = hint.replace("|", "\\|")
+            assert f"`{escaped_hint}`" in develop_menu
+
+        validate_menu = (SKILLS_DIR / "validate" / "skill-menu-mode.md").read_text()
+        assert "`[create\\|run] [block\\|feature\\|Jira]`" in validate_menu
 
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill (flat per AgentSkills spec)."""
@@ -495,10 +557,9 @@ class TestSkillFrontmatter:
         assert "## plugin-dev-audit" not in maintainer
         assert "scripts/run_self_test.sh" in maintainer
         assert "check_plugin_best_practices.py" in profile
-        assert upstream in maintainer
         assert upstream in external
         assert upstream in profile
-        assert "plugin-dev@claude-code-marketplace" in maintainer
+        assert "plugin-dev@claude-code-marketplace" in profile
         assert 'run_step "self-test"' in runner
         assert "plugin-dev-audit" not in runner
 
@@ -602,14 +663,15 @@ class TestSkillFrontmatter:
             "docker-compose-install.yml",
             "wordpress_install",
             "https://wp-dev.ucsc/wp-admin/",
-            "use the available browser tool",
         ]:
             assert requirement in text
         assert "do not repeat clean setup" in text
         assert "local node is not required" in text
+        assert "do not stop at container health" in text
+        assert "launch and drive" in text
 
     def test_verify_requires_live_runtime_evidence(self):
-        """Verify must prove behavior in the app rather than report test success."""
+        """Verify confirms requested behavior in the running app."""
         text = (SKILLS_DIR / "verify" / "SKILL.md").read_text().lower()
         assert "recorded launch recipe" in text
         assert "`run` skill" in text
@@ -617,6 +679,7 @@ class TestSkillFrontmatter:
         assert "use the available browser tool" in text
         assert "do not use jest, php tests, lint, type checks" in text
         assert "pass or fail for each acceptance criterion" in text
+        assert "target and behavior checked" in text
         assert "do not claim success from automated tests alone" in text
 
     def test_validate_skill_confirms_type_and_mode_before_tools(self):
@@ -1071,8 +1134,9 @@ class TestAgentsMd:
         allowed_modes = {
             "develop feature",
             "develop fix",
-            "validate create",
-            "validate run",
+            "validate php",
+            "validate jest",
+            "validate e2e",
         }
         listed = set(re.findall(r"^\| `([^`]+)` \|", text, re.MULTILINE))
         stale = listed - actual_skills - allowed_modes

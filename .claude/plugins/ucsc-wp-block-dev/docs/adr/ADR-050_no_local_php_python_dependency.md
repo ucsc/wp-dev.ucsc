@@ -17,6 +17,20 @@ The `ucsc-wp-block-dev` plugin must not depend on a local `php` or `python` bina
 1. **Docker Preferred:** For anything related to WordPress, PHP, or core plugin logic, always execute commands using Docker images (e.g., `php:8.1-cli` for standalone PHP testing, or the `wp-dev.ucsc` containers).
 2. **Plugin Cache Fallback:** If specific tooling is required that isn't suited for a Docker run, the tool must be provisioned and made available entirely within the plugin cache or virtual environment, completely isolating it from the host's global binary expectations.
 
+### Amendment (2026-06-24): Node and all test modes
+
+The no-host-runtime rule explicitly includes **Node**, not just PHP and Python,
+and applies to **all three test modes** (`php`, `jest`, `e2e`):
+
+- `php` — throwaway `php:8.1-cli` container (tests stub WordPress).
+- `jest` — the stack's `plugin_npm_start` node service.
+- `e2e` — a Node+Chromium container that drives the live `https://wp-dev.ucsc`
+  frontend, reaching the host's published 443 via
+  `--add-host=wp-dev.ucsc:host-gateway` (no host Chrome). The runner installs the
+  container's own linux `node_modules` into a named volume so the host's tree is
+  never used. See `skills/validate/references/run.md` for the canonical commands
+  and the reusable host-gateway pattern.
+
 ## Consequences
 
 - **Positive:** Guaranteed consistency across different developer machines. No more `command not found: php` errors.

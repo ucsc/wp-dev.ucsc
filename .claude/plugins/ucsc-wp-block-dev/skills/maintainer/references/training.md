@@ -52,16 +52,20 @@ Git commit or public review date in the training report.
 2. **Select examples** — choose one or two analogous upstream plugins from
    `upstream-plugin-patterns.md`; add `skill-creator` when skill evaluation or
    trigger quality is central.
-3. **Read narrowly** — inspect each selected manifest, README, and only the
+3. **Check the specification** — for skill behavior, frontmatter, invocation,
+   arguments, or run/verify semantics, consult the official
+   [Claude Code Skills documentation](https://code.claude.com/docs/en/skills)
+   before comparing examples.
+4. **Read narrowly** — inspect each selected manifest, README, and only the
    relevant command, agent, skill, hook, script, or test files.
-4. **Compare evidence** — distinguish reusable patterns, local gaps, existing
+5. **Compare evidence** — distinguish reusable patterns, local gaps, existing
    strengths, conflicts with ADRs, and ideas that are not worth adopting.
-5. **Recommend** — propose the smallest useful documentation, skill, script, or
+6. **Recommend** — propose the smallest useful documentation, skill, script, or
    test changes. Include expected benefit and validation approach.
-6. **Apply only in scope** — when the request asks to enrich, implement, or
+7. **Apply only in scope** — when the request asks to enrich, implement, or
    apply lessons, make the focused local changes. For a study-only request,
    return recommendations without editing.
-7. **Validate** — run focused tests first. When plugin structure or maintainer
+8. **Validate** — run focused tests first. When plugin structure or maintainer
    behavior changed, run `maintainer all`.
 
 ## Training report

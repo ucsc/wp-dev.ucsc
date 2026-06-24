@@ -21,9 +21,9 @@ skill's complete `SKILL.md` before acting.
 | `hub` | List all available skills and commands. Use when unsure which skill applies. |
 | `maintainer` | Maintain the plugin itself. Invoke as `/ucsc-wp-block-dev:maintainer` for validation, skill upkeep, ADRs, docs, and release readiness; sub-workflow `maintainer/retrospective` captures session lessons. |
 | `review` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
-| `run` | Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment. |
-| `validate` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate create` - Create automated PHP, Jest, or e2e tests<br>- `validate run` - Run existing automated PHP, Jest, or e2e tests |
-| `verify` | Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend. |
+| `run` | Launch and drive the plugin in wp-dev.ucsc to see a change working. |
+| `validate` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate php` - Create or run PHP tests<br>- `validate jest` - Create or run Jest tests<br>- `validate e2e` - Create or run end-to-end tests |
+| `verify` | Build and run the app to confirm a specific change in the editor or frontend without substituting tests. |
 
 For block-specific work, resolve the target through
 `develop/references/targets.md` and read only the selected target reference.

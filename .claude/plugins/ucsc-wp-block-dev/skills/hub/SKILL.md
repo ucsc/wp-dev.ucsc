@@ -30,20 +30,23 @@ entry is invoked as `ucsc-wp-block-dev:<name>`.
 
 All skills currently run on platform defaults. "Documented in hub" is a
 convention — not a frontmatter field — controlling whether a skill appears in
-the public workflow table below.
+the public workflow table below. The **Argument hint** column reproduces each
+top-level skill's `argument-hint` frontmatter exactly; pipes are escaped only
+because this is a Markdown table.
 
-| Skill or mode | user-invocable | model-invocable | Discoverable | Documented in hub |
-|---|---|---|---|---|
-| `develop` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `develop feature` | mode | mode | via develop | ✓ public |
-| `develop fix` | mode | mode | via develop | ✓ public |
-| `hub` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `review` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `run` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `validate` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `validate create` | mode | mode | via validate | ✓ public |
-| `validate run` | mode | mode | via validate | ✓ public |
-| `verify` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| Skill or mode | Argument hint | user-invocable | model-invocable | Discoverable | Documented in hub |
+|---|---|---|---|---|---|
+| `develop` | `[feature\|fix] [block] [description or Jira/GitHub URL or ID]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `develop feature` | `[block] [feature description] [Jira or GitHub URL/ID]` | mode | mode | via develop | ✓ public |
+| `develop fix` | `[block] [problem description] [Jira or GitHub URL/ID]` | mode | mode | via develop | ✓ public |
+| `hub` | `[block]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `review` | `[block\|PR\|branch\|file\|diff] [bugs\|security\|a11y\|tests\|all]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `run` | `[block] [change to demonstrate or URL]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `validate` | `[php\|jest\|e2e] [create\|run] [block\|feature\|Jira]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `validate php` | `[create\|run] [block\|feature\|Jira]` | mode | mode | via validate | ✓ public |
+| `validate jest` | `[create\|run] [block\|feature\|Jira]` | mode | mode | via validate | ✓ public |
+| `validate e2e` | `[create\|run] [block\|feature\|Jira]` | mode | mode | via validate | ✓ public |
+| `verify` | `[block] [change or acceptance criterion]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 
 **Discoverable** = model sees the skill's description in context and may
 auto-invoke it. Set `disable-model-invocation: true` to suppress this.
@@ -52,13 +55,19 @@ to hide from the menu while keeping model discoverability.
 
 ## Public workflows
 
-| Skill or mode | Arguments | Purpose |
-|---|---|---|
-| `develop` | `[feature\|fix] [block] [description]` | Add or modify block code (PHP, template, JS editor, REST, build).<br>- `develop feature` - defining and implementing new behavior<br>- `develop fix` - reproducing and repairing defects |
-| `review` | `[block \| PR \| branch \| file \| diff] [focus]` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
-| `run` | `[block] [start\|build\|watch\|open]` | Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment. |
-| `validate` | `[create\|run] [block \| feature \| Jira]` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate create` - creating automated PHP, Jest, or e2e tests<br>- `validate run` - running existing automated PHP, Jest, or e2e tests |
-| `verify` | `[block] [behavior or acceptance criterion]` | Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend. |
+Each skill is listed with its argument hint and purpose; a skill's modes are
+indented beneath it.
+
+- **`develop`** — `[feature|fix] [block] [description or Jira/GitHub URL or ID]` — Add or modify block code (PHP, template, JS editor, REST, build).
+  - **`feature`** — `[block] [feature description] [Jira or GitHub URL/ID]` — Define and implement new behavior: a new block, editor control, or frontend output.
+  - **`fix`** — `[block] [problem description] [Jira or GitHub URL/ID]` — Reproduce and repair a described defect in a specified target.
+- **`review`** — `[block|PR|branch|file|diff] [bugs|security|a11y|tests|all]` — Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests.
+- **`run`** — `[block] [change to demonstrate or URL]` — Launch and drive the app to see a change working.
+- **`validate`** — `[php|jest|e2e] [create|run] [block|feature|Jira]` — Create or run automated PHP, Jest, or e2e tests.
+  - **`php`** — `[create|run] [block|feature|Jira]` — Render callbacks, sanitization, REST routes, and transient/cache behavior.
+  - **`jest`** — `[create|run] [block|feature|Jira]` — Block registration, attributes, editor controls, and client behavior.
+  - **`e2e`** — `[create|run] [block|feature|Jira]` — Editor insertion and frontend rendering driven through a real browser.
+- **`verify`** — `[block] [change or acceptance criterion]` — Build and run the app to confirm a specific change without substituting tests or type checks.
 
 The `[…]` argument syntax mirrors each skill's `argument-hint` frontmatter, which
 the `/` slash menu surfaces inline. The `hub` skill accepts one optional
@@ -145,26 +154,19 @@ user then invokes a workflow skill to act — `:hub` itself never invokes one.
 Print this section only when `:hub` is shown from an active `maintainer`
 workflow.
 
-| Skill or mode | Purpose |
-|---|---|
-| `maintainer` | User-invocable plugin maintenance skill for validation, skill upkeep, ADRs, docs, and release readiness; model auto-invocation is disabled. |
-| `maintainer backlog` | Generate the combined personal worklist plus unimplemented active ADR backlog. |
-| `maintainer adr` | Create or update ADRs, preferring updates to existing skill ADRs when they fit. |
-| `maintainer skill` | Inspect, review, promote, or synchronize plugin skills through focused submodes. |
-| `maintainer training` | Study selected upstream plugin/skill examples and apply relevant lessons when requested. |
-| `maintainer retro` | Capture reusable session lessons through the hidden retrospective sub-workflow. |
-| `maintainer validate` | Run the CLI structural validator, then offer the token-heavy plugin-dev semantic review only if wanted. |
-| `maintainer self-test` | Run pytest contracts plus deterministic plugin/skill best-practice checks; does not test WordPress block targets or the GUI app. |
-| `maintainer review-skills` | Opt-in token-heavy skill quality review through the plugin-dev skill reviewer. |
-| `maintainer review-contrib` | Review a proposal or incubator candidate under `contrib/`. |
-| `maintainer promote-contrib` | Promote a reviewed incubator candidate into the live `skills/` inventory. |
-| `maintainer check-references` | Verify each skill support file is linked from its parent `SKILL.md`. |
-| `maintainer check-adr-implements` | Verify `implements:` ADR markers resolve to active ADRs and report coverage. |
-| `maintainer generate-docs` | Regenerate portable Markdown documentation artifacts without publishing. |
-| `maintainer publish` | Publish maintainer-owned slides, docs, or both after explicit target selection. |
-| `maintainer sync-inventory` | Reconcile README, AGENTS.md, hub, deck, and test inventory lists. |
-| `maintainer skill-details` | Show live frontmatter and invocation settings for every skill. |
-| `maintainer all` | Run token-frugal deterministic maintainer checks in order. |
+| Skill or mode | Arguments | Purpose |
+|---|---|---|
+| `maintainer` | `[backlog\|adr\|skill\|training\|retro\|self-test\|validate\|generate-docs\|publish\|all] [submode or target]` | User-invocable plugin maintenance skill for validation, skill upkeep, ADRs, docs, and release readiness; model auto-invocation is disabled. |
+| `maintainer backlog` | — | Generate the combined personal worklist plus unimplemented active ADR backlog. |
+| `maintainer adr` | `[create\|update\|inspect\|reconcile\|index] [ADR or decision]` | Create or update ADRs, preferring updates to existing skill ADRs when they fit. |
+| `maintainer skill` | `[details\|review\|review-contrib\|promote\|sync] [name or candidate]` | Inspect, review, promote, or synchronize plugin skills through focused submodes. |
+| `maintainer training` | `[goal] [from upstream examples]` | Study selected upstream plugin/skill examples and apply relevant lessons when requested. |
+| `maintainer retro` | `[lesson or target skill]` | Capture reusable session lessons through the hidden retrospective sub-workflow. |
+| `maintainer self-test` | — | Run pytest contracts plus deterministic plugin/skill best-practice checks; does not test WordPress block targets or the GUI app. |
+| `maintainer validate` | `[tier1\|tier2]` | Run the CLI structural validator, then offer the token-heavy plugin-dev semantic review only if wanted. |
+| `maintainer generate-docs` | — | Regenerate portable Markdown documentation artifacts without publishing. |
+| `maintainer publish` | `[guide\|deck\|all]` | Publish maintainer-owned slides, docs, or both after explicit target selection. |
+| `maintainer all` | — | Run token-frugal deterministic maintainer checks in order. |
 
 ## Routing
 

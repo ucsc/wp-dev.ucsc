@@ -1,7 +1,7 @@
 ---
 name: run
-description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and validate for automated tests.
-argument-hint: "[block] [start|build|watch|open]"
+description: This skill should be used when the user asks to "run the WordPress app", "start wp-dev.ucsc", "launch and drive the plugin", "open the editor", "interact with the block", or "demonstrate this change" in the ucsc-gutenberg-blocks Docker environment. Use verify for a specific acceptance criterion and validate for PHP, Jest, or e2e tests.
+argument-hint: "[block] [change to demonstrate or URL]"
 allowed-tools:
   - bash
   - docker
@@ -15,25 +15,20 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-002-RUN-WP-DEV, ADR-030-RUN-SEPARATION, ADR-073-RUN-CLAUDE-ONLY, ADR-091-RUN-TARGET, ADR-092-RUN-SHELL, ADR-093-RUN-BLOCK-TARGET, ADR-095-RUN-WP-EVAL
+implements: ADR-002-RUN-WP-DEV, ADR-030-RUN-SEPARATION, ADR-073-RUN-CLAUDE-ONLY, ADR-091-RUN-TARGET, ADR-092-RUN-SHELL, ADR-093-RUN-BLOCK-TARGET, ADR-095-RUN-WP-EVAL, ADR-097-RUN-CONSOLE-CAPTURE
 
 Follow this recorded project recipe instead of rediscovering the launch process. Work from the `wp-dev.ucsc` root.
 
-## What `run` proves — a DOM is served
+## What `run` proves — the app can be launched and driven
 
-Per the ADR-030 (2026-06-23) amendment, `run`'s success bar is that the
-`wp-dev.ucsc` stack is up and the WordPress app **serves a rendered page**
-(HTTP 200 with HTML) at the expected URL. `run` does not assert that a specific
-block is correct — proving a block actually rendered and behaves (its DOM vitals,
-the "is it alive?" check) belongs to `verify`. The seed helpers below
-(`seed_demo_page.sh`, `seed_events_cache.sh`) exist so `run` can stand up
-deterministic sample pages during bring-up that `verify` then drives.
+Build and launch the app, then use the recorded driver/browser path to interact
+with the requested surface and observe it working. `run` demonstrates the app;
+`verify` applies a specific acceptance criterion without falling back to tests.
 
 ## Launcher
 
-- [`launcher.md`](launcher.md) — slash-command launcher (ADR-086): if a run mode
-  is given, run it; otherwise resolve the plugin target and proceed with the
-  default build-and-launch recipe.
+- [`launcher.md`](launcher.md) — slash-command launcher (ADR-086). `run` has no
+  public submodes; resolve the requested app interaction from the arguments.
 
 ## Universal Command Intake
 
@@ -63,7 +58,7 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" inspect  # non-destructive sta
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" build    # Dockerized `npm run build`
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" launch   # up -d, wait for DB, activate plugin
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" smoke    # containers, wp-admin, plugin, blocks
-bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" drive URL # headless Chrome: screenshot + post-JS DOM
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" drive URL # headless Chrome: post-JS DOM + console errors (UCSC_SHOT=path for an optional screenshot)
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" down     # stop the stack
 ```
 
@@ -71,12 +66,12 @@ If `${CLAUDE_PLUGIN_ROOT}` is unset, call the script by its in-plugin path (`ski
 
 **Shell safety — macOS zsh (ADR-092).** The developer shell is zsh (system bash
 is 3.2), so always invoke scripts through `bash <script>` (as above) rather than
-relying on the interactive shell, never put inline `#` comments in commands you
-hand the user, and avoid bash-4-only constructs (`${var,,}`, `declare -A`, `&>>`,
-`|&`). Detect with `echo "$SHELL"` only when behavior depends on it.
+relying on the interactive shell. Never put inline `#` comments in commands
+provided to the user, and avoid bash-4-only constructs (`${var,,}`, `declare -A`,
+`&>>`, `|&`). Detect with `echo "$SHELL"` only when behavior depends on it.
 
 **Plugin target.** `ucsc-blocks` and `ucsc-gutenberg-blocks` share the one
-wp-dev.ucsc Docker runtime. Per ADR-091, pass the target you identified during
+wp-dev.ucsc Docker runtime. Per ADR-091, pass the target identified during
 intake explicitly — `UCSC_PLUGIN=<slug> bash .../run/driver.sh all` — rather than
 relying on the driver's cwd autodetection (which can pick the wrong plugin when
 the working directory is ambiguous). The driver builds it via a per-invocation
@@ -154,46 +149,18 @@ Use `https://wp-dev.ucsc/wp-admin/` as the canonical browser URL. The developmen
 
 ## Drive The App
 
-Do not stop at container health when the user asks to see the application
-working. **A frontend block's `view.js` only proves out when a real browser
-executes it** — `curl` returns the server HTML but never runs the script, so a
-broken wrapper-class selector (the kind of bug that makes `view.js` inert) looks
-fine in `curl` and is only caught by driving the page.
-
-### Agent path — `driver.sh drive` (headless Chrome)
+Do not stop at container health. Use the available browser tool or the driver's
+headless Chrome path to open the requested editor/frontend surface, interact
+with it, and observe the change working.
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/run/driver.sh" drive "https://wp-dev.ucsc/<page-slug>/"
 ```
 
-This renders the URL in headless Google Chrome (auto-detected at
-`/Applications/Google Chrome.app/...` on the dev Mac; `chromium`/`chromium-browser`
-on Linux), **writes a PNG screenshot** (path printed; override with `UCSC_SHOT=`),
-and **dumps the post-JS DOM** to `<log>.dom`. Read the screenshot to confirm the
-block rendered; grep the DOM dump to assert on hydrated markup that `view.js`
-added (e.g. the `clickable-item` class `ucsc-events` adds to each card):
-
-```bash
-grep -c 'ucsc-event-item clickable-item' /tmp/ucsc-run-*.log.dom
-```
-
-A nonzero count proves `view.js` ran *and* its `.wp-block-ucsc-events` selector
-matched the server-rendered wrapper — the end-to-end signal the block is wired up.
-
-Headless screenshots have **no login session**, so drive **public frontend
-pages**, not `wp-admin`. To exercise a block that needs data, publish a page
-containing it and seed its cache first (see Gotchas).
-
-### Manual fallback
-
-1. Use the available browser tool to open `https://wp-dev.ucsc/wp-admin/` and log in
-   (`admin` / `password`) for editor-side checks a headless screenshot can't reach.
-2. For frontend routing or block output, `curl -ks https://wp-dev.ucsc/path/`
-   confirms server-rendered HTML (but not client JS — use `drive` for that).
-3. Report what was observed in the running app.
-
-Use the `verify` skill when the goal is to prove a code change or acceptance
-criterion. Use the `validate` skill for Jest, PHP, or other automated tests.
+The driver records post-JS DOM and console output. Use `UCSC_SHOT=<path>` only
+when a screenshot materially helps. Use `verify` when the request provides a
+specific change or acceptance criterion to confirm. Use `validate` for PHP,
+Jest, or e2e suites.
 
 ## Runtime Introspection — `wp_eval.sh`
 
@@ -272,8 +239,8 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/run/block_doctor.sh" ucscblocks/classschedule
 - **Chrome headless against the vanity host.** The page lives at the self-signed
   `https://wp-dev.ucsc/` vhost. `driver.sh drive` passes
   `--host-resolver-rules="MAP wp-dev.ucsc 127.0.0.1"`, `--ignore-certificate-errors`,
-  and `--virtual-time-budget=6000` (so `DOMContentLoaded` JS runs) — you do not
-  need `/etc/hosts` edited for the headless path.
+  and `--virtual-time-budget=6000` (so `DOMContentLoaded` JS runs); the headless
+  path does not require an `/etc/hosts` edit.
 
 ## Recovery
 

@@ -1,4 +1,4 @@
-<!-- Generated: 2026-06-23 from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->
+<!-- Generated: 2026-06-24 from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->
 
 ---
 marp: true
@@ -38,7 +38,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
-**Generated:** 2026-06-23<br />
+**Generated:** 2026-06-24<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -129,11 +129,12 @@ references:
 | **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
 | **`maintainer`** | Plugin maintenance | User-invocable as `/ucsc-wp-block-dev:maintainer`; validates and improves the plugin, skills, ADRs, docs, and release readiness. |
 | **`review`** | Review request | Reviews a diff, branch, file, or Jira-scoped change. |
-| **`run`** | Build or launch request | Records and executes the Docker setup, build, launch, and app-driving recipe. |
+| **`run`** | Run request | Launches and drives wp-dev.ucsc to see a change working. |
 | **`validate`** | Validation / test creation or execution | Creates or runs PHP, Jest, or end-to-end tests. |
-| **`validate create`** | Test creation | Creates PHP, Jest, or end-to-end tests. |
-| **`validate run`** | Test execution | Runs existing PHP, Jest, or end-to-end tests. |
-| **`verify`** | Acceptance verification | Live DOM test of a change in the running WordPress editor or frontend. |
+| **`validate php`** | PHP test request | Creates or runs PHP tests. |
+| **`validate jest`** | Jest test request | Creates or runs JavaScript tests. |
+| **`validate e2e`** | Browser test request | Creates or runs end-to-end tests. |
+| **`verify`** | Change verification | Builds/runs the app and confirms a specific change without substituting tests. |
 
 **Hidden reference material:**
 
@@ -167,7 +168,7 @@ Claude routes targets, natural-language requests, and optional Jira context to t
 | **Validate create** | Create PHP, Jest, or end-to-end tests. |
 | **Validate run** | Run PHP, Jest, or end-to-end tests. |
 | **Review** | Review a diff, branch, file, block, or Jira change. |
-| **Run** | Build, launch, and drive `wp-dev.ucsc`. |
+| **Run** | Launch and drive `wp-dev.ucsc` to see a change working. |
 | **Verify** | Confirm behavior in the running editor or frontend. |
 | **Documentation** | Regenerate portable Markdown guide and slide-deck artifacts. |
 | **Maintainer** | Validate, test, review, and publish this plugin. |

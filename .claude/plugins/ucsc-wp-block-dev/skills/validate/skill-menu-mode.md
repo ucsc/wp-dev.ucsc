@@ -2,14 +2,14 @@
 
 implements: ADR-086-VALIDATE-LAUNCHER, ADR-088-VALIDATE-MODES
 
-When `validate` is invoked without a mode and the intended mode is not clear from
-the request, present this menu and wait for the user to choose. Confirm the test
-type (`php`, `jest`, or `e2e`) in the same question.
+When `validate` is invoked without a clear test type or operation, ask one
+question that selects a type plus `create` or `run`.
 
-| Mode | Use when |
-|---|---|
-| `validate create` | Create automated PHP, Jest, or e2e tests for a target, feature, fix, or Jira acceptance criterion. |
-| `validate run` | Run existing automated PHP, Jest, or e2e tests. |
+| Type | Arguments | Use when |
+|---|---|---|
+| `validate php` | `[create\|run] [block\|feature\|Jira]` | Create or run PHP test coverage. |
+| `validate jest` | `[create\|run] [block\|feature\|Jira]` | Create or run JavaScript editor/unit tests. |
+| `validate e2e` | `[create\|run] [block\|feature\|Jira]` | Create or run browser-driven end-to-end tests. |
 
-For a token-frugal single-call run of existing suites, the `validate run` path
+For a token-frugal single-call run of existing suites, the `run` operation
 uses [`validate_driver.sh`](validate_driver.sh).

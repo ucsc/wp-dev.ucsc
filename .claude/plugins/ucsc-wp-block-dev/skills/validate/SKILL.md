@@ -1,7 +1,7 @@
 ---
 name: validate
-description: Create or run automated PHP, Jest, or e2e tests for a ucsc-gutenberg-blocks block, feature, fix, or Jira acceptance criterion. Modes are `create` and `run`. Use `verify` instead when proving behavior in the live running editor or frontend — `validate` is for automated test suites only.
-argument-hint: "[create|run] [block | feature | Jira]"
+description: This skill should be used when the user asks to "create a PHP test", "run the PHP tests", "create a Jest test", "run the Jest tests", "create an e2e test", "run the e2e tests", or validate a ucsc-gutenberg-blocks feature, fix, or Jira acceptance criterion with an automated test suite. Use verify instead for live editor or frontend behavior.
+argument-hint: "[php|jest|e2e] [create|run] [block|feature|Jira]"
 allowed-tools:
   - bash
   - python
@@ -53,9 +53,9 @@ Environment overrides: `WP_CONTAINER`, `PLUGIN_SLUG` (default `ucsc-blocks`),
 
 ## Modes
 
-- `validate create` — create automated PHP, Jest, or e2e tests for a target,
-  feature, fix, or Jira acceptance criterion.
-- `validate run` — run existing automated PHP, Jest, or e2e tests.
+- `validate php [create|run]` — PHP test coverage.
+- `validate jest [create|run]` — JavaScript editor/unit test coverage.
+- `validate e2e [create|run]` — browser-driven end-to-end coverage.
 
 ## Confirm Type And Mode
 

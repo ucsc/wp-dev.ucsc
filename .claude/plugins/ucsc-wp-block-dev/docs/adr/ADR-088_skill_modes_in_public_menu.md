@@ -29,15 +29,26 @@ its own line in menu and hub surfaces:
 - `develop`
 - `develop feature`
 - `develop fix`
-- `validate create`
-- `validate run`
+- `validate php`
+- `validate jest`
+- `validate e2e`
+
+`run` and `verify` do not invent submodes: their arguments describe the app
+change/URL to demonstrate or the change/acceptance criterion to confirm.
+
+The first bracketed group in a mode-bearing skill's `argument-hint` is the
+canonical mode list. Its `skill-menu-mode.md` must explain every listed mode and
+show the remaining arguments. The hub reproduces top-level `argument-hint`
+values exactly (escaping table pipes only for Markdown rendering) and shows
+mode-specific argument syntax for nested modes.
 
 Retire `develop/survey` from the live skill inventory. Remove its skill file and
 references from public routing surfaces, tests, and README guidance.
 
 ## Consequences
 
-- Public workflow lists make the selectable paths explicit without promoting
-  feature, fix, create, or run into top-level skills.
+- Public workflow lists make selectable paths explicit without promoting modes
+  into top-level skills.
+- Slash-menu hints, skill menus, and hub syntax are test-enforced against drift.
 - `test` no longer appears in the hub inventory.
 - The old survey workflow is no longer callable from the plugin skill tree.

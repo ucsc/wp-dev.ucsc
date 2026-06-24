@@ -1,7 +1,7 @@
 ---
 name: maintainer
-description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, study upstream plugin patterns, review or promote contributed skills, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, source-guided training, contribution review, slide publishing, or release readiness.
-argument-hint: "[backlog|adr|skill|training|retro|self-test|validate|publish|all|...]"
+description: This skill should be used when the user asks to "maintain the plugin", "validate the plugin structure", "run the plugin self-tests", "review or promote a skill", "check ADR consistency", "study upstream plugin patterns", "publish the maintainer docs", or prepare ucsc-wp-block-dev for release.
+argument-hint: "[backlog|adr|skill|training|retro|self-test|validate|generate-docs|publish|all] [submode or target]"
 disable-model-invocation: true
 user-invocable: true
 allowed-tools:
@@ -76,10 +76,10 @@ skills:
 ## External references
 
 - [`references/external-references.md`](references/external-references.md) —
-  upstream source-of-truth links for skill and command authoring: Anthropic's
-  `plugin-dev` toolkit, the `skill-creator` skill, and the Claude Code
-  slash-command docs. Consult these over any in-repo paraphrase when creating or
-  refining skills, commands, or the run/verify drivers.
+  upstream source-of-truth links for skill and command authoring: the official
+  Claude Code Skills specification, Anthropic's `plugin-dev` toolkit, and the
+  `skill-creator` skill. Consult these over any in-repo paraphrase when creating
+  or refining skills, commands, or the run/verify drivers.
 - [`references/self-test.md`](references/self-test.md) — deterministic pytest
   and upstream-inspired plugin checks, local-source options, deliberate
   adaptations, and companion-plugin guidance.
@@ -100,120 +100,51 @@ Per ADR-020, when the user enters maintainer mode **without an explicit mode** (
 When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
 ## Anthropic plugin-dev tools
 
-`plugin-dev` is the required companion plugin for all Tier 2 operations (ADR-079).
-Docs: https://code.claude.com/docs/en/plugins  
-Source: https://github.com/anthropics/claude-code/tree/main/plugins/plugin-dev
-
-**Before running any Tier 2 operation, verify it is installed:**
-
-```bash
-claude plugin list | grep plugin-dev
-```
-
-If absent, install it then reload:
-
-```text
-/plugin install plugin-dev@claude-code-marketplace
-/reload-plugins
-```
-
-| Tool | Type | Purpose |
-|---|---|---|
-| `plugin-dev:plugin-validator` | Agent | Validates plugin manifest, skill frontmatter, naming, structure, and security |
-| `plugin-dev:skill-reviewer` | Agent | Reviews skill quality — description clarity, triggering effectiveness, best practices |
-| `plugin-dev:skill-development` | Skill | Guidance for writing and improving skills — frontmatter fields, description patterns, argument handling |
-| `plugin-dev:plugin-structure` | Skill | Plugin directory layout, manifest configuration, component organization |
-
-The local deterministic profile is part of `maintainer self-test`; see
+`plugin-dev` is the optional Tier 2 companion (ADR-079). Before agent-backed
+validation or skill review, verify `claude plugin list` includes it. Installation,
+tool inventory, upstream links, and the deterministic local profile live in
 [`references/self-test.md`](references/self-test.md).
 
 ## validate
 
-Two-tier validation per ADR-078:
-
-**Tier 1 — CLI structural check (free, deterministic):**
+Run Tier 1 structural validation first (ADR-078):
 
 ```bash
 claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
 ```
 
-Run this first. It checks manifest, frontmatter, naming, and file structure
-with no agent tokens. This is also exercised by `maintainer self-test` via the
-pytest suite.
-
-**Tier 2 — plugin-dev agent semantic review (opt-in, ~10k tokens):**
-
-Only offer this after Tier 1 passes and a deeper qualitative review is wanted
-(ADR-064). Launch via the Agent tool:
+After Tier 1 passes, offer the opt-in Tier 2 semantic review only when deeper
+qualitative analysis is wanted (ADR-064):
 
 - `subagent_type`: `plugin-dev:plugin-validator`
 - `prompt`: "Validate the Claude Code plugin at `.claude/plugins/ucsc-wp-block-dev`. Report critical errors, warnings, and overall quality."
 
-Relay only the findings that matter; fix critical errors before publishing.
+Consult [`references/self-test.md`](references/self-test.md) for the complete
+two-tier profile, companion-plugin setup, deliberate adaptations, and local
+upstream-source options. Relay actionable findings and fix critical errors
+before publishing.
 
 ## self-test
 
-Run the plugin's own deterministic tests:
+Run the deterministic plugin contracts and the upstream-inspired
+[`scripts/check_plugin_best_practices.py`](scripts/check_plugin_best_practices.py)
+checks:
 
 ```bash
 bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
 ```
 
-This runs both the bundled pytest contracts and upstream-inspired plugin/skill
-best-practice checks from
-[`scripts/check_plugin_best_practices.py`](scripts/check_plugin_best_practices.py).
-It tests the
-`ucsc-wp-block-dev` Claude Code plugin: manifest contracts, skill frontmatter,
-ADR integrity, support-file references, script CLI contracts, generated-doc
-contracts, inventory consistency, structure, naming, progressive disclosure,
-repository hygiene, or secret signatures. It does **not** test the WordPress GUI
-app, running Docker stack, block rendering, browser behavior, PHP block logic,
-or Jest/e2e suites; use `validate`, `run`, and `verify` for product/plugin
-runtime validation.
-
-For pytest-only diagnosis, run:
-
-If `pytest` is installed globally:
-
-```bash
-cd .claude/plugins/ucsc-wp-block-dev && python3 -m pytest -q
-```
-
-Or using the virtual environment:
-
-```bash
-cd .claude/plugins/ucsc-wp-block-dev && ../ucsc-wp-block-dev-venv/bin/pytest -q
-```
-
-If the host lacks Python/pytest, run the deterministic suite in Docker using
-the local Node image's Python. This installs pytest only inside the ephemeral
-container and keeps host Python out of the workflow (ADR-050):
-
-```bash
-docker run --rm -v "$PWD:/workspace" -w /workspace node:22.5.1 bash -lc \
-  'apt-get update >/tmp/apt-update.log && \
-   apt-get install -y python3-pytest >/tmp/apt-install.log && \
-   python3 -m pytest -q .claude/plugins/ucsc-wp-block-dev/tests'
-```
-
-Claude CLI-dependent tests are skipped in this container unless `claude` is
-available inside the image; that is expected for deterministic structural
-validation.
-
-Some tests skip gracefully when the `claude` CLI is unavailable — that is expected in CI.
-
-`maintainer test` is accepted as a legacy alias for this mode.
+Use [`references/self-test.md`](references/self-test.md) for check coverage,
+pytest-only diagnosis, the Docker fallback, expected CLI-dependent skips, and
+strict-warning behavior. This mode validates the development plugin itself; it
+does not replace WordPress runtime, PHP, Jest, or e2e validation. `maintainer
+test` remains a legacy alias.
 
 ## review-skills
 
-Opt-in only and token-heavy (~14k tokens): never run automatically or as part of `all` (ADR-064). Launch the `plugin-dev:skill-reviewer` agent to audit skill quality, description effectiveness, and best-practice adherence after creating or modifying any `SKILL.md`.
-
-Use the Agent tool:
-
-- `subagent_type`: `plugin-dev:skill-reviewer`
-- `prompt`: "Review the skills in the Claude Code plugin at `.claude/plugins/ucsc-wp-block-dev`. Check quality, description triggering effectiveness, and best practices."
-
-Relay actionable findings; fix description or frontmatter issues before publishing.
+Compatibility alias for `skill review`. Opt-in and token-heavy (~14k tokens):
+launch `plugin-dev:skill-reviewer` against this plugin, relay actionable
+findings, and fix critical description/frontmatter issues before publishing.
 
 ## skill-development
 
@@ -490,7 +421,9 @@ Live developer view of every skill's actual frontmatter and invocation settings 
 python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/skill_details.py
 ```
 
-Run after any `SKILL.md` frontmatter change to confirm the invocation posture is what you intended. The `hub` static grid is a snapshot; this script is the authoritative live source.
+Run after any `SKILL.md` frontmatter change to confirm the intended invocation
+posture. The `hub` static grid is a snapshot; this script is the authoritative
+live source.
 
 ## all
 

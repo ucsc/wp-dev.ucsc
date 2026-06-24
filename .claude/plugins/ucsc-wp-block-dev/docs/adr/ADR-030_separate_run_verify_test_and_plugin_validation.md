@@ -14,9 +14,12 @@ The existing `run` skill mixed build, startup, tests, and manual smoke checks. T
 
 ## Decision
 
-- `run` records and executes the reusable `wp-dev.ucsc` clean-setup, Docker build, launch, and app-driving recipe.
-- `verify` builds and launches through that recipe, then checks requested behavior or acceptance criteria in the live WordPress editor or frontend.
-- `test` owns automated Jest, PHP, Docker, and browser test execution or creation.
+- `run` records and executes the reusable `wp-dev.ucsc` clean-setup, build,
+  launch, and app-driving recipe so a requested change can be seen working.
+- `verify` builds/runs through that recipe, then confirms a specific code change
+  or acceptance criterion in the live WordPress editor or frontend without
+  substituting tests or type checks.
+- `validate` owns automated PHP, Jest, and e2e test execution or creation.
 - `maintainer validate` owns Claude plugin structure and quality validation.
 
 Runtime verification must not claim success from a build, lint, type check, or automated test alone. It must observe the requested behavior in the running application. Clean setup runs only when prerequisites are missing and requires approval for privileged, network, destructive, or environment-changing actions.
@@ -30,16 +33,11 @@ check: prove the change is actually live by observing concrete signals in the
 running application, not by trusting the build. This amendment sharpens the
 `run`/`verify` split accordingly:
 
-- **`run` only has to prove a DOM is served.** Its success bar is that the
-  `wp-dev.ucsc` stack is up and the WordPress app returns a rendered page
-  (HTTP 200 with HTML) at the expected URL. `run` does not assert anything about
-  a specific block's correctness.
-- **`verify` is the per-block "alive" test.** It loads the relevant page(s) in
-  the running editor/frontend and asserts on **DOM vitals** — concrete
-  landmarks/signals that prove the target block rendered and behaves as
-  specified (expected wrapper/class, block markup, rendered content, interactive
-  state). `verify` is what actually tests each block; an `argument-hint` of
-  `[block] [behavior or acceptance criterion]` reflects this.
+- **`run` launches and drives the app.** Its success bar is a real interaction
+  with the requested running surface, following the recorded project recipe.
+- **`verify` confirms the requested change.** It builds/runs as needed, then
+  evaluates the supplied change or acceptance criterion in the live app. Its
+  argument hint is `[block] [change or acceptance criterion]`.
 
 **Block fixtures for `verify`.** Preferred: seed a known **sample block on
 sample page(s)** as part of the `wp-dev.ucsc` bring-up, so `verify` always has a

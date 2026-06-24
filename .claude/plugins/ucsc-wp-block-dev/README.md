@@ -23,9 +23,14 @@ directly.
 | `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `maintainer` | Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
-| `run` | Build, launch, and drive blocks via the wp-dev.ucsc Docker environment |
-| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate create` - creating automated PHP, Jest, or e2e tests<br>- `validate run` - running existing automated PHP, Jest, or e2e tests |
-| `verify` | Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend |
+| `run` | Launch and drive wp-dev.ucsc to see a change working |
+| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate php` - PHP tests<br>- `validate jest` - Jest tests<br>- `validate e2e` - end-to-end tests |
+| `verify` | Build and run the app to confirm a specific change without substituting tests or type checks |
+
+`run` and `verify` follow the bundled Claude Code v2.1.145+ contract. The
+recorded recipe in this plugin plays the role of `/run-skill-generator`: `run`
+launches and drives the app, `verify` confirms a supplied change against the
+running app, and `validate` remains the PHP/Jest/e2e suite workflow.
 
 `develop/references/issue-context.md` provides shared Jira and issue
 normalization guidance for `develop`, `develop feature`, and `develop fix`.

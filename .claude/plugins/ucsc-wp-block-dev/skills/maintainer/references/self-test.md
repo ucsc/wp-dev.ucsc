@@ -87,6 +87,11 @@ Install the current marketplace distribution in Claude Code:
 
 Then run `/reload-plugins`.
 
+Before Tier 2 work, verify installation with `claude plugin list`. Use
+`plugin-dev:plugin-validator` for semantic plugin validation and
+`plugin-dev:skill-reviewer` for `maintainer skill review`; neither runs as part
+of `self-test` or `all`.
+
 ## Deliberate adaptations
 
 Do not copy upstream checks blindly. The `plugin-dev` source is a strong

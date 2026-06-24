@@ -1,7 +1,7 @@
 ---
 name: verify
-description: Build and run wp-dev.ucsc, then do a live DOM test of a ucsc-gutenberg-blocks code change or acceptance criterion in the running WordPress editor or frontend. Use when asked to verify, confirm, demonstrate, or prove that a block change works; do not substitute unit tests or type checks for live DOM testing.
-argument-hint: "[block] [behavior or acceptance criterion]"
+description: This skill should be used when the user asks to "verify this change", "confirm this works", "prove this acceptance criterion", "check the rendered block", or demonstrate that a ucsc-gutenberg-blocks change behaves correctly in the running WordPress editor or frontend without substituting automated tests or type checks.
+argument-hint: "[block] [change or acceptance criterion]"
 allowed-tools:
   - bash
   - curl
@@ -43,7 +43,9 @@ Two ways to find those vitals, in order of preference:
 
 ## Universal Command Intake
 
-Resolve the target block or app surface, natural-language expected behavior, and optional Jira key/URL from the full input and session context. Merge available acceptance criteria. Ask one concise question only when the behavior to prove or the target surface is missing.
+Resolve the target block, natural-language change or acceptance criterion, app
+surface, and optional Jira key/URL from the full input and session context.
+Ask one concise question only when the target or behavior to prove is missing.
 
 **Block target (ADR-093).** Resolve the block target with the shared contract in
 [`../develop/references/block-target-session.md`](../develop/references/block-target-session.md):
@@ -85,7 +87,7 @@ Use the available browser tool to:
 5. Inspect the rendered result, browser console, and network behavior when relevant.
 6. Capture a screenshot when it materially demonstrates the result.
 
-For data-backed blocks, verify the appropriate integration:
+For data-backed blocks, account for the appropriate integration:
 
 - Campus Directory may require UCSC VPN and LDAP access.
 - Course Catalog and Class Schedule may require live external data.

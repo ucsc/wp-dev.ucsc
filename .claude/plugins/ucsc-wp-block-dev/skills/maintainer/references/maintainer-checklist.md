@@ -1,6 +1,9 @@
-# Maintainer checklist — plugin-dev + skill-creator distilled
+# Maintainer checklist — official Skills spec + upstream toolkits
 
-This checklist synthesizes best practices from Anthropic's current
+Use the official
+[Claude Code Skills documentation](https://code.claude.com/docs/en/skills) for
+runtime behavior and supported frontmatter. This checklist also synthesizes
+authoring and review practices from Anthropic's current
 [`plugin-dev`](https://github.com/anthropics/claude-code/tree/main/plugins/plugin-dev)
 and `skill-creator` sources. Run `maintainer self-test` first; use this list for
 the semantic decisions that remain.
@@ -16,8 +19,16 @@ the semantic decisions that remain.
      plugin listed in `upstream-plugin-patterns.md`.
 
 3. Skill frontmatter
-   - SKILL.md frontmatter must include `name` and `description`.
-   - For risky skills, prefer `allowed-tools` whitelist over `disallowed-tools`.
+   - Include a concise `description`; keep `name` aligned with the directory
+     even though Claude Code can derive the command name from its location.
+   - Use `argument-hint` to make invocation syntax understandable in
+     autocomplete; use `arguments` only when named positional substitution is
+     useful in the skill body.
+   - Use `disable-model-invocation: true` for manually controlled workflows
+     with side effects or deliberate timing.
+   - Remember that `allowed-tools` pre-approves listed tools; it does not
+     restrict the remaining tool pool. Use `disallowed-tools` when an active
+     skill must remove a tool temporarily.
    - Keep `description` concise and include triggering contexts.
 
 4. Security & secrets

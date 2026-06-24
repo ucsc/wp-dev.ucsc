@@ -91,3 +91,5 @@ Retired (superseded/deprecated/rejected) ADRs are listed in [adrs_retired.md](ad
 | [ADR-093](ADR-093_session_block_target.md) | Persist the resolved block target across the session for all block skills | Accepted | 2026-06-23 |
 | [ADR-094](ADR-094_develop_scripts_expand_harness_path_variables_when_issuing_script_commands_to_claude.md) | Expand harness path variables when issuing script commands to Claude | Accepted | 2026-06-23 |
 | [ADR-095](ADR-095_develop_source_base_resolve_a_source_base_and_use_reusable_inspection_scripts_instead_of_hardcoded_paths_and_ad_hoc_find.md) | Resolve a source base and use reusable inspection scripts instead of hardcoded paths and ad-hoc find | Accepted | 2026-06-23 |
+| [ADR-096](ADR-096_sanity_check_plugin_matches_codebase_stack.md) | Sanity-check that the active plugin matches the codebase stack | Accepted | 2026-06-24 |
+| [ADR-097](ADR-097_drive_captures_console_errors_screenshot_opt_in.md) | Drive captures DOM and console errors; screenshot is opt-in | Accepted | 2026-06-24 |

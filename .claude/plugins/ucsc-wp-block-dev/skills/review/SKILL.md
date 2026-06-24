@@ -1,7 +1,7 @@
 ---
 name: review
-description: Review a WordPress block diff, branch, file, pull request, or Jira-scoped change for bugs, regressions, security, accessibility, and missing tests.
-argument-hint: "[block | PR | branch | file | diff] [focus]"
+description: This skill should be used when the user asks to "review this diff", "review this branch", "check this PR", "review this file", "check this change for accessibility", "look for security issues", or review a Jira-scoped WordPress block change for bugs, regressions, and missing tests.
+argument-hint: "[block|PR|branch|file|diff] [bugs|security|a11y|tests|all]"
 ---
 
 # Review Mode
@@ -36,7 +36,7 @@ proceeding.
 The references above use a relative path into `develop/references/`. This is an
 intentional dependency but fragile to directory moves/renames. Consider
 promoting shared references (issue-context.md, targets.md) to a plugin-level
-`skills/shared/references/` to avoid breakage. If you keep relative paths,
+`skills/shared/references/` to avoid breakage. When retaining relative paths,
 include an explicit comment documenting the dependency so future refactors
 won't silently break skill references.
 

@@ -1,6 +1,7 @@
 ---
 name: feature
 description: This skill should be used when the user asks to "add new behavior", "create a new block", "add a feature", "implement editor controls", "add frontend output", or describes new functionality for ucsc-gutenberg-blocks that is not a defect fix.
+argument-hint: "[block] [feature description] [Jira or GitHub URL/ID]"
 ---
 
 # Feature Workflow
@@ -15,13 +16,17 @@ behavior is incorrect.
 ## Universal Command Intake
 
 Resolve the target block, GUI, or app; the natural-language feature request;
-and optional Jira key/URL from the full input. Ask one concise question only
-when missing or conflicting information prevents useful work.
+and an optional issue reference — a **Jira key/URL or a GitHub issue/PR URL or
+ID** — from the full input. Ask one concise question only when missing or
+conflicting information prevents useful work.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read
 [`../references/issue-context.md`](../references/issue-context.md)
-before defining the feature.
+before defining the feature. When a **GitHub issue or PR** is supplied as the
+scope, fetch it for context (GitHub MCP → `gh` → REST, per
+[`../references/github.md`](../references/github.md)) the same way a Jira ticket
+is fetched before defining the feature.
 
 # Note on relative references
 The references above use a relative path into `develop/references/`. This is an

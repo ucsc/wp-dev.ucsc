@@ -56,14 +56,14 @@ METADATA = {
     },
     "develop feature": {
         "readme": "Mode of `develop` for defining and implementing new behavior",
-        "hub": "Mode of `develop` for defining and implementing new behavior.",
+        "hub": "Define and implement new behavior: a new block, editor control, or frontend output.",
         "agents_md": "Defining and implementing new behavior",
         "deck_trigger": "New behavior",
         "deck_desc": "Defines requirements and implements a feature, editor enhancement, or new block."
     },
     "develop fix": {
         "readme": "Mode of `develop` for reproducing and repairing defects",
-        "hub": "Mode of `develop` for reproducing and repairing defects.",
+        "hub": "Reproduce and repair a described defect in a specified target.",
         "agents_md": "Reproducing and repairing defects",
         "deck_trigger": "Bug repair",
         "deck_desc": "Reproduces, diagnoses, and repairs a described block defect."
@@ -90,11 +90,11 @@ METADATA = {
         "deck_desc": "Reviews a diff, branch, file, or Jira-scoped change."
     },
     "run": {
-        "readme": "Build, launch, and drive blocks via the wp-dev.ucsc Docker environment",
-        "hub": "Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment.",
-        "agents_md": "Build, launch, and drive the plugin in the wp-dev.ucsc Docker environment.",
-        "deck_trigger": "Build or launch request",
-        "deck_desc": "Records and executes the Docker setup, build, launch, and app-driving recipe."
+        "readme": "Launch and drive wp-dev.ucsc to see a change working",
+        "hub": "Launch and drive the app to see a change working.",
+        "agents_md": "Launch and drive the plugin in wp-dev.ucsc to see a change working.",
+        "deck_trigger": "Run request",
+        "deck_desc": "Launches and drives wp-dev.ucsc to see a change working."
     },
     "validate": {
         "readme": "Create or run automated PHP, Jest, or e2e tests",
@@ -103,26 +103,33 @@ METADATA = {
         "deck_trigger": "Validation / test creation or execution",
         "deck_desc": "Creates or runs PHP, Jest, or end-to-end tests."
     },
-    "validate create": {
-        "readme": "Mode of `validate` for creating automated PHP, Jest, or e2e tests",
-        "hub": "Mode of `validate` for creating automated PHP, Jest, or e2e tests.",
-        "agents_md": "Create automated PHP, Jest, or e2e tests.",
-        "deck_trigger": "Test creation",
-        "deck_desc": "Creates PHP, Jest, or end-to-end tests."
+    "validate php": {
+        "readme": "Mode of `validate` for PHP tests",
+        "hub": "Render callbacks, sanitization, REST routes, and transient/cache behavior.",
+        "agents_md": "Create or run PHP tests.",
+        "deck_trigger": "PHP test request",
+        "deck_desc": "Creates or runs PHP tests."
     },
-    "validate run": {
-        "readme": "Mode of `validate` for running existing automated PHP, Jest, or e2e tests",
-        "hub": "Mode of `validate` for running existing automated PHP, Jest, or e2e tests.",
-        "agents_md": "Run existing automated PHP, Jest, or e2e tests.",
-        "deck_trigger": "Test execution",
-        "deck_desc": "Runs existing PHP, Jest, or end-to-end tests."
+    "validate jest": {
+        "readme": "Mode of `validate` for Jest tests",
+        "hub": "Block registration, attributes, editor controls, and client behavior.",
+        "agents_md": "Create or run Jest tests.",
+        "deck_trigger": "Jest test request",
+        "deck_desc": "Creates or runs JavaScript tests."
+    },
+    "validate e2e": {
+        "readme": "Mode of `validate` for end-to-end tests",
+        "hub": "Editor insertion and frontend rendering driven through a real browser.",
+        "agents_md": "Create or run end-to-end tests.",
+        "deck_trigger": "Browser test request",
+        "deck_desc": "Creates or runs end-to-end tests."
     },
     "verify": {
-        "readme": "Live DOM test of a code change or acceptance criterion in the running WordPress editor or frontend",
-        "hub": "Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend.",
-        "agents_md": "Live DOM test of a change or acceptance criterion in the running WordPress editor or frontend.",
-        "deck_trigger": "Acceptance verification",
-        "deck_desc": "Live DOM test of a change in the running WordPress editor or frontend."
+        "readme": "Build and run the app to confirm a specific change without substituting tests or type checks",
+        "hub": "Build and run the app to confirm a specific change without substituting tests or type checks.",
+        "agents_md": "Build and run the app to confirm a specific change in the editor or frontend without substituting tests.",
+        "deck_trigger": "Change verification",
+        "deck_desc": "Builds/runs the app and confirms a specific change without substituting tests."
     }
 }
 
@@ -138,6 +145,26 @@ def get_skill_description(skill_name, skill_md_path):
         pass
     return f"Run the {skill_name} skill workflow."
 
+
+def get_argument_hint(skill_md_path):
+    try:
+        content = open(skill_md_path).read()
+        m = re.search(r'^argument-hint:\s*["\']?(.+?)["\']?\s*$', content, re.MULTILINE)
+        if m:
+            return m.group(1).replace("|", "\\|")
+    except Exception:
+        pass
+    return "—"
+
+
+MODE_HINTS = {
+    "develop feature": "[block] [feature description] [Jira or GitHub URL/ID]",
+    "develop fix": "[block] [problem description] [Jira or GitHub URL/ID]",
+    "validate php": "[create|run] [block|feature|Jira]",
+    "validate jest": "[create|run] [block|feature|Jira]",
+    "validate e2e": "[create|run] [block|feature|Jira]",
+}
+
 # Get list of live skills on disk (directories containing SKILL.md)
 live_skills = []
 for d in sorted(os.listdir(skills_dir)):
@@ -150,7 +177,7 @@ print(f"Syncing skills: {', '.join(live_skills)}")
 # than as separate peer rows.
 MODES = {
     "develop": ["develop feature", "develop fix"],
-    "validate": ["validate create", "validate run"],
+    "validate": ["validate php", "validate jest", "validate e2e"],
 }
 
 
@@ -253,26 +280,34 @@ hub_path = os.path.join(skills_dir, "hub", "SKILL.md")
 if os.path.exists(hub_path):
     hub_content = open(hub_path).read()
     
-    # Public workflows table
-    lines = [
-        "| Skill or mode | Purpose |",
-        "|---|---|"
-    ]
+    # Public workflows — a nested list (ADR-088): each skill on its own line with
+    # its argument hint and purpose; its modes indented beneath it. This is a
+    # list, not a table, so pipes inside the `code spans` are not escaped.
+    list_lines = []
     for s in live_skills:
         if s in ["hub", "maintainer", "retrospective"]:
             continue
         desc = METADATA.get(s, {}).get("hub") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-        if desc:
-            desc += fold_modes(s, "hub")
-            lines.append(f"| `{s}` | {desc} |")
-        
-    pattern_pub = r"(## Public workflows\s*\n\s*\| Skill or mode \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
+        if not desc:
+            continue
+        hint = get_argument_hint(os.path.join(skills_dir, s, "SKILL.md")).replace("\\|", "|")
+        list_lines.append(f"- **`{s}`** — `{hint}` — {desc}")
+        for mode in MODES.get(s, []):
+            mode_desc = METADATA.get(mode, {}).get("hub")
+            if not mode_desc:
+                continue
+            mode_desc = re.sub(r"^Mode of `[^`]+` for ", "", mode_desc).rstrip(".")
+            mode_label = mode.split()[-1]
+            mode_hint = MODE_HINTS.get(mode, "—")
+            list_lines.append(f"  - **`{mode_label}`** — `{mode_hint}` — {mode_desc}.")
+
+    pattern_pub = r"(## Public workflows\s*\n\nEach skill is listed with its argument hint and purpose; a skill's modes are\nindented beneath it\.\n\n)(.*?)(?=\n\n)"
     match_pub = re.search(pattern_pub, hub_content, re.DOTALL)
-    
+
     pub_ok = False
     if match_pub:
         current_pub = match_pub.group(2).strip()
-        expected_pub = "\n".join(lines[2:]).strip()
+        expected_pub = "\n".join(list_lines).strip()
         pub_ok = current_pub == expected_pub
         
     if pub_ok:
@@ -314,7 +349,7 @@ if os.path.exists(deck_path):
             for mode in ["develop feature", "develop fix"]:
                 lines.append(f"| **`{mode}`** | {METADATA[mode]['deck_trigger']} | {METADATA[mode]['deck_desc']} |")
         if s == "validate":
-            for mode in ["validate create", "validate run"]:
+            for mode in ["validate php", "validate jest", "validate e2e"]:
                 lines.append(f"| **`{mode}`** | {METADATA[mode]['deck_trigger']} | {METADATA[mode]['deck_desc']} |")
         
     pattern = r"(\| Skill or mode \| Trigger \| Purpose \|\s*\n\| :---\ \| :---\ \| :---\ \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"

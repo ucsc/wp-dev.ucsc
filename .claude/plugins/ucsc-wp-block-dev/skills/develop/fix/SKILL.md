@@ -1,6 +1,7 @@
 ---
 name: fix
 description: This skill should be used when the user asks to "fix a block", "debug an issue", "something is broken", "block not showing", "wrong output", or reports any defect in a ucsc-gutenberg-blocks block, GUI, or app. Require the target and a plain-language problem description before investigating.
+argument-hint: "[block] [problem description] [Jira or GitHub URL/ID]"
 ---
 
 # Fix — Debug a Block Issue
@@ -17,15 +18,19 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/` unless 
 
 ## Universal Command Intake
 
-Resolve the target, natural-language problem description, and optional Jira
-key/URL from the full input and session context, regardless of order. Preserve
-explicit user instructions and ask one concise question only when missing or
-conflicting information blocks the fix workflow.
+Resolve the target, natural-language problem description, and an optional issue
+reference — a **Jira key/URL or a GitHub issue/PR URL or ID** — from the full
+input and session context, regardless of order. Preserve explicit user
+instructions and ask one concise question only when missing or conflicting
+information blocks the fix workflow.
 
 When Jira, Confluence, pasted ticket details, or issue normalization applies,
 read
 [`../references/issue-context.md`](../references/issue-context.md)
-before investigating.
+before investigating. When a **GitHub issue or PR** is supplied as the scope,
+fetch it for context (GitHub MCP → `gh` → REST, per
+[`../references/github.md`](../references/github.md)) the same way a Jira ticket
+is fetched before investigating.
 
 # Note on relative references
 The references above use a relative path into `develop/references/`. This is an
