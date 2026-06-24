@@ -20,11 +20,12 @@ directly.
 | Skill or mode | Purpose |
 |---|---|
 | `develop` | Add or modify block code directly<br>- `develop feature` - defining and implementing new behavior<br>- `develop fix` - reproducing and repairing defects |
+| `feedback` | Report a bug or suggestion about the plugin's skills (the `/bug` analog) |
 | `hub` | List every available skill and command (`:hub`) — enumeration only |
 | `maintainer` | Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness |
 | `review` | Review a diff, branch, file, block, or Jira-scoped change |
 | `run` | Launch and drive wp-dev.ucsc to see a change working |
-| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate php` - PHP tests<br>- `validate jest` - Jest tests<br>- `validate e2e` - end-to-end tests |
+| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate php` - PHP tests<br>- `validate jest` - Jest tests<br>- `validate e2e` - end-to-end tests<br>- `validate all` - the full sequential battery (PHP -> Jest -> E2E) |
 | `verify` | Build and run the app to confirm a specific change without substituting tests or type checks |
 
 `run` and `verify` follow the bundled Claude Code v2.1.145+ contract. The
@@ -108,7 +109,7 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
 bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
 
 # Run PHP and Jest automated test suites in Docker
-bash .claude/plugins/ucsc-wp-block-dev/skills/validate/validate_driver.sh all
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/validate-php.sh all
 ```
 
 The raw commands below are the underlying steps those drivers automate:
@@ -227,7 +228,7 @@ skill's `SKILL.md`. The pytest suite enforces the same invariant.
 Run the complete plugin self-test with:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run-self-test.sh
 ```
 
 To validate without the skill, ask Claude to "validate the plugin at `.claude/plugins/ucsc-wp-block-dev`" — it will launch the `plugin-dev:plugin-validator` agent. Run the bundled tests directly with:

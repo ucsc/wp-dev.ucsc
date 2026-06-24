@@ -23,13 +23,13 @@ Tier 2 agents.
 Run the complete self-test from the repository root:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/run-self-test.sh"
 ```
 
 Run only the best-practice checker when diagnosing that layer:
 
 ```bash
-python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_plugin_best_practices.py \
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/check-plugin-best-practices.py" \
   --strict-warnings
 ```
 
@@ -44,7 +44,7 @@ Anthropic checkouts. Keep locations outside checked-in skill instructions:
 PLUGIN_DEV_SOURCE=/path/to/claude-plugins-official/plugins/plugin-dev \
 SKILL_CREATOR_SOURCE=/path/to/skills/skills/skill-creator \
 CLAUDE_PLUGINS_SOURCE=/path/to/claude-plugins-official/plugins \
-  bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+  bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/run-self-test.sh"
 ```
 
 `--plugin-dev-source` accepts the `plugin-dev` directory, its `plugins/`

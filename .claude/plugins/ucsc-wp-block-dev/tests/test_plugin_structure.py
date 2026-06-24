@@ -14,12 +14,13 @@ PROJECT_ROOT = PLUGIN_ROOT.parents[2]
 SKILLS_DIR = PLUGIN_ROOT / "skills"
 CONTRIB_DIR = PLUGIN_ROOT / "contrib"
 ADR_DIR = PLUGIN_ROOT / "docs" / "adr"
-SLIDE_DECK = SKILLS_DIR / "maintainer" / "assets" / "ucsc_wp_block_dev_presentation.md"
+SLIDE_DECK = SKILLS_DIR / "maintainer" / "assets" / "ucsc-wp-block-dev-presentation.md"
 PUBLISHER = PROJECT_ROOT / ".claude" / "scripts" / "publish_to_gdoc.py"
 PLUGIN_NAME = "ucsc-wp-block-dev"
 FORBIDDEN_PLUGIN_NAME = "ucsc-" + "wordpress-block-dev"
 EXPECTED_LIVE_SKILLS = {
     "develop",
+    "feedback",
     "hub",
     "maintainer",
     "review",
@@ -550,13 +551,13 @@ class TestSkillFrontmatter:
             SKILLS_DIR / "maintainer" / "references" / "self-test.md"
         ).read_text()
         runner = (
-            SKILLS_DIR / "maintainer" / "scripts" / "run_all_plugin_tests.sh"
+            SKILLS_DIR / "maintainer" / "scripts" / "run-all-plugin-tests.sh"
         ).read_text()
         upstream = "https://github.com/anthropics/claude-code/tree/main/plugins/plugin-dev"
 
         assert "## plugin-dev-audit" not in maintainer
-        assert "scripts/run_self_test.sh" in maintainer
-        assert "check_plugin_best_practices.py" in profile
+        assert "scripts/run-self-test.sh" in maintainer
+        assert "check-plugin-best-practices.py" in profile
         assert upstream in external
         assert upstream in profile
         assert "plugin-dev@claude-code-marketplace" in profile
@@ -850,7 +851,7 @@ class TestSkillFrontmatter:
 class TestMaintainerSlideDeck:
     def test_canonical_deck_is_maintainer_owned(self):
         assert SLIDE_DECK.exists()
-        assert not (PROJECT_ROOT / "ucsc_wp_block_dev_presentation.md").exists()
+        assert not (PROJECT_ROOT / "ucsc-wp-block-dev-presentation.md").exists()
 
     def test_deck_lists_every_top_level_skill(self):
         text = SLIDE_DECK.read_text()
@@ -876,7 +877,7 @@ class TestMaintainerSlideDeck:
             '"skills"',
             '"maintainer"',
             '"assets"',
-            '"ucsc_wp_block_dev_presentation.md"',
+            '"ucsc-wp-block-dev-presentation.md"',
         ]:
             assert path_part in text
 
@@ -902,12 +903,12 @@ class TestAdrIndex:
             )
 
     def test_adr_filenames_use_current_convention(self):
-        """ADR filenames use ADR-NNN_skill_mode_detail.md shape."""
+        """ADR filenames use ADR-NNN-skill-mode-mode-details.md shape."""
         adr_files = sorted(ADR_DIR.glob("ADR-*.md"))
         bad = [
             adr_file.name
             for adr_file in adr_files
-            if not re.match(r"^ADR-\d{3}_[a-z0-9]+(?:_[a-z0-9]+)+\.md$", adr_file.name)
+            if not re.match(r"^ADR-\d{3}-[a-z0-9]+(?:-[a-z0-9]+)+\.md$", adr_file.name)
         ]
         assert not bad, "ADR filename convention violations:\n" + "\n".join(
             f"  {name}" for name in bad
@@ -947,7 +948,7 @@ class TestAdrIndex:
 
     def test_fix_token_study_is_multi_pronged_and_measured(self):
         """ADR-026 must optimize full fix sessions without weakening correctness gates."""
-        text = (ADR_DIR / "ADR-026_study_multi_pronged_fix_token_reduction.md").read_text().lower()
+        text = (ADR_DIR / "ADR-026-develop-fix-mode-token-reduction.md").read_text().lower()
         for workstream in [
             "loaded instruction size",
             "intake and routing",
@@ -964,7 +965,7 @@ class TestAdrIndex:
 
     def test_mcp_token_study_compares_startup_strategies(self):
         """ADR-027 must measure MCP savings against startup and unused-session cost."""
-        text = (ADR_DIR / "ADR-027_study_github_atlassian_mcp_token_cost.md").read_text().lower()
+        text = (ADR_DIR / "ADR-027-maintainer-study-github-atlassian-mcp-token-cost.md").read_text().lower()
         for configuration in ["fallback only", "on demand", "always on"]:
             assert configuration in text
         assert "measure github and atlassian independently" in text
@@ -975,7 +976,7 @@ class TestAdrIndex:
 
     def test_mcp_activation_is_just_in_time_and_token_driven(self):
         """ADR-028 must keep the multi-purpose plugin light and activation controlled."""
-        text = (ADR_DIR / "ADR-028_start_mcp_just_in_time_when_token_efficient.md").read_text().lower()
+        text = (ADR_DIR / "ADR-028-maintainer-start-mcp-just-in-time-when-token-efficient.md").read_text().lower()
         assert "multi-purpose plugin" in text
         assert "do not start github or atlassian mcp by default" in text
         assert "activate only the relevant mcp just in time" in text
@@ -1062,11 +1063,28 @@ class TestFileLayout:
                     f"Skill directory name '{d.name}' does not follow canonical lowercase pattern"
                 )
 
-    def test_token_usage_log_exists(self):
-        """ADR-076: logs/token-usage.log must exist so token-heavy ops can be recorded."""
-        assert (PLUGIN_ROOT / "logs" / "token-usage.log").exists(), (
-            "logs/token-usage.log missing — create it per ADR-076"
-        )
+    def test_skill_support_file_naming(self):
+        """ADR-032: skill support filenames use lowercase kebab-case."""
+        ignored = {"SKILL.md"}
+        for path in SKILLS_DIR.rglob("*"):
+            if not path.is_file() or path.name in ignored:
+                continue
+            if "__pycache__" in path.parts or path.suffix == ".pyc":
+                continue
+            assert re.match(r"^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+)?$", path.name), (
+                f"Skill support file '{path.relative_to(PLUGIN_ROOT)}' is not kebab-case"
+            )
+
+    def test_token_usage_is_user_scoped(self):
+        """ADR-076: token usage belongs in the user cache, not the repository."""
+        assert not (PLUGIN_ROOT / "logs" / "token-usage.log").exists()
+        assert (
+            PLUGIN_ROOT
+            / "skills"
+            / "maintainer"
+            / "scripts"
+            / "token-usage.py"
+        ).exists()
 
     def test_gitignore_ignores_venv_and_pycache(self):
         """Verify .gitignore includes rules to ignore python caches and virtual environment."""
@@ -1120,7 +1138,7 @@ class TestAgentsMd:
         for skill_name in sorted(actual_skills):
             assert f"`{skill_name}`" in text, (
                 f"AGENTS.md missing live skill '{skill_name}' — "
-                "run sync_inventory.sh --write to regenerate"
+                "run sync-inventory.sh --write to regenerate"
             )
 
     def test_agents_md_has_no_stale_skills(self):
@@ -1142,5 +1160,5 @@ class TestAgentsMd:
         stale = listed - actual_skills - allowed_modes
         assert not stale, (
             f"AGENTS.md routing table references retired skills: {sorted(stale)} — "
-            "run sync_inventory.sh --write to regenerate"
+            "run sync-inventory.sh --write to regenerate"
         )

@@ -47,7 +47,7 @@ criteria.
 ## 5. Run the test suite
 
 ```bash
-cd .claude/plugins/ucsc-wp-block-dev && ../ucsc-wp-block-dev-venv/bin/pytest -q
+cd "${CLAUDE_PLUGIN_ROOT}" && ../ucsc-wp-block-dev-venv/bin/pytest -q
 ```
 
 The `test_target_references_are_bidirectional` test will fail if step 1 and

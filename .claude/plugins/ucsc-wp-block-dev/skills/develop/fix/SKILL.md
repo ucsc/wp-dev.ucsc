@@ -55,10 +55,10 @@ A target alone is not sufficient, and a description without a target is not suff
 **Block target (ADR-093).** The target is a persistent session value shared
 across skills. Resolve it with the shared contract in
 [`../references/block-target-session.md`](../references/block-target-session.md):
-ARGUMENTS → persisted session value (`../scripts/session_target.sh get`) → cwd
+ARGUMENTS → persisted session value (`../scripts/session-target.sh get`) → cwd
 inference → prompt. Validate an inferred directory with
-`../scripts/block_target_check.sh` before adopting it, and persist a newly
-resolved target with `session_target.sh set` so later skills reuse it without
+`../scripts/block-target-check.sh` before adopting it, and persist a newly
+resolved target with `session-target.sh set` so later skills reuse it without
 re-asking.
 
 Prompt for a Jira ID up front. If none was supplied, include the Jira request in

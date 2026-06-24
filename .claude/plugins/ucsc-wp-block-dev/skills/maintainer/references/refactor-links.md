@@ -30,7 +30,7 @@ find .claude/plugins/ucsc-wp-block-dev -name "*.md" -print0 \
 After running, re-run the test suite to confirm no links remain broken:
 
 ```bash
-cd .claude/plugins/ucsc-wp-block-dev && ../ucsc-wp-block-dev-venv/bin/pytest -q -k "markdown_links"
+cd "${CLAUDE_PLUGIN_ROOT}" && ../ucsc-wp-block-dev-venv/bin/pytest -q -k "markdown_links"
 ```
 
 ## When to use a script vs manual edits
@@ -48,9 +48,9 @@ When a skill is moved from `skills/<name>/` to `skills/<parent>/<name>/`:
 
 1. **Update relative paths inside the moved SKILL.md** — `../parent/references/` becomes `../references/` (one level closer).
 2. **Reference the sub-skill from the parent SKILL.md** — add a `## Sub-workflows` section linking `<name>/SKILL.md`.
-3. **Update `sync_inventory.sh` METADATA** — the hardcoded dict still has entries for the old skill name; update or remove them and update the parent skill's `readme`/`hub`/`agents_md` copy. Run `--write` after.
+3. **Update `sync-inventory.sh` METADATA** — the hardcoded dict still has entries for the old skill name; update or remove them and update the parent skill's `readme`/`hub`/`agents_md` copy. Run `--write` after.
 4. **Update `test_plugin_validity.py`** — `test_core_skills_present` has its own hardcoded skill list separate from `test_plugin_structure.py`; both must be updated.
-5. **Update hub, README, AGENTS.md, slide deck** — `sync_inventory.sh --write` handles these once METADATA is correct.
+5. **Update hub, README, AGENTS.md, slide deck** — `sync-inventory.sh --write` handles these once METADATA is correct.
 6. **Check for prose backtick paths** — `test_all_markdown_links_resolve` only catches markdown hyperlinks (text-plus-href format); backtick prose paths like `` `skill/references/foo.md` `` can silently drift. Run the plugin-validator agent after a structural refactor to catch these.
 
 ## Detecting stale prose paths

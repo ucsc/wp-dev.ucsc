@@ -114,7 +114,7 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh all
 bash .claude/plugins/ucsc-wp-block-dev/skills/verify/driver.sh <block-slug>
 
 # Run PHP and Jest automated test suites in Docker
-bash .claude/plugins/ucsc-wp-block-dev/skills/validate/validate_driver.sh all
+bash .claude/plugins/ucsc-wp-block-dev/skills/validate/validate-php.sh all
 ```
 
 The raw commands below are the underlying steps those drivers automate:
@@ -233,7 +233,7 @@ skill's `SKILL.md`. The pytest suite enforces the same invariant.
 Run the complete plugin self-test with:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run-self-test.sh
 ```
 
 To validate without the skill, ask Claude to "validate the plugin at `.claude/plugins/ucsc-wp-block-dev`" — it will launch the `plugin-dev:plugin-validator` agent. Run the bundled tests directly with:

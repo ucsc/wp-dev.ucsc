@@ -12,13 +12,13 @@ Concurrent edits can grab the next sequential number while you work, causing a c
 
 - `README.md` skills table
 - `skills/hub/SKILL.md` public workflows table
-- Slide deck: `skills/maintainer/assets/ucsc_wp_block_dev_presentation.md`
+- Slide deck: `skills/maintainer/assets/ucsc-wp-block-dev-presentation.md`
 - Root `AGENTS.md` routing table
 - `EXPECTED_LIVE_SKILLS` in `tests/test_plugin_structure.py`
 - Any hardcoded skill lists in other tests (e.g., `test_plugin_validity.py::test_core_skills_present`)
 - Generated `generate-docs` assets (run `generate-docs` to refresh)
 
-Run `sync_inventory.sh --write` first, then `check-references` and `test`.
+Run `sync-inventory.sh --write` first, then `check-references` and `test`.
 
 ## Publishing is per-target
 
@@ -31,3 +31,8 @@ When referencing generated local files (e.g., code reviews) via absolute paths, 
 ## Superseding an ADR can leave a stale test
 
 Tests sometimes assert a decision's literal wording (e.g., a commit-syntax string). When an ADR is superseded, `grep` the tests for phrases tied to the old ADR, update the assertions to the current wording, and re-point the test docstring to the superseding ADR(s). A superseded ADR whose test still asserts the old text fails `test` even though the skills are correct.
+
+## Temporary scripts under `skills/` trigger test failures
+
+Every script placed under `skills/<skill>/scripts/` must be executable, start with a shebang, and be referenced in the skill's `SKILL.md`. One-off helper scripts (e.g., custom migration or renaming scripts) should be run from outside the `skills/` structure, or deleted immediately after use, to avoid breaking the automated plugin structure tests.
+

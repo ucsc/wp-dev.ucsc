@@ -7,7 +7,7 @@ Generates a combined, on-the-fly backlog for ucsc-wp-block-dev by merging:
   1. The personal backlog (WORKLIST.md), kept in the user's personal ~/.claude
      folder, NOT in the repo.
   2. Active ADRs not yet implemented by any skill or script — the forward-coverage
-     gap from the `implements:` markers (see check_adr_implements.py). This list
+     gap from the `implements:` markers (see check-adr-implements.py). This list
      is computed fresh on every run.
 
 The merged result is written to a CACHE file that is NOT checked in (an ephemeral
@@ -27,12 +27,18 @@ Usage:
 import os
 import re
 import sys
+from importlib.util import module_from_spec, spec_from_file_location
 from datetime import date
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(SCRIPT_DIR))
-import check_adr_implements as cai  # noqa: E402  (sibling script, reuse its logic)
+CHECKER = SCRIPT_DIR / "check-adr-implements.py"
+SPEC = spec_from_file_location("check_adr_implements", CHECKER)
+if SPEC is None or SPEC.loader is None:
+    raise RuntimeError(f"Unable to load ADR checker: {CHECKER}")
+cai = module_from_spec(SPEC)
+sys.modules[SPEC.name] = cai
+SPEC.loader.exec_module(cai)
 
 
 def print_usage() -> None:

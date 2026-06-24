@@ -10,6 +10,7 @@ question that selects a type plus `create` or `run`.
 | `validate php` | `[create\|run] [block\|feature\|Jira]` | Create or run PHP test coverage. |
 | `validate jest` | `[create\|run] [block\|feature\|Jira]` | Create or run JavaScript editor/unit tests. |
 | `validate e2e` | `[create\|run] [block\|feature\|Jira]` | Create or run browser-driven end-to-end tests. |
+| `validate all` | `[block]` | Run every suite sequentially (PHP → Jest → E2E) in one battery (ADR-101); run-only. |
 
 For a token-frugal single-call run of existing suites, the `run` operation
-uses [`validate_driver.sh`](validate_driver.sh).
+uses [`validate-php.sh`](validate-php.sh).

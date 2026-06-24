@@ -52,7 +52,7 @@ FAILED=0
 # Prefer the shared source-base resolver so every driver agrees on the repo root
 # (ADR-095). Self-locate it relative to this driver; fall back to inline walk-up.
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd)"
-SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source_base.sh"
+SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source-base.sh"
 
 find_root() {
   local d
@@ -185,10 +185,10 @@ do_smoke() {
   local status
   status=$(dc exec -T wpcli wp plugin list --name="$PLUGIN" --field=status 2>>"$LOG" | tr -d '\r' || true)
   [ "$status" = "active" ] && pass "plugin status: active" || fail "plugin status: ${status:-unknown}"
-  # 4. blocks registered — runtime registry via list_blocks.sh (reviewed PHP in
+  # 4. blocks registered — runtime registry via list-blocks.sh (reviewed PHP in
   #    a file, piped to wp-cli; spans ALL activated plugins, reads no repo source)
   local blocks nblocks
-  blocks=$(bash "$SCRIPT_DIR/list_blocks.sh" 2>>"$LOG" || true)
+  blocks=$(bash "$SCRIPT_DIR/list-blocks.sh" 2>>"$LOG" || true)
   nblocks=$(printf '%s\n' "$blocks" | grep -c . || true)
   if [ "$nblocks" -gt 0 ]; then
     pass "$nblocks ucsc* block(s) registered"
@@ -282,7 +282,7 @@ do_down() { echo "down"; dc down >>"$LOG" 2>&1 && pass "stack stopped" || fail "
 do_blocks() {
   echo "blocks"
   local blocks nblocks
-  blocks=$(bash "$SCRIPT_DIR/list_blocks.sh" 2>>"$LOG" || true)
+  blocks=$(bash "$SCRIPT_DIR/list-blocks.sh" 2>>"$LOG" || true)
   nblocks=$(printf '%s\n' "$blocks" | grep -c . || true)
   if [ "$nblocks" -gt 0 ]; then
     pass "$nblocks ucsc* block(s) registered (all plugins)"
@@ -297,7 +297,7 @@ do_blocks() {
 do_demo() {
   echo "demo"
   local url
-  url=$(bash "$SCRIPT_DIR/seed_demo_page.sh" 2>>"$LOG" | tr -d '\r' | grep -E '^https?://' | tail -n1)
+  url=$(bash "$SCRIPT_DIR/seed-demo-page.sh" 2>>"$LOG" | tr -d '\r' | grep -E '^https?://' | tail -n1)
   if [ -n "$url" ]; then
     pass "demo page seeded ($url)"
     do_drive "$url"

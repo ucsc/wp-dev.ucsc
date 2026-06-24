@@ -7,7 +7,7 @@ from pathlib import Path
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 ADR_DIR = PLUGIN_ROOT / "docs" / "adr"
 SKILLS_DIR = PLUGIN_ROOT / "skills"
-CHECKER = SKILLS_DIR / "maintainer" / "scripts" / "check_adr_implements.py"
+CHECKER = SKILLS_DIR / "maintainer" / "scripts" / "check-adr-implements.py"
 
 ACTIVE_STATUSES = {"Accepted", "Proposed"}
 INACTIVE_STATUSES = {"Superseded", "Deprecated", "Rejected"}

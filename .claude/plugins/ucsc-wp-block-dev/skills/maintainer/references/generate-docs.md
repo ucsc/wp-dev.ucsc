@@ -24,13 +24,13 @@ The generated files live under `references/` (alongside this file):
 Run the script from the repository root:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/regenerate-docs.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/regenerate-docs.sh"
 ```
 
 The script reads:
 
 - `.claude/plugins/ucsc-wp-block-dev/README.md`
-- `.claude/plugins/ucsc-wp-block-dev/skills/maintainer/assets/ucsc_wp_block_dev_presentation.md`
+- `.claude/plugins/ucsc-wp-block-dev/skills/maintainer/assets/ucsc-wp-block-dev-presentation.md`
 - `.claude/plugins/ucsc-wp-block-dev/docs/adr/index.md` and referenced ADRs,
   as source-of-truth context for documentation scope, policy, and roadmap
   themes.

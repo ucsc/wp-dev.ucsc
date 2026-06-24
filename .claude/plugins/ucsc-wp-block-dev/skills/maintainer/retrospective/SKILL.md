@@ -86,9 +86,14 @@ nothing applies):
    it from `SKILL.md`.
 2. **Skill improvement candidate** — Was there guidance the AI re-derived that
    should be captured in a reference file or `SKILL.md` section? If yes, add it.
-3. **Token-reduction candidate** — Did a token-heavy operation (see ADR-076 log
-   at `logs/token-usage.log`) surface something a cheaper structural test could
-   catch? If yes, add or improve the test.
+3. **Token-reduction candidate** — Run the current user's ADR-076 report:
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/token-usage.py" report
+   ```
+
+   Did a token-heavy operation surface something a cheaper structural test
+   could catch? If yes, add or improve the test.
 
 If none apply, state "no script/skill/test improvements this session" and move on.
 
@@ -97,7 +102,7 @@ If none apply, state "no script/skill/test improvements this session" and move o
 Run the reference checker to confirm no unreferenced files were added:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_references.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/check-skill-references.sh"
 ```
 
 If a new reference file was added (not just an existing file updated), also
@@ -108,7 +113,7 @@ link it from the owning skill's `SKILL.md`.
 Tell the user:
 - Which file(s) were updated and what was added (one line each).
 - Whether an ADR was created.
-- The `check_skill_references.sh` result.
+- The `check-skill-references.sh` result.
 
 Do not summarize the entire session — focus only on what changed in the skills.
 
@@ -119,3 +124,6 @@ worked examples of this workflow's output:
 
 - [`archived-2026-06-18-gutenberg-hardening.md`](archived-2026-06-18-gutenberg-hardening.md)
   — security/CI/workflow hardening of ucsc-gutenberg-blocks and this plugin.
+- [`archived-2026-06-24-adr-naming-and-orchestration.md`](archived-2026-06-24-adr-naming-and-orchestration.md)
+  — ADR filename skill-prefixing and orchestrating wrapper scripts retrospective.
+

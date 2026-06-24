@@ -50,7 +50,7 @@ the semantic decisions that remain.
    - Run `maintainer self-test`.
    - Run `maintainer validate` before publishing.
    - Ensure `check-references` passes (ADR-032).
-   - Confirm `skill_details.py` shows no unexpected allowed/disallowed tools.
+   - Confirm `skill-details.py` shows no unexpected allowed/disallowed tools.
    - Use `plugin-dev:skill-reviewer` only when an opt-in qualitative review is
      worth the token cost.
 

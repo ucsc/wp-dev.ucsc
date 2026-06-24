@@ -18,10 +18,10 @@ Resolve the review target, natural-language review focus, and optional Jira key/
 diff, branch, or PR touching one block), resolve that block with the shared
 contract in
 [`../develop/references/block-target-session.md`](../develop/references/block-target-session.md):
-ARGUMENTS → persisted session value (`../develop/scripts/session_target.sh get`)
+ARGUMENTS → persisted session value (`../develop/scripts/session-target.sh get`)
 → cwd inference → prompt. Validate an inferred directory with
-`../develop/scripts/block_target_check.sh` before adopting it, and persist a
-newly resolved target with `session_target.sh set`. A PR/branch/diff review that
+`../develop/scripts/block-target-check.sh` before adopting it, and persist a
+newly resolved target with `session-target.sh set`. A PR/branch/diff review that
 spans multiple blocks or the whole plugin needs no single block target.
 
 Per ADR-022, the review target may be a pull-request reference: a **GitHub PR** — a full URL such as `https://github.com/ucsc/ucsc-gutenberg-blocks/pull/169` or a bare `#<n>` (GitHub is the canonical PR host for this plugin; fetch it with the `gh` CLI) — or a **Bitbucket PR** (`https://bitbucket.org/<workspace>/<repo>/pull-requests/<n>` for related UCSC webapps repos). A Jira reference (ADR-021) and a PR reference may both be supplied — Jira gives the issue/acceptance context, the PR gives the code under review.

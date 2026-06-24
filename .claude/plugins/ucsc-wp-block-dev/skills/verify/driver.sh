@@ -29,7 +29,16 @@ case "${1:-}" in
     ;;
 esac
 
-PLUGIN="ucsc-gutenberg-blocks"
+# Autodetect the plugin from the invocation directory (any path segment under
+# .../wp-content/plugins/<slug>); fall back to ucsc-gutenberg-blocks. Override
+# with UCSC_PLUGIN=<slug>. Detect from $PWD before any cd below.
+detect_plugin() {
+  case "$PWD" in
+    */wp-content/plugins/*) local rest="${PWD#*/wp-content/plugins/}"; echo "${rest%%/*}"; return 0 ;;
+  esac
+  return 1
+}
+PLUGIN="${UCSC_PLUGIN:-$(detect_plugin || echo ucsc-gutenberg-blocks)}"
 APP_HOST="wp-dev.ucsc"
 LOG="${UCSC_VERIFY_LOG:-/tmp/ucsc-verify-$(date +%Y%m%d-%H%M%S).log}"
 FAILED=0
@@ -49,7 +58,7 @@ done
 # Prefer the shared source-base resolver so every driver agrees on the repo root
 # (ADR-095). Self-locate it relative to this driver; fall back to inline walk-up.
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd)"
-SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source_base.sh"
+SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source-base.sh"
 
 find_root() {
   local d
@@ -91,15 +100,25 @@ else
 fi
 
 # 2. build freshness — is build/ newer than every source file?
-if [ -f "$PDIR/build/index.js" ]; then
-  stale=$(find "$PDIR/src" -type f -newer "$PDIR/build/index.js" -print -quit 2>>"$LOG" || true)
+ref_js=""
+if [ -n "$SLUG" ] && [ -f "$PDIR/build/blocks/$SLUG/index.js" ]; then
+  ref_js="$PDIR/build/blocks/$SLUG/index.js"
+elif [ -f "$PDIR/build/index.js" ]; then
+  ref_js="$PDIR/build/index.js"
+else
+  # fall back to any JS file in build/
+  ref_js=$(find "$PDIR/build" -name '*.js' -type f 2>>"$LOG" | head -n 1 || true)
+fi
+
+if [ -n "$ref_js" ] && [ -f "$ref_js" ]; then
+  stale=$(find "$PDIR/src" -type f \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" -o -name "*.css" -o -name "*.scss" -o -name "*.json" \) ! -path "*/.claude/*" -newer "$ref_js" -print -quit 2>>"$LOG" || true)
   if [ -n "$stale" ]; then
     fail "build is STALE (src changed since last build) — run: run/driver.sh build"
   else
-    pass "build up to date with src/"
+    pass "build up to date with src/ (ref: $(basename "$ref_js"))"
   fi
 else
-  fail "build/index.js missing — run: run/driver.sh build"
+  fail "built JS file missing — run: run/driver.sh build"
 fi
 
 # 3. block registry (server-side, render-callback blocks register on init)

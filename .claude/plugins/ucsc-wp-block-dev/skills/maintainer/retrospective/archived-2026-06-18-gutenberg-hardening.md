@@ -4,7 +4,7 @@
 > `ucsc-gutenberg-blocks/skills/maintainer/references/` (it had landed inside the
 > WordPress plugin by mistake). The original file was titled "ADR-086" but is a
 > retrospective writeup, not an ADR — renamed to avoid colliding with the real
-> `docs/adr/ADR-086_maintainer_conventions.md`.
+> `docs/adr/ADR-086-maintainer-conventions.md`.
 
 Status: Accepted (historical record)
 Date: 2026-06-18

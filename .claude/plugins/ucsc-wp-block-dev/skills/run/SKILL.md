@@ -44,8 +44,8 @@ as `UCSC_PLUGIN=<slug>` and echo the chosen target before the first build/launch
 The *block* target (which block to build/drive) follows the shared session
 contract in
 [`../develop/references/block-target-session.md`](../develop/references/block-target-session.md)
-(ADR-093): ARGUMENTS → persisted value (`develop/scripts/session_target.sh get`)
-→ cwd inference → prompt; validate with `develop/scripts/block_target_check.sh`.
+(ADR-093): ARGUMENTS → persisted value (`develop/scripts/session-target.sh get`)
+→ cwd inference → prompt; validate with `develop/scripts/block-target-check.sh`.
 It scopes the `drive` step's block surface (ADR-091 amendment).
 
 ## Fast Path — `driver.sh`
@@ -162,7 +162,7 @@ when a screenshot materially helps. Use `verify` when the request provides a
 specific change or acceptance criterion to confirm. Use `validate` for PHP,
 Jest, or e2e suites.
 
-## Runtime Introspection — `wp_eval.sh`
+## Runtime Introspection — `wp-eval.sh`
 
 To inspect WordPress runtime state (registered blocks, options, transients) with
 PHP, **do not** pipe an inline heredoc into `wp eval-file` — a command like
@@ -172,24 +172,24 @@ prompts. Instead run a bundled PHP file through a wrapper that pipes it over
 STDIN (ADR-095):
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/run/list_blocks.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/list-blocks.sh"
 ```
 
-[`list_blocks.sh`](list_blocks.sh) resolves the repo root via `source_base.sh`
-and pipes [`helpers/list_blocks.php`](helpers/list_blocks.php) into
+[`list-blocks.sh`](list-blocks.sh) resolves the repo root via `source-base.sh`
+and pipes [`helpers/list-blocks.php`](helpers/list-blocks.php) into
 `wp eval-file -` over STDIN — listing every UCSC block (both `ucsc/*` and
 `ucscblocks/*`) in the live registry across all activated plugins, with no PHP
 embedded in a shell string. For other runtime queries, prefer the generic
-substrate [`wp_eval.sh`](wp_eval.sh) — it locates the root and pipes any
+substrate [`wp-eval.sh`](wp-eval.sh) — it locates the root and pipes any
 `helpers/<name>.php` to `wp eval-file -`, forwarding `KEY=VAL` args as container
 env (`getenv()`), so a new query is just a reviewed PHP file plus a thin `*.sh`
 wrapper, never an inline eval.
 
-### Diagnose a block that renders a fallback — `block_doctor.sh`
+### Diagnose a block that renders a fallback — `block-doctor.sh`
 
 When a dynamic block shows a placeholder or "No X available" and the cause is
-unclear, [`block_doctor.sh`](block_doctor.sh) (PHP in
-[`helpers/block_doctor.php`](helpers/block_doctor.php)) explains it in one call:
+unclear, [`block-doctor.sh`](block-doctor.sh) (PHP in
+[`helpers/block-doctor.php`](helpers/block-doctor.php)) explains it in one call:
 it renders the block server-side as the anonymous user and flags whether the
 output looks like a fallback, then audits the anonymous permission posture of
 every REST route in a namespace. A dynamic block that fetches via its own
@@ -198,7 +198,7 @@ anonymous access during a logged-out frontend render, and this surfaces exactly
 which route is the culprit:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/run/block_doctor.sh" ucscblocks/classschedule
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/block-doctor.sh" ucscblocks/classschedule
 ```
 
 ## Gotchas
@@ -216,24 +216,24 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/run/block_doctor.sh" ucscblocks/classschedule
   renders a placeholder until `ucsc_events_fetch_data()` has data; that data is a
   transient keyed `ucsc_events_<md5(apiUrl)>`. Seed it so the block renders real
   `.ucsc-event-item` cards offline by running the bundled seeder (the PHP lives in
-  [`helpers/seed_events_cache.php`](helpers/seed_events_cache.php) and is piped to
+  [`helpers/seed-events-cache.php`](helpers/seed-events-cache.php) and is piped to
   wp-cli over STDIN — no inline eval heredoc, ADR-095):
 
   ```bash
-  bash "${CLAUDE_PLUGIN_ROOT}/skills/run/seed_events_cache.sh"
+  bash "${CLAUDE_PLUGIN_ROOT}/skills/run/seed-events-cache.sh"
   ```
 
-  [`seed_events_cache.sh`](seed_events_cache.sh) seeds the transient; clear it
+  [`seed-events-cache.sh`](seed-events-cache.sh) seeds the transient; clear it
   again with `wp transient delete --all`.
 
 - **Seed a demo page that contains every registered `ucsc/*` block** for a single
   frontend URL to drive/verify against, via
-  [`seed_demo_page.sh`](seed_demo_page.sh) (PHP in
-  [`helpers/seed_demo_page.php`](helpers/seed_demo_page.php)). It upserts the page
+  [`seed-demo-page.sh`](seed-demo-page.sh) (PHP in
+  [`helpers/seed-demo-page.php`](helpers/seed-demo-page.php)). It upserts the page
   and prints its URL:
 
   ```bash
-  bash "${CLAUDE_PLUGIN_ROOT}/skills/run/seed_demo_page.sh"
+  bash "${CLAUDE_PLUGIN_ROOT}/skills/run/seed-demo-page.sh"
   ```
 
 - **Chrome headless against the vanity host.** The page lives at the self-signed

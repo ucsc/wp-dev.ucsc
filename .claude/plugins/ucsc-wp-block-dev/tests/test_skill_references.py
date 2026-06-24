@@ -12,13 +12,13 @@ import subprocess
 from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
-CHECKER = PLUGIN_ROOT / "skills" / "maintainer" / "scripts" / "check_skill_references.sh"
+CHECKER = PLUGIN_ROOT / "skills" / "maintainer" / "scripts" / "check-skill-references.sh"
 SKILLS_DIR = PLUGIN_ROOT / "skills"
 
 
 def test_checker_exists_and_executable():
     assert CHECKER.exists(), f"reference checker missing at {CHECKER}"
-    assert os.access(CHECKER, os.X_OK), "check_skill_references.sh is not executable"
+    assert os.access(CHECKER, os.X_OK), "check-skill-references.sh is not executable"
 
 
 def test_all_skill_support_files_referenced():

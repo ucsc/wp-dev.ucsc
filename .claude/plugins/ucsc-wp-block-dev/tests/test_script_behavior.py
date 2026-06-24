@@ -82,15 +82,46 @@ def test_backlog_missing_worklist_is_reported_not_fatal(tmp_path):
     assert "not found" in section.lower()
 
 
+def test_token_usage_is_recorded_and_reported_per_user_cache(tmp_path):
+    """ADR-076: token usage stays in the selected user's cache."""
+    env = os.environ.copy()
+    env["UCSC_WP_BLOCK_DEV_CACHE"] = str(tmp_path)
+    script = SCRIPTS / "token-usage.py"
+
+    append = subprocess.run(
+        ["python3", str(script), "append", "validate", "test entry"],
+        capture_output=True,
+        text=True,
+        cwd=str(PLUGIN_ROOT),
+        env=env,
+        timeout=20,
+    )
+    assert append.returncode == 0, append.stdout + append.stderr
+    assert (tmp_path / "token-usage.log").exists()
+
+    report = subprocess.run(
+        ["python3", str(script), "report"],
+        capture_output=True,
+        text=True,
+        cwd=str(PLUGIN_ROOT),
+        env=env,
+        timeout=20,
+    )
+    assert report.returncode == 0, report.stdout + report.stderr
+    assert f"token usage log: {tmp_path / 'token-usage.log'}" in report.stdout
+    assert "entries: 1" in report.stdout
+    assert "validate: 1" in report.stdout
+
+
 def test_new_adr_filename_matches_structural_convention():
-    """The new_adr.sh generator must emit the same 3-digit shape the structural
+    """The new-adr.sh generator must emit the same 3-digit shape the structural
     test enforces — guards against generator/convention drift (e.g. %04d vs %03d).
     """
-    script = (SCRIPTS / "new_adr.sh").read_text()
+    script = (SCRIPTS / "new-adr.sh").read_text()
     width = re.search(r'printf "%0(\d)d"', script)
-    assert width, "new_adr.sh no longer uses a zero-padded printf width"
+    assert width, "new-adr.sh no longer uses a zero-padded printf width"
     assert width.group(1) == "3", (
-        f"new_adr.sh pads ADR numbers to {width.group(1)} digits, but the "
+        f"new-adr.sh pads ADR numbers to {width.group(1)} digits, but the "
         "convention (test_adr_filenames_use_current_convention) expects 3"
     )
 
@@ -98,7 +129,7 @@ def test_new_adr_filename_matches_structural_convention():
 def test_best_practice_checks_pass_current_plugin():
     """The deterministic best-practice profile must pass the maintained tree."""
     result = subprocess.run(
-        ["python3", str(SCRIPTS / "check_plugin_best_practices.py")],
+        ["python3", str(SCRIPTS / "check-plugin-best-practices.py")],
         capture_output=True,
         text=True,
         cwd=str(PLUGIN_ROOT),
@@ -126,7 +157,7 @@ def test_best_practice_checks_reject_misplaced_components(tmp_path):
     result = subprocess.run(
         [
             "python3",
-            str(SCRIPTS / "check_plugin_best_practices.py"),
+            str(SCRIPTS / "check-plugin-best-practices.py"),
             "--plugin-root",
             str(plugin),
         ],
@@ -154,7 +185,7 @@ def test_best_practice_checks_report_optional_local_source(tmp_path):
     result = subprocess.run(
         [
             "python3",
-            str(SCRIPTS / "check_plugin_best_practices.py"),
+            str(SCRIPTS / "check-plugin-best-practices.py"),
             "--plugin-dev-source",
             str(tmp_path),
         ],
@@ -182,7 +213,7 @@ def test_best_practice_checks_report_optional_skill_creator_source(tmp_path):
     result = subprocess.run(
         [
             "python3",
-            str(SCRIPTS / "check_plugin_best_practices.py"),
+            str(SCRIPTS / "check-plugin-best-practices.py"),
             "--skill-creator-source",
             str(tmp_path),
         ],
@@ -217,7 +248,7 @@ def test_best_practice_checks_report_optional_plugin_collection(tmp_path):
     result = subprocess.run(
         [
             "python3",
-            str(SCRIPTS / "check_plugin_best_practices.py"),
+            str(SCRIPTS / "check-plugin-best-practices.py"),
             "--plugin-collection-source",
             str(tmp_path),
         ],

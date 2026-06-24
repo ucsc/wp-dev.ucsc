@@ -36,7 +36,7 @@ Prefer user-provided local sources for fast, offline inspection:
 Run the inventory report when local sources are configured:
 
 ```bash
-python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_plugin_best_practices.py \
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/check-plugin-best-practices.py" \
   --json
 ```
 

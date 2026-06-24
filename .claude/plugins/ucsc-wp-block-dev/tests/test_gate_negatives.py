@@ -1,7 +1,7 @@
 """Negative-path tests for the maintainer gate scripts.
 
-The structural suite only runs check_skill_references.sh and
-check_adr_implements.py against the real (clean) tree, which proves they PASS but
+The structural suite only runs check-skill-references.sh and
+check-adr-implements.py against the real (clean) tree, which proves they PASS but
 not that they actually FAIL on a violation — a checker hard-wired to return PASS
 would sail through. These tests plant a violation in a hermetic fixture tree and
 assert the gate bites, then confirm the clean variant passes.
@@ -17,8 +17,8 @@ from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS = PLUGIN_ROOT / "skills" / "maintainer" / "scripts"
-REF_CHECKER = SCRIPTS / "check_skill_references.sh"
-ADR_CHECKER = SCRIPTS / "check_adr_implements.py"
+REF_CHECKER = SCRIPTS / "check-skill-references.sh"
+ADR_CHECKER = SCRIPTS / "check-adr-implements.py"
 
 
 def _install_checker(src: Path, fixture_root: Path) -> Path:
@@ -49,7 +49,7 @@ def _skill(fixture_root: Path, name: str, body: str = "") -> Path:
 def _adr(fixture_root: Path, number: str, slug: str, status: str = "Accepted") -> Path:
     adr_dir = fixture_root / "docs" / "adr"
     adr_dir.mkdir(parents=True, exist_ok=True)
-    path = adr_dir / f"ADR-{number}_{slug}.md"
+    path = adr_dir / f"ADR-{number}-{slug}.md"
     path.write_text(
         f'---\ntitle: "ADR-{number}: Demo"\nstatus: {status}\ndate: 2026-01-01\n---\n\n'
         f"# ADR-{number}: Demo\n"
@@ -58,7 +58,7 @@ def _adr(fixture_root: Path, number: str, slug: str, status: str = "Accepted") -
 
 
 # --------------------------------------------------------------------------- #
-# check_skill_references.sh
+# check-skill-references.sh
 # --------------------------------------------------------------------------- #
 
 def test_reference_gate_fails_on_unreferenced_support_file(tmp_path):
@@ -89,7 +89,7 @@ def test_reference_gate_passes_when_support_file_is_referenced(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
-# check_adr_implements.py
+# check-adr-implements.py
 # --------------------------------------------------------------------------- #
 
 def test_implements_gate_fails_on_missing_adr(tmp_path):

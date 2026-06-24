@@ -42,22 +42,46 @@ host toolchain — only the Docker daemon.
 
 ## Running Tests via Driver (Preferred)
 
-Always prefer running tests using the driver in a single token-frugal call. The
-script is `validate_driver.sh` (not `driver.sh`) and currently runs the
-**PHP/PHPUnit** suite only — it takes no subcommands:
+Always prefer running tests via a single token-frugal driver call. Pick the
+driver family by the resolved target repo.
+
+### Repo-local battery — `bin/validate*.sh` (`ucsc-gutenberg-blocks`)
+
+When the target repo ships `bin/validate*.sh`, prefer them. They implement the
+per-type + battery design from ADR-066 with **distinct per-suite logs**, all in
+Docker (no host PHP/Node):
+
+| Command | Runs | Log (`$UCSC_LOG_DIR`, default `/tmp`) |
+|---|---|---|
+| `bash bin/validate-php.sh` | standalone `tests/php/*.php` **+** `tests/phpunit` (PHPUnit) in `php:8.1-cli` | `ucsc-validate-php.log` |
+| `bash bin/validate-jest.sh` | `npm test` (wp-scripts) in a Node container with a named `node_modules` volume | `ucsc-validate-jest.log` |
+| `bash bin/validate-e2e.sh` | wraps `tests/e2e/run-e2e.sh` | `ucsc-validate-e2e.log` |
+| `bash bin/validate.sh [php] [jest] [e2e]` | battery — runs all, or only the named suites; prints a per-suite PASS/FAIL summary with each log path; exits non-zero if any fail | per-suite logs above |
+
+The `php` driver runs **both** PHP styles: the dependency-free standalone files
+(each its own process, `php tests/php/<X>.php`) and the PHPUnit suite under
+`tests/phpunit/` via the bundled `phpunit.phar`. The e2e suite needs the stack
+up (`run` first); php and jest run fully offline. Each script supports `--help`.
+
+### Plugin driver — `validate-php.sh` (`ucsc-blocks`)
+
+For the `ucsc-blocks` plugin, which ships no `bin/` runners, use the plugin-side
+driver. It runs the **PHP/PHPUnit** suite only and takes no subcommands:
 
 ```bash
 # Run the ucsc-blocks PHPUnit suite inside the wp-dev.ucsc container
-bash .claude/plugins/ucsc-wp-block-dev/skills/validate/validate_driver.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/validate/validate-php.sh"
 ```
 
 Environment overrides: `WP_CONTAINER` (target container), `PLUGIN_SLUG` (plugin
 folder, default `ucsc-blocks`), `PHPUNIT_PHAR_URL`.
 
-> The `php|jest|e2e|all` subcommands, log redirection, and pass/fail summary
-> described in ADR-066 are **not yet implemented** in `validate_driver.sh`. Run
-> Jest and e2e via their Docker commands above (the `plugin_npm_start` service
-> and `tests/e2e/run-e2e.sh`) — never host `npm` — until the driver is completed.
+> The plugin `validate-php.sh` is intentionally PHP-only (ADR-066, amended
+> 2026-06-23). The `php|jest|e2e|all` battery and per-suite logging that ADR-066
+> originally described are realized at the product-repo level by the
+> `bin/validate*.sh` runners above, not by this plugin script. For `ucsc-blocks`,
+> run Jest and e2e via their Docker commands above (the `plugin_npm_start`
+> service and `tests/e2e/run-e2e.sh`) — never host `npm`.
 
 ## Running PHP Tests (Manual/Fallback)
 
@@ -78,9 +102,9 @@ e2e harness runs in a Node+Chromium container and drives the **live**
 repo (first verified 2026-06-24 for `ucsc-gutenberg-blocks`):
 
 ```bash
-bash tests/e2e/run-e2e.sh
+bash tests/e2e/run-e2e.sh"
 # target a specific page:
-CLASS_SCHEDULE_E2E_URL=https://wp-dev.ucsc/some-page/ bash tests/e2e/run-e2e.sh
+CLASS_SCHEDULE_E2E_URL=https://wp-dev.ucsc/some-page/ bash tests/e2e/run-e2e.sh"
 ```
 
 Key patterns the harness encodes (reuse these for any block's e2e):
@@ -97,17 +121,15 @@ Key patterns the harness encodes (reuse these for any block's e2e):
   skipped when cached), mounted over `/app/node_modules`.
 - **Container-aware config:** `UCSC_E2E_IN_CONTAINER=1` switches
   `jest-puppeteer.config.js` from the host fallback (dev Chrome + a
-  `MAP wp-dev.ucsc 127.0.0.1` resolver rule, like `run/driver.sh drive`) to the
+  `MAP wp-dev.ucsc 127.0.0.1` resolver rule, like `run/driver.sh" drive`) to the
   in-container path (`/usr/bin/chromium`, `--add-host` DNS).
 - **Specs** live at `tests/e2e/*.spec.js` and run via
   `npm run test:e2e` (= `wp-scripts test-e2e --rootDir=tests/e2e`) *inside* that
   container.
 
-**Fixture caveat:** the block server-renders its real markup only when its
-configured criterion returns data, and `run/seed_demo_page.sh` seeds only
-`ucsc/*` blocks — it skips `ucscblocks/*` blocks like `classschedule`. Drive a
-dedicated published page whose criterion currently returns rows (e.g.
-`class-schedule-demo`), not the generic demo page.
+**Fixture caveat:** 
+- **For `ucsc-blocks` (`ucsc/*`):** Use the unified `https://wp-dev.ucsc/ucsc-block-demo/` page seeded by `run/seed-demo-page.sh`. It contains all `ucsc/*` blocks and is the canonical E2E target for the newer plugin.
+- **For `ucsc-gutenberg-blocks` (`ucscblocks/*`):** The seeder skips these older blocks. You must drive a dedicated published page whose criterion returns rows (e.g., `https://wp-dev.ucsc/class-schedule-demo/`), not the generic demo page.
 
 ## Reporting
 
@@ -122,7 +144,7 @@ Docker stack (verified 2026-06-23):
 
 - **Container name is `ucsc-wordpress-wp`** (image `wp-devucsc-wp`), not
   `wp-dev.ucsc`. A `docker ps --filter name=wp-dev.ucsc` matches nothing.
-  `validate_driver.sh` auto-detects the container; override with `WP_CONTAINER`.
+  `validate-php.sh` auto-detects the container; override with `WP_CONTAINER`.
 - **The plugin slug is `ucsc-blocks`.** A separate legacy plugin,
   `ucsc-gutenberg-blocks`, coexists in the same WordPress install — do not
   conflate the skill's nominal name with the plugin folder. The driver defaults
@@ -131,6 +153,20 @@ Docker stack (verified 2026-06-23):
   global `phpunit` in `ucsc-wordpress-wp`, only PHP 8.1. The plugin's
   `tests/bootstrap.php` runs in standalone mode (stubs WordPress and loads the
   block PHP directly), so the suite needs only PHP + a PHPUnit 10 phar — no
-  WordPress test library. `validate_driver.sh` fetches the phar to `/tmp` on
+  WordPress test library. `validate-php.sh` fetches the phar to `/tmp` on
   demand; alternatively run `composer install` inside the plugin.
+- **E2E Puppeteer 23/24 Compatibility**: Newer versions of `@wordpress/scripts`
+  (e.g., version 30+) use newer `puppeteer-core` versions where:
+  - `puppeteer-core/install` is completely removed, causing E2E startup errors in the
+    harness. Bypass by touching dummy extensionless `install` and `install.js` files
+    in `node_modules/puppeteer-core/` within the E2E container prior to testing.
+  - The Puppeteer `Page` object does not inherit from `EventEmitter` and lacks
+    `removeListener` and `addListener`. This causes `jest-environment-puppeteer` to
+    crash during setup/teardown. Patch the environment script in-container via `sed`
+    to replace `.removeListener(` with `.off(` and `.addListener(` with `.on(`.
+- **Seed Page Block Attributes**: For E2E tests targeting dynamic/data-backed blocks
+  (like `ucsc/events`), the seeded block block-comment on the demo page must include
+  configured attributes (e.g. `apiUrl`). If left empty, the block will fall back to
+  rendering its empty placeholder, causing E2E tests waiting for item selectors to
+  time out.
 

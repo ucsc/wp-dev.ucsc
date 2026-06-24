@@ -29,7 +29,7 @@ plugin_root="$(cd "$maintainer_dir/../.." && pwd)"
 out_dir="$maintainer_dir/references"
 
 main_source="$plugin_root/README.md"
-deck_source="$maintainer_dir/assets/ucsc_wp_block_dev_presentation.md"
+deck_source="$maintainer_dir/assets/ucsc-wp-block-dev-presentation.md"
 main_out="$out_dir/generate-docs-main.md"
 deck_out="$out_dir/generate-docs-presentation.md"
 generated_date="$(date +%Y-%m-%d)"
@@ -56,7 +56,7 @@ fi
 } > "$main_out"
 
 {
-  printf "<!-- Generated: %s from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->\n\n" "$generated_date"
+  printf "<!-- Generated: %s from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->\n\n" "$generated_date"
   perl -pe "s{\\*\\*Generated:\\*\\* \\d{4}-\\d{2}-\\d{2}<br />}{**Generated:** ${generated_date}<br />}" "$deck_source"
 } > "$deck_out"
 

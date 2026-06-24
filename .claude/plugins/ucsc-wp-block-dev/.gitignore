@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+logs/
 
 # Google API credentials — never commit
 scripts/service_account.json

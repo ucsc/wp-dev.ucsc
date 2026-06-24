@@ -27,7 +27,7 @@ Apply this order at the start of any block-operating skill:
 2. **Persisted session value** — if no argument is given, adopt the stored target
    without re-asking.
 3. **CWD inference** — otherwise infer from the working directory by running
-   `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve_target.sh" [path] [--persist]`,
+   `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh" [path] [--persist]`,
    which derives `<slug> <repo> <path>` from the path string alone (no globbing,
    no token cost), validates it, and can persist it. State the inferred target so
    the user can correct it (ADR-090).
@@ -54,10 +54,10 @@ When a target is secured, specify **all three** (ADR-093, 2026-06-23 amendment):
 Persist all three together:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" set <slug> <repo> <abs-path>
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" set <slug> <repo> <abs-path>
 ```
 
-Validate the path with `block_target_check.sh` (below) before persisting.
+Validate the path with `block-target-check.sh` (below) before persisting.
 
 ## Validate the target is really a block
 
@@ -66,7 +66,7 @@ it is a WordPress block code set and not just a folder that happens to match a
 name. Use the inexpensive check:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/block_target_check.sh" <block-dir-or-file>
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/block-target-check.sh" <block-dir-or-file>
 ```
 
 It exits 0 (PASS) when the path has a `block.json` (ucsc-blocks layout) or a JS
@@ -76,7 +76,7 @@ and non-zero otherwise. If it FAILs, treat the target as unresolved and prompt
 
 ## Helper
 
-[`../scripts/session_target.sh`](../scripts/session_target.sh) reads and writes
+[`../scripts/session-target.sh`](../scripts/session-target.sh) reads and writes
 the cache file at `~/.cache/ucsc-wp-block-dev/session-target` (override the dir
 with `$UCSC_WP_BLOCK_DEV_CACHE`):
 
@@ -84,13 +84,13 @@ Issue these with the harness-expanded `${CLAUDE_PLUGIN_ROOT}` path (ADR-094); do
 not assign the script path to a temporary shell variable:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" get    # "<slug> <repo> <path>" or empty
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" slug   # slug only
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" repo   # owning repo/plugin only
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" dir    # target's filesystem path only
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" set ucsc-events ucsc-blocks \
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" get    # "<slug> <repo> <path>" or empty
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" slug   # slug only
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" repo   # owning repo/plugin only
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" dir    # target's filesystem path only
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" set ucsc-events ucsc-blocks \
   /Users/.../plugins/ucsc-blocks/src/blocks/ucsc-events
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" clear
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" clear
 ```
 
 The cache file is session/dev-machine scoped, never committed, and safe to clear
@@ -103,7 +103,7 @@ ad-hoc `ls`/`get` calls — run the wrapper, which self-locates via
 `${BASH_SOURCE[0]}` and validates the persisted path:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check_session_target.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check-session-target.sh"
 ```
 
 To review the source of the target-resolution scripts, run the wrapper's `show`
@@ -111,5 +111,5 @@ mode rather than an inline `cat`/`for` loop (which trips shell-expansion
 permission prompts, ADR-094/ADR-095):
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check_session_target.sh" show
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check-session-target.sh" show
 ```

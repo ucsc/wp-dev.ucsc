@@ -1,8 +1,0 @@
-# Token usage log — ucsc-wp-block-dev
-# Format: YYYY-MM-DD HH:MM  <operation>  <notes>
-# Append an entry each time a token-heavy operation runs (ADR-076).
-# Reviewed during retrospective sessions (ADR-059).
-#
-# Approved token-heavy operations (ADR-064):
-#   validate      ~10k tokens  plugin-dev:plugin-validator agent
-#   review-skills ~14k tokens  plugin-dev:skill-reviewer agent

@@ -19,10 +19,10 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-058-MAINTAINER-LOW-TOKEN, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH
+implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS
 
 This body marker traces the skill to the ADRs it implements (ADR-086, decision C).
-`scripts/check_adr_implements.py` validates that every referenced ADR is active.
+`scripts/check-adr-implements.py` validates that every referenced ADR is active.
 `maintainer` is the pilot skill for this convention before wider rollout.
 
 Maintenance workflow for the `ucsc-wp-block-dev` plugin (not for block code —
@@ -31,10 +31,10 @@ Markdown artifact regeneration, read
 [`references/generate-docs.md`](references/generate-docs.md).
 
 Use this skill with one mode: `backlog`, `adr`, `skill`, `training`, `retro`,
-`validate`, `self-test`, `review-skills`,
+`self-test`, `validate`, `generate-docs`, `publish` (bare = both; or
+`guide`/`deck`), or `all`. Detailed compatibility modes: `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`,
-`training`, `generate-docs`, `publish` (bare = both; or `guide`/`deck`), `adr`, `sync-inventory`,
-`skill-details`, `backlog`, or `all`. `test` remains a legacy alias for
+`sync-inventory`, and `skill-details`. `test` remains a legacy alias for
 `self-test`; `new-adr` remains a legacy alias for `adr`. Run all commands below
 from the repo root.
 
@@ -48,7 +48,7 @@ claude --plugin-dir .claude/plugins/ucsc-wp-block-dev
 This loads the in-tree plugin (skills, agents, hooks) so maintainer edits take
 effect without installing from a marketplace.
 
-Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003 and ADR-058 (single-agent mode by default).
+Keep token use low: run the validator and tests rather than reading every file by hand. See ADR-003 (low token use, single-agent default).
 
 ## Maintainer checklist
 
@@ -71,7 +71,8 @@ skills:
   script/skill/test improvements (ADR-077). Reached through `maintainer` or by
   describing the goal at session end. See ADR-083. Past captured retrospectives
   are archived in the sub-skill dir, e.g.
-  [`retrospective/archived-2026-06-18-gutenberg-hardening.md`](retrospective/archived-2026-06-18-gutenberg-hardening.md).
+  [`retrospective/archived-2026-06-18-gutenberg-hardening.md`](retrospective/archived-2026-06-18-gutenberg-hardening.md) and
+  [`retrospective/archived-2026-06-24-adr-naming-and-orchestration.md`](retrospective/archived-2026-06-24-adr-naming-and-orchestration.md).
 
 ## External references
 
@@ -98,12 +99,22 @@ Resolve the plugin target, natural-language maintenance request, and optional Ji
 Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do. Present the durable modes first: `backlog`, `adr`, `skill`, `training`, and `retro`; then offer `self-test`, `validate`, `generate-docs`, `publish`, and `all`, with detailed compatibility modes available when needed. Per ADR-064, flag that `skill review`/`review-skills` and Tier 2 `validate` spawn token-heavy Anthropic `plugin-dev` agents; never run them automatically. Run the chosen mode only after selection. Treat `test` as a legacy alias for `self-test`, `new-adr` as a legacy alias for `adr`, and the older skill-specific modes as aliases under `skill`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
+
 ## Anthropic plugin-dev tools
 
 `plugin-dev` is the optional Tier 2 companion (ADR-079). Before agent-backed
 validation or skill review, verify `claude plugin list` includes it. Installation,
 tool inventory, upstream links, and the deterministic local profile live in
 [`references/self-test.md`](references/self-test.md).
+
+After launching a token-heavy Tier 2 operation, record it in the current
+user's cache with
+[`scripts/token-usage.py`](scripts/token-usage.py):
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/token-usage.py" \
+  append <operation> "<notes>"
+```
 
 ## validate
 
@@ -127,11 +138,11 @@ before publishing.
 ## self-test
 
 Run the deterministic plugin contracts and the upstream-inspired
-[`scripts/check_plugin_best_practices.py`](scripts/check_plugin_best_practices.py)
+[`scripts/check-plugin-best-practices.py`](scripts/check-plugin-best-practices.py)
 checks:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/run-self-test.sh"
 ```
 
 Use [`references/self-test.md`](references/self-test.md) for check coverage,
@@ -170,61 +181,28 @@ selection. Keep compatibility modes working, but prefer `maintainer skill
 
 ## review-contrib
 
-Review a proposal under `contrib/proposals/` or a candidate under
-`contrib/incubator/`. Require the candidate name when it is not clear from the
-request. Read `contrib/README.md` before reviewing.
-
-For a proposal:
-
-1. Check that it follows `contrib/proposals/TEMPLATE.md`.
-2. Compare its triggers and workflow with existing production skills.
-3. Check that the scope is specific to UCSC WordPress block development.
-4. Return one decision: `reject`, `revise`, or `incubate`, with concise reasons.
-5. For `incubate`, create `contrib/incubator/<skill-name>/SKILL.md` from
-   `contrib/incubator/TEMPLATE.md`, carrying forward the accepted proposal
-   details. Keep the original proposal until promotion for review history.
-
-For an incubator candidate:
-
-1. Apply the `skill-development` guidance.
-2. Check trigger clarity, workflow completeness, overlap, security, support-file
-   references, tests, and realistic examples.
-3. Return one decision: `revise` or `promote`, with remaining work listed.
-
+Review a proposal under `contrib/proposals/` or an incubator candidate under
+`contrib/incubator/`. Read `contrib/README.md` first, require the candidate name
+when it is unclear, and return one decision (`reject`/`revise`/`incubate` for a
+proposal; `revise`/`promote` for a candidate).
 Do not place a candidate under `skills/` during review.
+Per-stage checklists: [`references/contrib.md`](references/contrib.md).
 
 ## promote-contrib
 
-Promote a named directory from `contrib/incubator/<skill-name>/` into
-`skills/<skill-name>/`. Read `contrib/README.md` and apply the
-`skill-development` guidance first.
-
-Before moving files:
-
-1. Confirm no production skill has the same name or substantially overlapping
-   triggers.
-2. Confirm the directory name matches the frontmatter `name`.
-3. Confirm the description clearly states behavior and trigger context.
-4. Confirm every support file is linked from `SKILL.md`.
-5. Run focused candidate tests or examples.
-
-After moving files:
-
-1. Update `README.md`, `AGENTS.md`, the `hub` skill, and the maintainer slide
-   deck when the new skill changes those inventories.
-2. Add or update structural tests for the supported skill surface.
-3. Run `self-test`, `validate`, `check-references`, and `review-skills`.
-4. Remove the corresponding proposal only after the promotion checks pass.
-
-If any check fails, leave the candidate in `contrib/incubator/` and report the
-required revisions.
+Promote an accepted directory from `contrib/incubator/<skill-name>/` into
+`skills/<skill-name>/` only after the name, trigger, description, and
+support-file checks pass; then update the inventories (`README.md`, `AGENTS.md`,
+`hub`, slide deck) and run `self-test`, `validate`, `check-references`, and
+`review-skills`. Full before/after checklist:
+[`references/contrib.md`](references/contrib.md).
 
 ## check-references
 
 Enforce ADR-032: every supporting file under a skill directory must be referenced from that skill's `SKILL.md`, so nested `references/`, `assets/`, and `scripts/` files stay discoverable (progressive disclosure). Run the bundled scanner:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_skill_references.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/check-skill-references.sh"
 ```
 
 It prints one line per skill and a PASS/FAIL summary, exiting non-zero when any nested file is not linked from its `SKILL.md`. Fix a FAIL by adding a skill-relative reference (e.g. `references/foo.md`) to the skill — under a "Reference files" heading when one is warranted — or by removing the obsolete file. The pytest suite runs this same check, so a gap fails `validate` too.
@@ -235,7 +213,7 @@ Enforce ADR-086, decision C: verify the `implements:` traceability markers in
 skills and scripts. Run the checker:
 
 ```bash
-python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/check_adr_implements.py
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/check-adr-implements.py"
 ```
 
 It runs two checks: a hard **reverse** gate (every ADR named in an `implements:`
@@ -265,7 +243,7 @@ worklist with the ADRs that are not yet implemented (computed on the fly from th
 `implements:` markers). Run:
 
 ```bash
-python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/backlog.py
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/backlog.py"
 ```
 
 Sources and outputs (all outside the repo, so nothing is checked in):
@@ -295,7 +273,7 @@ Confluence. Read
 then run:
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/regenerate-docs.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/regenerate-docs.sh"
 ```
 
 This writes generated artifacts under
@@ -307,60 +285,22 @@ It does not publish or upload anything.
 
 ## publish
 
-Per ADR-063, **bare `publish` publishes both** the guide and the deck. A specific
-output is named: `guide` (the prose docs) or `deck` (the slides). Publishing is
-always explicit and is never part of the `all` health-check mode. Legacy aliases:
-`docs` = `guide`, `slides` = `deck`, and `all` = both.
+Per ADR-063, **bare `publish` publishes both** the guide and the deck; or name a
+single output (`guide` for the prose docs, `deck` for the slides). Publishing is
+always explicit and is **never** part of the `all` health-check mode. Legacy
+aliases: `docs` = `guide`, `slides` = `deck`, `all` = both. The canonical Marp
+deck source is maintainer-owned at `assets/ucsc-wp-block-dev-presentation.md`; do
+not restore a second deck at the repository root (ADR-018).
 
-### publish deck
+Fast paths — each refreshes the date/artifacts, runs the contract tests, then
+publishes in one call (pass `--no-publish` to refresh and test only):
 
-(Legacy alias: `publish slides`.)
+- deck: `bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/refresh-and-publish-slides.sh"`
+- guide: `bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/refresh-and-publish-docs.sh"`
 
-The canonical Marp source is maintainer-owned:
-
-`skills/maintainer/assets/ucsc_wp_block_dev_presentation.md`
-
-**Fast path:** `bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/refresh_and_publish_slides.sh` bumps the `Generated:` date to today, runs the deck-contract tests, then publishes — in one token-frugal call. Pass `--no-publish` to refresh and test without uploading. The numbered steps below are what it automates and what to reconcile when deck content has drifted.
-
-Before publishing:
-
-1. Compare the deck's skill inventory with every top-level directory under `skills/`.
-2. Compare its ADR summary with `docs/adr/index.md`.
-3. Refresh the title slide's `Generated:` value to the current date.
-4. Run the plugin tests, which enforce the deck path and inventory contract.
-
-Publish the verified deck to the existing Google Doc:
-
-```bash
-python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw/edit"
-```
-
-Do not restore a second deck at the repository root (ADR-018).
-
-### publish guide
-
-(Legacy alias: `publish docs`.)
-
-Publishes the generated prose guide
-`skills/maintainer/references/generate-docs-main.md`
-(derived from `README.md` via `generate-docs`) to its own Google Doc.
-
-**Fast path:** `bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/refresh_and_publish_docs.sh` regenerates the artifacts, runs the generate-docs contract tests, then publishes. Pass `--no-publish` to refresh and test without uploading.
-
-The guide's destination Google Doc URL must be set in `GDOC_URL` inside
-`refresh_and_publish_docs.sh` before first publish; until then the script refuses
-to upload. The underlying publisher accepts an explicit source:
-
-```bash
-python3 .claude/scripts/publish_to_gdoc.py \
-  --source skills/maintainer/references/generate-docs-main.md \
-  --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
-```
-
-### publish (both)
-
-Bare `publish` runs `publish deck` then `publish guide`. (Legacy alias:
-`publish all`.)
+For the pre-publish reconciliation steps and the explicit `publish_to_gdoc.py`
+invocations and destination docs, read
+[`references/publish.md`](references/publish.md).
 
 ## adr
 
@@ -371,32 +311,36 @@ reasonably hold the decision.
 
 When creating a new ADR, automatically allocate the next available ADR number,
 create a markdown file with standard frontmatter and skeleton, and update the ADR
-index file. Per ADR-086, prefer the skill+mode+detail form, which produces
-`ADR-NNN_<skill>_<mode>_<detail>.md`. The legacy two-argument slug form is still
-accepted as an alias, but it also emits a three-digit underscore filename. Number
+index file. Per ADR-065, new ADRs follow the hyphenated `ADR-NNN-<skill>-<mode>-mode-<detail>.md` form. The legacy slug form is still accepted as an alias. Number
 detection matches ADR files by their leading number regardless of separator. Per
 ADR-086 decision B, default to extending an existing ADR and create a new one
 only when the user says "add" or no existing ADR fits.
 
 ```bash
-# Preferred (ADR-086): ADR-NNN_<skill>_<mode>_<detail>.md
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <skill> <mode> "<title>"
+# Preferred (ADR-065): ADR-NNN-<skill>-<mode>-mode-<detail>.md
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/new-adr.sh" <skill> <mode> "<title>"
 
-# Legacy alias: ADR-NNN_<slug>.md
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/new_adr.sh <slug> "<title>"
+# Legacy alias: ADR-NNN-<slug>.md
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/new-adr.sh" <slug> "<title>"
 ```
 
 `new-adr` remains a legacy alias for this mode.
 
-### Retiring an ADR
+To bulk rename active and retired ADR files on disk and automatically update their references across the plugin codebase, run the utility script:
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/rename-adrs.py"
+```
+
+### Retiring and consolidating ADRs
 
 When an ADR becomes Superseded, Deprecated, or Rejected, move it out of the
-active set: set its `status:`, move the file to `docs/adr/retired/`, remove its
-row from `docs/adr/index.md`, and add a one-line entry to
-`docs/adr/adrs_retired.md` (linking into `retired/`). Active ADRs keep only
-active decisions; the `test_adr_retired.py` contract enforces this split.
-`new_adr.sh` scans `retired/` when allocating numbers, so retired numbers are
-never reused.
+active set with the [`retire-adr.sh`](scripts/retire-adr.sh) helper (subcommands
+`refs` and `retire`) instead of hand-editing the four affected files. Prefer one
+ADR per skill/theme over a stream of tiny decision files (ADR-086). For the full
+retire and merge workflows — map refs → fold into the lowest-numbered survivor →
+repoint markers/prose → grep-verify zero dangling → gates — read
+[`references/adr-consolidation.md`](references/adr-consolidation.md).
 
 ## sync-inventory
 
@@ -407,10 +351,10 @@ set before plugin work begins. Run the script:
 
 ```bash
 # Check for any drift (dry-run check)
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/sync_inventory.sh --check
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/sync-inventory.sh" --check
 
 # Reconcile and regenerate all files automatically
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/sync_inventory.sh --write
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/sync-inventory.sh" --write
 ```
 
 ## skill-details
@@ -418,7 +362,7 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/sync_inventory.
 Live developer view of every skill's actual frontmatter and invocation settings (ADR-071). Shows `user-invocable`, `model-invocable`, `discoverable`, `disable-model-invocation`, `allowed-tools`, `context`, `agent`, and any extra fields — resolved to their actual values, not static defaults. Flags any skill that differs from the all-defaults baseline.
 
 ```bash
-python3 .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/skill_details.py
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/skill-details.py"
 ```
 
 Run after any `SKILL.md` frontmatter change to confirm the intended invocation
@@ -434,7 +378,7 @@ Report a single combined summary.
 **Single-command wrapper (preferred):** run the whole battery at once with
 
 ```bash
-bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_all_plugin_tests.sh
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/run-all-plugin-tests.sh"
 ```
 
 It runs `self-test`, `check-references`, and `claude plugin validate --strict`
@@ -470,4 +414,4 @@ After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate
 See [`references/maintenance-gotchas.md`](references/maintenance-gotchas.md) for the full list. Critical items:
 
 - **Claim the ADR number before writing** — check both `docs/adr/index.md` and `ls docs/adr/` before creating a new ADR file.
-- **Skill inventory sync set** — adding/removing a skill requires updating README, hub, slide deck, AGENTS.md, and two test files together. Run `sync_inventory.sh --write` first.
+- **Skill inventory sync set** — adding/removing a skill requires updating README, hub, slide deck, AGENTS.md, and two test files together. Run `sync-inventory.sh --write` first.

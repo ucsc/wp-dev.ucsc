@@ -21,7 +21,7 @@ SLIDES_PATH = (
     / "skills"
     / "maintainer"
     / "assets"
-    / "ucsc_wp_block_dev_presentation.md"
+    / "ucsc-wp-block-dev-presentation.md"
 )
 SERVICE_ACCOUNT_FILE = SCRIPT_DIR / "service_account.json"
 CREDENTIALS_FILE = SCRIPT_DIR / "credentials.json"

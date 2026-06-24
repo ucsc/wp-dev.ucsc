@@ -14,7 +14,7 @@ repository and current CLI documentation as canonical when they differ.
 
 ```bash
 CLAUDE_PLUGINS_SOURCE=/path/to/claude-plugins-official/plugins \
-  bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+  bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/run-self-test.sh"
 ```
 
 ## Purposeful comparison set

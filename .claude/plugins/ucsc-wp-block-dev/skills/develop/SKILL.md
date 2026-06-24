@@ -10,7 +10,7 @@ Guided flow for adding a new Gutenberg block or extending an existing one in `uc
 
 ## Implements
 
-implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET, ADR-093-DEVELOP-SESSION-TARGET, ADR-094-DEVELOP-SCRIPTS, ADR-095-DEVELOP-SOURCE-BASE
+implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET, ADR-093-DEVELOP-SESSION-TARGET, ADR-094-DEVELOP-SCRIPTS, ADR-095-DEVELOP-SOURCE-BASE, ADR-096-DEVELOP-STACK-CHECK
 
 ## Modes
 
@@ -54,9 +54,9 @@ full contract. Resolve it in this order:
 1. **Explicit ARGUMENTS** — a target named in the arguments always wins and
    replaces any persisted value.
 2. **Persisted session value** — else reuse the stored target without re-asking
-   (`bash scripts/session_target.sh get`).
+   (`bash scripts/session-target.sh get`).
 3. **CWD inference** — else infer from the working directory with
-   `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve_target.sh"` (a
+   `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh` (a
    `.../src/blocks/<slug>` segment, or a directory matching a slug in
    [`references/targets.md`](references/targets.md)); it resolves
    `<slug> <repo> <path>` deterministically with no token cost. State the inferred
@@ -64,12 +64,28 @@ full contract. Resolve it in this order:
 4. **Prompt** — only when ambiguous or empty, require the user to choose a target.
 
 When a target is newly resolved or changed (steps 1, 3, 4), persist it with
-`bash scripts/session_target.sh set <slug> <repo> <abs-path>` — specify the
+`bash scripts/session-target.sh set <slug> <repo> <abs-path>` — specify the
 repository and the target both, and record the filesystem path (ADR-093). Resolve known slugs and
 aliases through [`references/targets.md`](references/targets.md), then read only
 the selected target reference. Do not load all target references.
 (ADR-084 selection contract, refined by ADR-090 CWD inference and ADR-093 session
 persistence.)
+
+**Stack sanity check (ADR-096).** This plugin was forked from the Laravel+Vue
+sibling `ucsc-laravel-vue-dev` and shares the same skill names, so the wrong
+plugin can load against a repo silently. Once per session — when the target is
+first resolved or changes — confirm the codebase is WordPress/Gutenberg before
+acting:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/stack-check.sh" <target-path>
+```
+
+It exits 0 on a WordPress match or an ambiguous/undetectable stack (printing a
+warning), and exits 3 only on a clear mismatch (Laravel/Vue signals, no
+WordPress). On a mismatch, surface it and recommend switching to
+`ucsc-laravel-vue-dev` rather than proceeding; on ambiguity, confirm the target
+with the user. Do not hard-block an ambiguous stack.
 
 Target references (ucsc-gutenberg-blocks):
 
@@ -90,10 +106,11 @@ Target references (ucsc-blocks):
 Target resolution (ADR-093):
 
 - [`references/block-target-session.md`](references/block-target-session.md) — persistent session-target contract (shared by feature/fix/run/validate/verify/review)
-- [`scripts/session_target.sh`](scripts/session_target.sh) — get/set/clear the session target cache
-- [`scripts/block_target_check.sh`](scripts/block_target_check.sh) — cheap check that a path is a real block code set, not just a folder
-- [`scripts/resolve_target.sh`](scripts/resolve_target.sh) — zero-token CWD inference: derive `<slug> <repo> <path>` from a path string, validate, optional `--persist` (the ADR-093 step 3)
-- [`scripts/check_session_target.sh`](scripts/check_session_target.sh) — one-call wrapper that reports the session target (ADR-094)
+- [`scripts/session-target.sh`](scripts/session-target.sh) — get/set/clear the session target cache
+- [`scripts/block-target-check.sh`](scripts/block-target-check.sh) — cheap check that a path is a real block code set, not just a folder
+- [`scripts/resolve-target.sh`](scripts/resolve-target.sh) — zero-token CWD inference: derive `<slug> <repo> <path>` from a path string, validate, optional `--persist` (the ADR-093 step 3)
+- [`scripts/check-session-target.sh`](scripts/check-session-target.sh) — one-call wrapper that reports the session target (ADR-094)
+- [`scripts/stack-check.sh`](scripts/stack-check.sh) — once-per-session WordPress-vs-Laravel stack sanity check; warns on mismatch (ADR-096)
 
 **Script execution (ADR-094).** Issue script commands with the harness-expanded
 `${CLAUDE_PLUGIN_ROOT}` absolute path — do not assign script paths to temporary
@@ -102,7 +119,7 @@ For the session-target checks, run the single wrapper rather than a sequence of
 ad-hoc commands:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check_session_target.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check-session-target.sh"
 ```
 
 **Source base (ADR-095).** Never hardcode an absolute base path like
@@ -111,12 +128,12 @@ command. Resolve locations through the source-base resolver, and inspect a
 plugin's block layout with the reusable inspector (quoted, `node_modules` pruned):
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/source_base.sh" plugin-dir ucsc-blocks
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/inspect_block_layout.sh" ucsc-gutenberg-blocks
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/source-base.sh" plugin-dir ucsc-blocks
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/inspect-block-layout.sh" ucsc-gutenberg-blocks
 ```
 
-- [`scripts/source_base.sh`](scripts/source_base.sh) — resolve repo-root / plugin-root / wp-plugins / plugin-dir (ADR-095)
-- [`scripts/inspect_block_layout.sh`](scripts/inspect_block_layout.sh) — safe block-layout inspection for either repo (ADR-095)
+- [`scripts/source-base.sh`](scripts/source-base.sh) — resolve repo-root / plugin-root / wp-plugins / plugin-dir (ADR-095)
+- [`scripts/inspect-block-layout.sh`](scripts/inspect-block-layout.sh) — safe block-layout inspection for either repo (ADR-095)
 
 Domain references:
 

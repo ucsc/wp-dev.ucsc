@@ -1,4 +1,4 @@
-<!-- Generated: 2026-06-24 from skills/maintainer/assets/ucsc_wp_block_dev_presentation.md -->
+<!-- Generated: 2026-06-24 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
 
 ---
 marp: true
@@ -333,7 +333,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
 
 Automated pipeline to compile and deploy these presentation slides to Google Docs:
 
-* **Source:** `.claude/plugins/ucsc-wp-block-dev/skills/maintainer/assets/ucsc_wp_block_dev_presentation.md` (Marp Markdown, this file).
+* **Source:** `.claude/plugins/ucsc-wp-block-dev/skills/maintainer/assets/ucsc-wp-block-dev-presentation.md` (Marp Markdown, this file).
 * **Script:** `.claude/scripts/publish_to_gdoc.py` — converts Marp Markdown to styled HTML and uploads to Google Drive.
 * **How it works:**
   1. Strips Marp frontmatter (theme, style, pagination config).
@@ -353,7 +353,7 @@ Automated pipeline to compile and deploy these presentation slides to Google Doc
   ```
   This is also the implementation behind the maintainer `publish deck`
   operation; `publish docs` publishes the prose guide the same way (ADR-063).
-* **One-call refresh + publish:** `skills/maintainer/scripts/refresh_and_publish_slides.sh` (deck) and `refresh_and_publish_docs.sh` (guide) bump/regenerate, run the contract tests, then publish — automating the manual steps below (ADR-003, ADR-015, ADR-063, ADR-088).
+* **One-call refresh + publish:** `skills/maintainer/scripts/refresh-and-publish-slides.sh` (deck) and `refresh-and-publish-docs.sh` (guide) bump/regenerate, run the contract tests, then publish — automating the manual steps below (ADR-003, ADR-015, ADR-063, ADR-088).
 * **Generated date:** Update the `Generated:` field on the title slide before each publish (ADR-015).
 
 ---

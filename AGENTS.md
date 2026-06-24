@@ -18,11 +18,12 @@ skill's complete `SKILL.md` before acting.
 | Skill | Use for |
 | --- | --- |
 | `develop` | Add or modify block code (PHP, template, JS editor, REST, build).<br>- `develop feature` - Defining and implementing new behavior<br>- `develop fix` - Reproducing and repairing defects |
+| `feedback` | Report a bug or suggestion about the plugin's own skills. Collects a note plus session context and delivers it to a configured endpoint/email or saves locally; not for the WordPress feedback block. |
 | `hub` | List all available skills and commands. Use when unsure which skill applies. |
 | `maintainer` | Maintain the plugin itself. Invoke as `/ucsc-wp-block-dev:maintainer` for validation, skill upkeep, ADRs, docs, and release readiness; sub-workflow `maintainer/retrospective` captures session lessons. |
 | `review` | Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests. |
 | `run` | Launch and drive the plugin in wp-dev.ucsc to see a change working. |
-| `validate` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate php` - Create or run PHP tests<br>- `validate jest` - Create or run Jest tests<br>- `validate e2e` - Create or run end-to-end tests |
+| `validate` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate php` - Create or run PHP tests<br>- `validate jest` - Create or run Jest tests<br>- `validate e2e` - Create or run end-to-end tests<br>- `validate all` - Run all test suites sequentially in one battery, single-agent |
 | `verify` | Build and run the app to confirm a specific change in the editor or frontend without substituting tests. |
 
 For block-specific work, resolve the target through

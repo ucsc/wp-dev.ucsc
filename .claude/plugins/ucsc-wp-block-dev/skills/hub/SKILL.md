@@ -14,7 +14,7 @@ implements: ADR-013-HUB-README, ADR-060-HUB-LIST-SKILLS, ADR-061-HUB-NATIVE-DISC
 does **not** parse a request or route it — Claude routes natively from each
 skill's `description` (ADR-061). Print the public workflow tables below as-is;
 this is a static inventory, so do not scan the filesystem or spawn agents to
-build it (ADR-058). It may, however, detect the current **repository** from the
+build it (ADR-003). It may, however, detect the current **repository** from the
 working-directory path string — a token-free string operation, not a filesystem
 scan — to offer that repo's block targets (ADR-060 amendment); see
 [Current repository and its block targets](#current-repository-and-its-block-targets).
@@ -39,13 +39,15 @@ because this is a Markdown table.
 | `develop` | `[feature\|fix] [block] [description or Jira/GitHub URL or ID]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `develop feature` | `[block] [feature description] [Jira or GitHub URL/ID]` | mode | mode | via develop | ✓ public |
 | `develop fix` | `[block] [problem description] [Jira or GitHub URL/ID]` | mode | mode | via develop | ✓ public |
+| `feedback` | `[bug\|idea\|question] [note]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `hub` | `[block]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `review` | `[block\|PR\|branch\|file\|diff] [bugs\|security\|a11y\|tests\|all]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `run` | `[block] [change to demonstrate or URL]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
-| `validate` | `[php\|jest\|e2e] [create\|run] [block\|feature\|Jira]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
+| `validate` | `[php\|jest\|e2e\|all] [create\|run] [block\|feature\|Jira]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 | `validate php` | `[create\|run] [block\|feature\|Jira]` | mode | mode | via validate | ✓ public |
 | `validate jest` | `[create\|run] [block\|feature\|Jira]` | mode | mode | via validate | ✓ public |
 | `validate e2e` | `[create\|run] [block\|feature\|Jira]` | mode | mode | via validate | ✓ public |
+| `validate all` | `[block]` | mode | mode | via validate | ✓ public |
 | `verify` | `[block] [change or acceptance criterion]` | ✓ (default) | ✓ (default) | ✓ (default) | ✓ public |
 
 **Discoverable** = model sees the skill's description in context and may
@@ -61,12 +63,14 @@ indented beneath it.
 - **`develop`** — `[feature|fix] [block] [description or Jira/GitHub URL or ID]` — Add or modify block code (PHP, template, JS editor, REST, build).
   - **`feature`** — `[block] [feature description] [Jira or GitHub URL/ID]` — Define and implement new behavior: a new block, editor control, or frontend output.
   - **`fix`** — `[block] [problem description] [Jira or GitHub URL/ID]` — Reproduce and repair a described defect in a specified target.
+- **`feedback`** — `[bug|idea|question] [note]` — Report a bug or suggestion about the plugin's skills (the `/bug` analog); delivers to a configured endpoint/email or saves a local copy.
 - **`review`** — `[block|PR|branch|file|diff] [bugs|security|a11y|tests|all]` — Review a diff, branch, file, PR, or Jira-scoped change for bugs, regressions, security, a11y, and missing tests.
 - **`run`** — `[block] [change to demonstrate or URL]` — Launch and drive the app to see a change working.
-- **`validate`** — `[php|jest|e2e] [create|run] [block|feature|Jira]` — Create or run automated PHP, Jest, or e2e tests.
+- **`validate`** — `[php|jest|e2e|all] [create|run] [block|feature|Jira]` — Create or run automated PHP, Jest, or e2e tests.
   - **`php`** — `[create|run] [block|feature|Jira]` — Render callbacks, sanitization, REST routes, and transient/cache behavior.
   - **`jest`** — `[create|run] [block|feature|Jira]` — Block registration, attributes, editor controls, and client behavior.
   - **`e2e`** — `[create|run] [block|feature|Jira]` — Editor insertion and frontend rendering driven through a real browser.
+  - **`all`** — `[block]` — Run every suite sequentially (PHP -> Jest -> E2E) in one agent (ADR-101).
 - **`verify`** — `[block] [change or acceptance criterion]` — Build and run the app to confirm a specific change without substituting tests or type checks.
 
 The `[…]` argument syntax mirrors each skill's `argument-hint` frontmatter, which
@@ -94,17 +98,20 @@ Known block-hosting repos:
 - `ucsc-gutenberg-blocks` — `src/blocks/<Name>.js`
 
 The maintainer skill takes no block target — its target is the plugin itself
-(ADR-085). `hub` does not *require* a target, but it can resolve, validate, and
-**set** the session target as a convenience — see
+(ADR-085). `hub` does not *require* a target and **never prompts for one**, but
+it can resolve, validate, and **set** the session target as a convenience when
+one is supplied or unambiguously inferred from the cwd — see
 [Current repository and its block targets](#current-repository-and-its-block-targets).
 
 ## Current repository and its block targets
 
 `:hub` resolves, validates, and **sets** the session block target so the next
 workflow skill reuses it instead of making the user re-specify it (ADR-093,
-ADR-060 amendment). Setting that session value is the only state `:hub` changes;
-it still does not invoke a workflow skill (no routing). Resolution and
-validation order:
+ADR-060 amendment) — but only when a target is **supplied or unambiguously
+inferred from the cwd**. The block target is **optional** for `:hub`: it never
+prompts for a target and never blocks the inventory on a target selection.
+Setting that session value is the only state `:hub` changes; it still does not
+invoke a workflow skill (no routing). Resolution and validation order:
 
 1. **Target passed to `:hub`** — when the user supplies a block (e.g.
    `:hub ucsc-events`), validate it before adopting it. Resolve its repo and
@@ -113,41 +120,58 @@ validation order:
    confirm it is a real block:
 
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/block_target_check.sh" <block-dir-or-file>
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/block-target-check.sh" <block-dir-or-file>
    ```
 
    On PASS, persist it (below); on FAIL, report the target as invalid and fall
    through to CWD detection rather than persisting a bogus value.
 
-2. **CWD detection** — otherwise detect the repo and slug from the
-   working-directory path string (token-free, no globbing) and persist when a
-   slug resolves:
+2. **CWD auto-set** — otherwise detect the repo and slug from the
+   working-directory path string (token-free, no globbing) and, **only when a
+   single slug resolves**, persist it:
 
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve_target.sh" --persist
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh" --persist
    ```
 
-   It prints `<slug> <repo> <path>`. Use the `<repo>` field to scope the offer:
+   It prints `<slug> <repo> <path>`. A resolved slug auto-sets the session
+   target; it does **not** scope which repos appear in the list below. When no
+   single slug resolves (e.g. the cwd is a repo root, or exit 3), set nothing and
+   fall through to step 3.
 
-   - **`ucsc-blocks`** — directory blocks under `src/blocks/<slug>/`.
-   - **`ucsc-gutenberg-blocks`** — single-file blocks `src/blocks/<Name>.js`.
-   - **Neither** (exit 3, or a repo not listed) — say the cwd is not inside a
-     known block repo and offer targets from both repos.
+3. **List targets from every block repo that exists (no prompt)** — independent
+   of the cwd, list the block targets for each known repo **that is present on
+   disk**, and omit any repo that is absent. Check presence cheaply (a directory
+   test, not a scan):
 
-3. **Offer the repo's targets** — list the matching repo's targets from
-   `targets.md` (the canonical, drift-free source) and let the user pick one.
-   On selection, persist it.
+   ```bash
+   plugins="$(bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/source-base.sh" wp-plugins)"
+   for repo in ucsc-blocks ucsc-gutenberg-blocks; do
+     [ -d "$plugins/$repo" ] && echo "present: $repo"
+   done
+   ```
 
-Persist a resolved or chosen target with the ADR-093 contract so every later
-skill reuses it without re-asking:
+   For each repo reported `present:`, list that repo's targets from
+   [`targets.md`](../develop/references/targets.md) (the canonical, drift-free
+   source). If both repos exist, include both — the `ucsc-blocks` blocks **and**
+   the `ucsc-gutenberg-blocks` blocks. If only one exists, list only that one. If
+   neither is present, say no block repo is on disk and list no targets. This is
+   an **informational** list shown beside the inventory: `:hub` leaves the
+   session target unset and never blocks on a selection. The user may run
+   `:hub <block>` or name the target when invoking a workflow skill. Listing
+   available targets is not the same as requiring a selection.
+
+When a target is resolved by step 1 or step 2, persist it with the ADR-093
+contract so every later skill reuses it without re-asking:
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session_target.sh" set <slug> <repo> <abs-path>
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" set <slug> <repo> <abs-path>
 ```
 
-Once set, show the target at the top of the inventory and frame the workflow
-list around it (e.g. "what the plugin can do with `<slug>` as the target"). The
-user then invokes a workflow skill to act — `:hub` itself never invokes one.
+When a target was set (step 1 or 2), show it at the top of the inventory and
+frame the workflow list around it (e.g. "what the plugin can do with `<slug>` as
+the target"). When none was set, just show the inventory. Either way the user
+then invokes a workflow skill to act — `:hub` itself never invokes one.
 
 ## Maintainer Workflows
 
