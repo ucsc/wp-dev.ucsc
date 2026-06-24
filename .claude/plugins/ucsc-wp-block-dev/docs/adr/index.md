@@ -86,3 +86,8 @@ Retired (superseded/deprecated/rejected) ADRs are listed in [adrs_retired.md](ad
 | [ADR-088](ADR-088_skill_modes_in_public_menu.md) | Skill modes appear as public menu lines | Accepted | 2026-06-22 |
 | [ADR-089](ADR-089_maintainer_public_slash.md) | Maintainer is a user-only slash skill with modes | Accepted | 2026-06-22 |
 | [ADR-090](ADR-090_develop_fix_infer_block_target_from_cwd.md) | Infer block target from CWD | Accepted | 2026-06-22 |
+| [ADR-091](ADR-091_run_target_identify_the_run_target_before_invoking_the_driver.md) | Identify the run target before invoking the driver | Accepted | 2026-06-23 |
+| [ADR-092](ADR-092_shell_safety.md) | Detect the shell and emit zsh-safe terminal commands on macOS | Accepted | 2026-06-23 |
+| [ADR-093](ADR-093_session_block_target.md) | Persist the resolved block target across the session for all block skills | Accepted | 2026-06-23 |
+| [ADR-094](ADR-094_develop_scripts_expand_harness_path_variables_when_issuing_script_commands_to_claude.md) | Expand harness path variables when issuing script commands to Claude | Accepted | 2026-06-23 |
+| [ADR-095](ADR-095_develop_source_base_resolve_a_source_base_and_use_reusable_inspection_scripts_instead_of_hardcoded_paths_and_ad_hoc_find.md) | Resolve a source base and use reusable inspection scripts instead of hardcoded paths and ad-hoc find | Accepted | 2026-06-23 |

@@ -67,7 +67,9 @@ skills:
 - [`retrospective/SKILL.md`](retrospective/SKILL.md) — capture lessons from a fix,
   feature, review, or run session into skill and reference files, and prompt for
   script/skill/test improvements (ADR-077). Reached through `maintainer` or by
-  describing the goal at session end. See ADR-083.
+  describing the goal at session end. See ADR-083. Past captured retrospectives
+  are archived in the sub-skill dir, e.g.
+  [`retrospective/archived-2026-06-18-gutenberg-hardening.md`](retrospective/archived-2026-06-18-gutenberg-hardening.md).
 
 ## External references
 

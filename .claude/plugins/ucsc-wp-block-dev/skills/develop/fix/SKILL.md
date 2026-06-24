@@ -7,7 +7,7 @@ description: This skill should be used when the user asks to "fix a block", "deb
 
 ## Implements
 
-implements: ADR-007-FIX-PROBLEM, ADR-008-FIX-JIRA, ADR-009-FIX-INTAKE, ADR-010-FIX-JIRA-REPEAT, ADR-026-FIX-TOKEN-STUDY, ADR-036-FIX-WORKFLOW, ADR-059-FIX-RETROSPECTIVE
+implements: ADR-007-FIX-PROBLEM, ADR-008-FIX-JIRA, ADR-009-FIX-INTAKE, ADR-010-FIX-JIRA-REPEAT, ADR-026-FIX-TOKEN-STUDY, ADR-036-FIX-WORKFLOW, ADR-059-FIX-RETROSPECTIVE, ADR-093-FIX-BLOCK-TARGET
 
 Systematic flow for diagnosing and fixing failures in `ucsc-gutenberg-blocks`.
 
@@ -46,6 +46,15 @@ Before using tools or investigating, obtain both required inputs from the user:
 2. **Fix description** — what needs to be fixed. A plain-language description is sufficient.
 
 A target alone is not sufficient, and a description without a target is not sufficient. A Jira ID alone is also insufficient unless its available details clearly supply both. If either required input is missing, ask one concise question for all missing inputs and wait for the answer.
+
+**Block target (ADR-093).** The target is a persistent session value shared
+across skills. Resolve it with the shared contract in
+[`../references/block-target-session.md`](../references/block-target-session.md):
+ARGUMENTS → persisted session value (`../scripts/session_target.sh get`) → cwd
+inference → prompt. Validate an inferred directory with
+`../scripts/block_target_check.sh` before adopting it, and persist a newly
+resolved target with `session_target.sh set` so later skills reuse it without
+re-asking.
 
 Prompt for a Jira ID up front. If none was supplied, include the Jira request in
 the same clarification as the concrete-problem question. When Atlassian MCP

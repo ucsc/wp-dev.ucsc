@@ -7,11 +7,21 @@ description: Review a WordPress block diff, branch, file, pull request, or Jira-
 
 ## Implements
 
-implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-034-REVIEW-DEFER-MCP-LOGIN, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS
+implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-034-REVIEW-DEFER-MCP-LOGIN, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS, ADR-093-REVIEW-BLOCK-TARGET
 
 ## Universal Command Intake
 
 Resolve the review target, natural-language review focus, and optional Jira key/URL from the full input. Infer the current diff when no target is supplied and it is unambiguous. Ask one concise question only when the review surface cannot be determined safely.
+
+**Block target (ADR-093).** When the review is scoped to a specific block (a
+diff, branch, or PR touching one block), resolve that block with the shared
+contract in
+[`../develop/references/block-target-session.md`](../develop/references/block-target-session.md):
+ARGUMENTS → persisted session value (`../develop/scripts/session_target.sh get`)
+→ cwd inference → prompt. Validate an inferred directory with
+`../develop/scripts/block_target_check.sh` before adopting it, and persist a
+newly resolved target with `session_target.sh set`. A PR/branch/diff review that
+spans multiple blocks or the whole plugin needs no single block target.
 
 Per ADR-022, the review target may be a pull-request reference: a **GitHub PR** — a full URL such as `https://github.com/ucsc/ucsc-gutenberg-blocks/pull/169` or a bare `#<n>` (GitHub is the canonical PR host for this plugin; fetch it with the `gh` CLI) — or a **Bitbucket PR** (`https://bitbucket.org/<workspace>/<repo>/pull-requests/<n>` for related UCSC webapps repos). A Jira reference (ADR-021) and a PR reference may both be supplied — Jira gives the issue/acceptance context, the PR gives the code under review.
 

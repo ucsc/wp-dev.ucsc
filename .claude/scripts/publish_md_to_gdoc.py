@@ -161,7 +161,7 @@ def authenticate(credentials_path):
     SCOPES = ["https://www.googleapis.com/auth/drive"]
 
     # Method 1: gcloud ADC
-    gcloud_adc = Path("/Users/henryh/.config/gcloud/application_default_credentials.json")
+    gcloud_adc = Path.home() / ".config/gcloud/application_default_credentials.json"
     if gcloud_adc.exists():
         try:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(gcloud_adc)

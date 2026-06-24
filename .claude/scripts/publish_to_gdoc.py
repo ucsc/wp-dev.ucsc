@@ -249,7 +249,7 @@ def authenticate_google_drive():
     SCOPES = ['https://www.googleapis.com/auth/drive']
     
     # Method 1: gcloud Application Default Credentials (ADC)
-    gcloud_adc_path = Path("/Users/henryh/.config/gcloud/application_default_credentials.json")
+    gcloud_adc_path = (Path.home() / ".config/gcloud/application_default_credentials.json")
     if gcloud_adc_path.exists():
         try:
             print("[INFO] Authenticating using gcloud Application Default Credentials...")
@@ -369,7 +369,7 @@ def main():
             if idx + 1 < len(sys.argv):
                 source_path = Path(sys.argv[idx + 1]).expanduser().resolve()
 
-    gcloud_adc_path = Path("/Users/henryh/.config/gcloud/application_default_credentials.json")
+    gcloud_adc_path = (Path.home() / ".config/gcloud/application_default_credentials.json")
     if not gcloud_adc_path.exists() and not SERVICE_ACCOUNT_FILE.exists() and not CREDENTIALS_FILE.exists() and not TOKEN_FILE.exists():
         print_instructions_and_exit()
 

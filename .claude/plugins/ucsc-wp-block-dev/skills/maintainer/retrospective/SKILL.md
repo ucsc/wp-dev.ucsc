@@ -48,8 +48,8 @@ Append to the closest existing reference file. Prefer these targets in order:
 
 | Lesson type | Target file |
 |---|---|
-| PHP test pattern, stub recipe, guard-condition checklist | `test/references/create.md` |
-| Running PHP or Jest tests via Docker | `test/references/run.md` |
+| PHP test pattern, stub recipe, guard-condition checklist | `validate/references/create.md` |
+| Running PHP or Jest tests via Docker | `validate/references/run.md` |
 | WordPress routing, FSE theme, block rendering | `develop/references/domain-blocks.md` |
 | Fix diagnostic, known transient/cache edge case | `develop/fix/SKILL.md` recovery or gotchas section |
 | Run / environment / Docker edge case | `run/SKILL.md` Recovery section |
@@ -110,3 +110,11 @@ Tell the user:
 - The `check_skill_references.sh` result.
 
 Do not summarize the entire session — focus only on what changed in the skills.
+
+## Archived Retrospectives
+
+Captured retrospectives from past sessions are kept under `references/` as
+worked examples of this workflow's output:
+
+- [`archived-2026-06-18-gutenberg-hardening.md`](archived-2026-06-18-gutenberg-hardening.md)
+  — security/CI/workflow hardening of ucsc-gutenberg-blocks and this plugin.

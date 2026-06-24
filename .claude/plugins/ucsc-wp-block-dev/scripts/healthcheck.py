@@ -7,7 +7,16 @@ import json
 import os
 from pathlib import Path
 
-PLUGIN_DIR = Path("/Users/henryh/_code/_campuspress/wp-dev.ucsc/public/wp-content/plugins/ucsc-gutenberg-blocks")
+# Resolve relative to this file (repo root is 4 levels up:
+# <repo>/.claude/plugins/ucsc-wp-block-dev/<scripts|tests>/healthcheck.py); env
+# override wins. Never hardcode a developer's absolute home path.
+_REPO_ROOT = Path(__file__).resolve().parents[4]
+PLUGIN_DIR = Path(
+    os.environ.get(
+        "UCSC_HEALTHCHECK_PLUGIN_DIR",
+        str(_REPO_ROOT / "public/wp-content/plugins/ucsc-gutenberg-blocks"),
+    )
+)
 report = {"ok": True, "checks": []}
 
 if not PLUGIN_DIR.exists():

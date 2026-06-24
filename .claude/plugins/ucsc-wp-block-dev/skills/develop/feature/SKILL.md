@@ -7,7 +7,7 @@ description: This skill should be used when the user asks to "add new behavior",
 
 ## Implements
 
-implements: ADR-008-FEATURE-JIRA, ADR-009-FEATURE-INTAKE, ADR-010-FEATURE-JIRA-REPEAT, ADR-036-FEATURE-WORKFLOW, ADR-059-FEATURE-RETROSPECTIVE
+implements: ADR-008-FEATURE-JIRA, ADR-009-FEATURE-INTAKE, ADR-010-FEATURE-JIRA-REPEAT, ADR-036-FEATURE-WORKFLOW, ADR-059-FEATURE-RETROSPECTIVE, ADR-093-FEATURE-BLOCK-TARGET
 
 Use this as the preferred workflow for new behavior. Use `fix` when existing
 behavior is incorrect.
@@ -34,6 +34,15 @@ Before using tools, require:
 
 - **Target:** the block, GUI, or app that will change.
 - **Desired outcome:** a plain-language description of the new behavior.
+
+**Block target (ADR-093).** The target is a persistent session value shared
+across skills. Resolve it with the shared contract in
+[`../references/block-target-session.md`](../references/block-target-session.md):
+ARGUMENTS → persisted session value (`../scripts/session_target.sh get`) → cwd
+inference → prompt. Validate an inferred directory with
+`../scripts/block_target_check.sh` before adopting it, and persist a newly
+resolved target with `session_target.sh set` so `develop` and later skills reuse
+it without re-asking.
 
 Prompt for a Jira ID up front in the initial clarification when none was
 supplied. When Atlassian MCP tools are available and a Jira ID or URL is

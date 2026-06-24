@@ -14,7 +14,7 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE
+implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE, ADR-093-VERIFY-BLOCK-TARGET
 
 Verify behavior against the live `wp-dev.ucsc` application, following the
 recorded launch recipe in the `run` skill.
@@ -22,6 +22,13 @@ recorded launch recipe in the `run` skill.
 ## Universal Command Intake
 
 Resolve the target block or app surface, natural-language expected behavior, and optional Jira key/URL from the full input and session context. Merge available acceptance criteria. Ask one concise question only when the behavior to prove or the target surface is missing.
+
+**Block target (ADR-093).** Resolve the block target with the shared contract in
+[`../develop/references/block-target-session.md`](../develop/references/block-target-session.md):
+ARGUMENTS → persisted session value (`develop/scripts/session_target.sh get`) →
+cwd inference → prompt. Validate an inferred directory with
+`develop/scripts/block_target_check.sh` before adopting it, and persist a newly
+resolved target with `session_target.sh set`.
 
 ## Build And Launch
 

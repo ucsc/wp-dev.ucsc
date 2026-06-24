@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
-PLUGIN_DIR="/Users/henryh/_code/_campuspress/wp-dev.ucsc/public/wp-content/plugins/ucsc-gutenberg-blocks"
+# repo root = 4 levels up (.../ucsc-wp-block-dev/<scripts|tests> -> repo); env
+# override wins. Never hardcode a developer's absolute home path.
+_HERE="$(cd "$(dirname "$0")" && pwd)"
+_REPO_ROOT="$(cd "$_HERE/../../../.." && pwd)"
+PLUGIN_DIR="${UCSC_HEALTHCHECK_PLUGIN_DIR:-$_REPO_ROOT/public/wp-content/plugins/ucsc-gutenberg-blocks}"
 MANUAL_TEST="$PLUGIN_DIR/tests/run_manual_test.php"
 PHPUNIT_TEST_DIR="$PLUGIN_DIR/tests/phpunit"
 

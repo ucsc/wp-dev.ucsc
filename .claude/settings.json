@@ -1,13 +1,5 @@
 {
   "enabledPlugins": {
     "ucsc-wp-block-dev@ucsc-wordpress": true
-  },
-  "extraKnownMarketplaces": {
-    "ucsc-wordpress": {
-      "source": {
-        "source": "directory",
-        "path": "/Users/henryh/_code/_campuspress/wp-dev.ucsc/.claude"
-      }
-    }
   }
 }

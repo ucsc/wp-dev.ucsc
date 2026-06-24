@@ -9,7 +9,7 @@ Guided flow for adding a new Gutenberg block or extending an existing one in `uc
 
 ## Implements
 
-implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET
+implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET, ADR-093-DEVELOP-SESSION-TARGET, ADR-094-DEVELOP-SCRIPTS, ADR-095-DEVELOP-SOURCE-BASE
 
 ## Modes
 
@@ -21,6 +21,12 @@ For scoped work, prefer the appropriate mode over invoking `develop` directly:
 Primarily touches `classes/` and `src/blocks/`.
 
 All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/`.
+
+## Launcher
+
+- [`launcher.md`](launcher.md) — slash-command launcher (ADR-086): if a mode is
+  given, run it; otherwise load [`skill-menu-mode.md`](skill-menu-mode.md) and
+  show the mode menu before acting.
 
 ## Universal Command Intake
 
@@ -36,16 +42,30 @@ compact implementation brief into this workflow.
 When GitHub CLI tooling is needed for pull request creation or inspection, read
 [`references/github.md`](references/github.md) before proceeding.
 
-Before using tools, determine the target. First **infer the block target from the
-current working directory** — e.g. a `.../src/blocks/<slug>` path segment, or a
-directory matching a slug in [`references/targets.md`](references/targets.md).
-When exactly one confident match is found, adopt it as the session target and
-state the inferred target so the user can correct it, rather than prompting. Only
-when inference is ambiguous or yields nothing, require the user to choose a target.
-An explicitly supplied target always wins over inference. Resolve known
-slugs and aliases through [`references/targets.md`](references/targets.md), then
-read only the selected target reference. Do not load all target references.
-(ADR-084 selection contract, refined by ADR-090 CWD inference.)
+Before using tools, determine the target. The block target is a **persistent
+session value** shared across skills (ADR-093) — see
+[`references/block-target-session.md`](references/block-target-session.md) for the
+full contract. Resolve it in this order:
+
+1. **Explicit ARGUMENTS** — a target named in the arguments always wins and
+   replaces any persisted value.
+2. **Persisted session value** — else reuse the stored target without re-asking
+   (`bash scripts/session_target.sh get`).
+3. **CWD inference** — else infer from the working directory with
+   `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve_target.sh"` (a
+   `.../src/blocks/<slug>` segment, or a directory matching a slug in
+   [`references/targets.md`](references/targets.md)); it resolves
+   `<slug> <repo> <path>` deterministically with no token cost. State the inferred
+   target so the user can correct it.
+4. **Prompt** — only when ambiguous or empty, require the user to choose a target.
+
+When a target is newly resolved or changed (steps 1, 3, 4), persist it with
+`bash scripts/session_target.sh set <slug> <repo> <abs-path>` — specify the
+repository and the target both, and record the filesystem path (ADR-093). Resolve known slugs and
+aliases through [`references/targets.md`](references/targets.md), then read only
+the selected target reference. Do not load all target references.
+(ADR-084 selection contract, refined by ADR-090 CWD inference and ADR-093 session
+persistence.)
 
 Target references (ucsc-gutenberg-blocks):
 
@@ -62,6 +82,37 @@ Target references (ucsc-blocks):
 
 - [`references/target-calendar-feed.md`](references/target-calendar-feed.md)
 - [`references/target-ucsc-events.md`](references/target-ucsc-events.md)
+
+Target resolution (ADR-093):
+
+- [`references/block-target-session.md`](references/block-target-session.md) — persistent session-target contract (shared by feature/fix/run/validate/verify/review)
+- [`scripts/session_target.sh`](scripts/session_target.sh) — get/set/clear the session target cache
+- [`scripts/block_target_check.sh`](scripts/block_target_check.sh) — cheap check that a path is a real block code set, not just a folder
+- [`scripts/resolve_target.sh`](scripts/resolve_target.sh) — zero-token CWD inference: derive `<slug> <repo> <path>` from a path string, validate, optional `--persist` (the ADR-093 step 3)
+- [`scripts/check_session_target.sh`](scripts/check_session_target.sh) — one-call wrapper that reports the session target (ADR-094)
+
+**Script execution (ADR-094).** Issue script commands with the harness-expanded
+`${CLAUDE_PLUGIN_ROOT}` absolute path — do not assign script paths to temporary
+shell variables (shell state does not persist between calls) or rely on the cwd.
+For the session-target checks, run the single wrapper rather than a sequence of
+ad-hoc commands:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check_session_target.sh"
+```
+
+**Source base (ADR-095).** Never hardcode an absolute base path like
+`/Users/.../wp-dev.ucsc/...` and never hand-roll `find`/`ls` exploration in a
+command. Resolve locations through the source-base resolver, and inspect a
+plugin's block layout with the reusable inspector (quoted, `node_modules` pruned):
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/source_base.sh" plugin-dir ucsc-blocks
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/inspect_block_layout.sh" ucsc-gutenberg-blocks
+```
+
+- [`scripts/source_base.sh`](scripts/source_base.sh) — resolve repo-root / plugin-root / wp-plugins / plugin-dir (ADR-095)
+- [`scripts/inspect_block_layout.sh`](scripts/inspect_block_layout.sh) — safe block-layout inspection for either repo (ADR-095)
 
 Domain references:
 

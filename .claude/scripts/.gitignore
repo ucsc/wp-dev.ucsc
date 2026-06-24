@@ -1,6 +1,9 @@
 # Virtual environment
 .venv/
 
+# Python bytecode cache
+__pycache__/
+
 # Google API credentials — never commit
 service_account.json
 credentials.json

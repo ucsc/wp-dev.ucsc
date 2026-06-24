@@ -4,3 +4,6 @@ public/
 
 # .agents skills are symlinks to .claude (ADR-017) — do not track
 .agents/plugins/ucsc-wp-block-dev/skills/
+
+# Per-machine Claude Code settings (holds the absolute marketplace path) — local only
+.claude/settings.local.json

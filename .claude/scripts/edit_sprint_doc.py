@@ -60,7 +60,7 @@ def authenticate():
         from google.oauth2.credentials import Credentials
         from googleapiclient.discovery import build
 
-    gcloud_adc = Path("/Users/henryh/.config/gcloud/application_default_credentials.json")
+    gcloud_adc = Path.home() / ".config/gcloud/application_default_credentials.json"
     if gcloud_adc.exists():
         try:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(gcloud_adc)

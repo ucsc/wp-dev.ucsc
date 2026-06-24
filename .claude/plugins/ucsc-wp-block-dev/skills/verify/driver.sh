@@ -46,8 +46,19 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# Prefer the shared source-base resolver so every driver agrees on the repo root
+# (ADR-095). Self-locate it relative to this driver; fall back to inline walk-up.
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd)"
+SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source_base.sh"
+
 find_root() {
   local d
+  if [ -f "$SOURCE_BASE" ]; then
+    d="$(bash "$SOURCE_BASE" repo-root 2>/dev/null || true)"
+    if [ -n "$d" ] && [ -d "$d/public/wp-content/plugins/${PLUGIN}" ]; then
+      echo "$d"; return 0
+    fi
+  fi
   for d in "${WP_DEV_ROOT:-}" "$PWD" "$(cd "$(dirname "$0")" && pwd)"; do
     [ -n "$d" ] || continue
     while [ -n "$d" ] && [ "$d" != "/" ]; do

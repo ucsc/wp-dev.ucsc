@@ -49,8 +49,19 @@ LOG="${UCSC_RUN_LOG:-/tmp/ucsc-run-$(date +%Y%m%d-%H%M%S).log}"
 FAILED=0
 
 # --- locate the wp-dev.ucsc root -------------------------------------------
+# Prefer the shared source-base resolver so every driver agrees on the repo root
+# (ADR-095). Self-locate it relative to this driver; fall back to inline walk-up.
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd)"
+SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source_base.sh"
+
 find_root() {
   local d
+  if [ -f "$SOURCE_BASE" ]; then
+    d="$(bash "$SOURCE_BASE" repo-root 2>/dev/null || true)"
+    if [ -n "$d" ] && [ -d "$d/public/wp-content/plugins/${PLUGIN}" ]; then
+      echo "$d"; return 0
+    fi
+  fi
   for d in "${WP_DEV_ROOT:-}" "$PWD" "$(cd "$(dirname "$0")" && pwd)"; do
     [ -n "$d" ] || continue
     while [ -n "$d" ] && [ "$d" != "/" ]; do
@@ -71,6 +82,21 @@ dc() { docker compose "$@"; }
 # detail = compact one-liner; everything noisy is appended to $LOG
 pass() { printf '  [ OK ] %s\n' "$1"; }
 fail() { printf '  [FAIL] %s\n' "$1"; FAILED=1; }
+
+# Pre-flight: every phase talks to Docker, so a stopped daemon otherwise makes
+# each `docker compose` call print the same "Cannot connect to the Docker
+# daemon" line — flooding the log with ~20 identical errors. Probe once and emit
+# a single actionable line instead.
+require_docker() {
+  if ! docker info >/dev/null 2>&1; then
+    echo "preflight"
+    fail "Docker daemon not running — start Docker Desktop, then re-run"
+    echo "  ...  open -a Docker   (wait until 'docker info' succeeds)"
+    echo "----"
+    echo "RESULT: FAIL  (Docker daemon unreachable)"
+    exit 1
+  fi
+}
 
 # --- phases -----------------------------------------------------------------
 do_inspect() {
@@ -159,12 +185,17 @@ do_smoke() {
   local status
   status=$(dc exec -T wpcli wp plugin list --name="$PLUGIN" --field=status 2>>"$LOG" | tr -d '\r' || true)
   [ "$status" = "active" ] && pass "plugin status: active" || fail "plugin status: ${status:-unknown}"
-  # 4. blocks registered (render-callback blocks register on init)
-  local nblocks
-  nblocks=$(dc exec -T wpcli wp eval \
-    'foreach (WP_Block_Type_Registry::get_instance()->get_all_registered() as $n=>$b){ if (strpos($n,"ucsc")===0) echo $n,"\n"; }' \
-    2>>"$LOG" | grep -c . || true)
-  [ "$nblocks" -gt 0 ] && pass "$nblocks ucsc* block(s) registered" || fail "no ucsc* blocks registered"
+  # 4. blocks registered — runtime registry via list_blocks.sh (reviewed PHP in
+  #    a file, piped to wp-cli; spans ALL activated plugins, reads no repo source)
+  local blocks nblocks
+  blocks=$(bash "$SCRIPT_DIR/list_blocks.sh" 2>>"$LOG" || true)
+  nblocks=$(printf '%s\n' "$blocks" | grep -c . || true)
+  if [ "$nblocks" -gt 0 ]; then
+    pass "$nblocks ucsc* block(s) registered"
+    printf '%s\n' "$blocks" | grep . | sed 's/^/  ...    /'
+  else
+    fail "no ucsc* blocks registered"
+  fi
 }
 
 # Drive a frontend URL with a real headless browser to prove client JS runs.
@@ -218,17 +249,48 @@ do_drive() {
 
 do_down() { echo "down"; dc down >>"$LOG" 2>&1 && pass "stack stopped" || fail "docker compose down (see log)"; }
 
+# List every ucsc/* block registered in the running WP (all activated plugins).
+do_blocks() {
+  echo "blocks"
+  local blocks nblocks
+  blocks=$(bash "$SCRIPT_DIR/list_blocks.sh" 2>>"$LOG" || true)
+  nblocks=$(printf '%s\n' "$blocks" | grep -c . || true)
+  if [ "$nblocks" -gt 0 ]; then
+    pass "$nblocks ucsc* block(s) registered (all plugins)"
+    printf '%s\n' "$blocks" | grep . | sed 's/^/  ...    /'
+  else
+    fail "no ucsc* blocks registered"
+  fi
+}
+
+# Seed the registry-driven demo page (all registered ucsc/* blocks), then drive
+# it in a real browser to prove the blocks render across whatever plugins exist.
+do_demo() {
+  echo "demo"
+  local url
+  url=$(bash "$SCRIPT_DIR/seed_demo_page.sh" 2>>"$LOG" | tr -d '\r' | grep -E '^https?://' | tail -n1)
+  if [ -n "$url" ]; then
+    pass "demo page seeded ($url)"
+    do_drive "$url"
+  else
+    fail "demo page seed failed (see log)"
+  fi
+}
+
 # --- dispatch ---------------------------------------------------------------
 cmd="${1:-all}"
+require_docker
 case "$cmd" in
   inspect) do_inspect ;;
   build)   do_build ;;
   launch)  do_launch ;;
   smoke)   do_smoke ;;
+  blocks)  do_blocks ;;
+  demo)    do_demo ;;
   drive)   do_drive "${2:-}" ;;
   down)    do_down ;;
   all)     do_inspect; do_build; do_launch; do_smoke ;;
-  *) echo "usage: driver.sh [inspect|build|launch|smoke|drive URL|all|down]"; exit 2 ;;
+  *) echo "usage: driver.sh [inspect|build|launch|smoke|blocks|demo|drive URL|all|down]"; exit 2 ;;
 esac
 
 echo "----"
