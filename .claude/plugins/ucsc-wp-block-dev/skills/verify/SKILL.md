@@ -1,6 +1,7 @@
 ---
 name: verify
 description: Build and run wp-dev.ucsc, then do a live DOM test of a ucsc-gutenberg-blocks code change or acceptance criterion in the running WordPress editor or frontend. Use when asked to verify, confirm, demonstrate, or prove that a block change works; do not substitute unit tests or type checks for live DOM testing.
+argument-hint: "[block] [behavior or acceptance criterion]"
 allowed-tools:
   - bash
   - curl
@@ -18,6 +19,27 @@ implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VE
 
 Verify behavior against the live `wp-dev.ucsc` application, following the
 recorded launch recipe in the `run` skill.
+
+## What `verify` proves — DOM vitals, the "is it alive?" check
+
+Per the ADR-030 (2026-06-23) amendment, `verify` is the per-block **"are you
+alive?"** test: it loads the relevant page(s) in the running editor/frontend and
+asserts on concrete **DOM vitals** — landmarks/signals proving the target block
+actually rendered and behaves as specified (expected wrapper/class, block markup,
+rendered content, hydrated interactive state). Proving a DOM is merely *served*
+is the `run` skill's job and is not sufficient here.
+
+Two ways to find those vitals, in order of preference:
+
+1. **Against a seeded fixture (preferred).** Drive a known sample page that
+   contains the target block, so the same landmarks are present every run. The
+   `run` skill seeds such fixtures during bring-up — `run/seed_demo_page.sh`
+   upserts a demo page containing every registered `ucsc/*` block (and
+   `run/seed_events_cache.sh` for data-backed blocks). Drive the URL it prints.
+2. **Smoke test (fallback).** When no fixture exists, look for general
+   signals/landmarks on the site's main page (and optionally a few other pages)
+   confirming the app and target block are alive, rather than asserting against a
+   guaranteed fixture.
 
 ## Universal Command Intake
 

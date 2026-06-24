@@ -7,17 +7,20 @@ user to choose.
 
 | Mode | Use when |
 |---|---|
+| `backlog` | Generate the combined personal worklist plus ADR implementation backlog. |
+| `adr` | Create, update, inspect, reconcile, or index ADRs. |
+| `skill` | Inspect, review, promote, or synchronize plugin skills. |
+| `training` | Study selected upstream plugin/skill examples and turn relevant patterns into local recommendations or requested improvements. |
+| `retro` | Capture reusable session lessons into skills, references, scripts, tests, or ADRs. |
+| `self-test` | Run the plugin's pytest contracts and deterministic best-practice checks — tests this Claude plugin, not WordPress block targets or the GUI app. Legacy alias: `test`. |
 | `validate` | Run plugin structural validation. Token-heavy Tier 2 agent review is opt-in only. |
-| `self-test` | Run the plugin's own deterministic pytest suite (manifest, frontmatter, ADRs, references, inventory) — tests the plugin itself, not the WordPress GUI app. Legacy alias: `test`. |
-| `review-skills` | Run the token-heavy plugin-dev skill reviewer after explicit choice. |
+| `review-skills` | Compatibility alias for `skill review`; token-heavy and opt-in. |
 | `review-contrib` | Review a proposed or incubating contributed skill. |
 | `promote-contrib` | Promote an incubating skill into production. |
 | `check-references` | Verify each skill references its support files. |
 | `check-adr-implements` | Verify ADR `implements:` markers. |
 | `generate-docs` | Regenerate portable Markdown documentation artifacts. |
 | `publish` | Publish both the guide and deck (bare), or a named `guide`/`deck`, after explicit approval. |
-| `adr` | Create, update, inspect, reconcile, or index ADRs. |
 | `sync-inventory` | Synchronize README, hub, AGENTS, deck, and tests with skill inventory. |
 | `skill-details` | Show live frontmatter and invocation settings. |
-| `backlog` | Generate the combined personal worklist plus ADR implementation backlog. |
 | `all` | Run deterministic health checks; excludes token-heavy plugin-dev agents. |

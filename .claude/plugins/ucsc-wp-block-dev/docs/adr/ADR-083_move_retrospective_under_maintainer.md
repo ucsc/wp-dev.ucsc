@@ -39,7 +39,9 @@ Move `retrospective` from `skills/retrospective/` to
   `maintainer/retrospective/SKILL.md`.
 - Visibility is unchanged: `retrospective` stays out of the public README, hub
   public-workflow table, and slide-deck tables. It remains reachable through
-  `maintainer` or by describing the goal at session end.
+  `maintainer retro` or by describing the goal at session end. `retro` is the
+  concise public mode name; `retrospective` remains the internal sub-skill
+  directory and frontmatter name.
 
 ## Consequences
 

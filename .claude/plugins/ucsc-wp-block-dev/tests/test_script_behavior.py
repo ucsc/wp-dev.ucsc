@@ -93,3 +93,138 @@ def test_new_adr_filename_matches_structural_convention():
         f"new_adr.sh pads ADR numbers to {width.group(1)} digits, but the "
         "convention (test_adr_filenames_use_current_convention) expects 3"
     )
+
+
+def test_best_practice_checks_pass_current_plugin():
+    """The deterministic best-practice profile must pass the maintained tree."""
+    result = subprocess.run(
+        ["python3", str(SCRIPTS / "check_plugin_best_practices.py")],
+        capture_output=True,
+        text=True,
+        cwd=str(PLUGIN_ROOT),
+        timeout=20,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "RESULT: PASS" in result.stdout
+    assert "anthropics/claude-code/tree/main/plugins/plugin-dev" in result.stdout
+
+
+def test_best_practice_checks_reject_misplaced_components(tmp_path):
+    """A high-value upstream rule must bite in a hermetic negative fixture."""
+    plugin = tmp_path / "demo-plugin"
+    manifest_dir = plugin / ".claude-plugin"
+    manifest_dir.mkdir(parents=True)
+    (manifest_dir / "plugin.json").write_text(
+        '{"name":"demo-plugin","version":"1.0.0","description":"Demo",'
+        '"author":{"name":"Demo"},"repository":"https://example.test/repo",'
+        '"homepage":"https://example.test","license":"MIT"}'
+    )
+    (manifest_dir / "skills").mkdir()
+    (plugin / "README.md").write_text("# Demo\n")
+    (plugin / "LICENSE").write_text("MIT\n")
+
+    result = subprocess.run(
+        [
+            "python3",
+            str(SCRIPTS / "check_plugin_best_practices.py"),
+            "--plugin-root",
+            str(plugin),
+        ],
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    assert result.returncode == 1
+    assert "[component-placement]" in result.stdout
+    assert "RESULT: FAIL" in result.stdout
+
+
+def test_best_practice_checks_report_optional_local_source(tmp_path):
+    source = tmp_path / "plugins" / "plugin-dev"
+    for relative in [
+        "agents/plugin-validator.md",
+        "agents/skill-reviewer.md",
+        "skills/plugin-structure/SKILL.md",
+        "skills/skill-development/SKILL.md",
+    ]:
+        path = source / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("reference\n")
+
+    result = subprocess.run(
+        [
+            "python3",
+            str(SCRIPTS / "check_plugin_best_practices.py"),
+            "--plugin-dev-source",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(PLUGIN_ROOT),
+        timeout=20,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert f"plugin-dev source: {source} (available)" in result.stdout
+
+
+def test_best_practice_checks_report_optional_skill_creator_source(tmp_path):
+    source = tmp_path / "skills" / "skill-creator"
+    for relative in [
+        "SKILL.md",
+        "references/schemas.md",
+        "scripts/quick_validate.py",
+        "scripts/run_eval.py",
+    ]:
+        path = source / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("reference\n")
+
+    result = subprocess.run(
+        [
+            "python3",
+            str(SCRIPTS / "check_plugin_best_practices.py"),
+            "--skill-creator-source",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(PLUGIN_ROOT),
+        timeout=20,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert f"skill-creator source: {source} (available)" in result.stdout
+
+
+def test_best_practice_checks_report_optional_plugin_collection(tmp_path):
+    plugins = tmp_path / "plugins"
+    expected = [
+        "example-plugin",
+        "feature-dev",
+        "hookify",
+        "security-guidance",
+        "code-review",
+        "pr-review-toolkit",
+        "commit-commands",
+        "code-simplifier",
+        "session-report",
+        "claude-md-management",
+        "plugin-dev",
+        "skill-creator",
+    ]
+    for name in expected:
+        (plugins / name).mkdir(parents=True)
+
+    result = subprocess.run(
+        [
+            "python3",
+            str(SCRIPTS / "check_plugin_best_practices.py"),
+            "--plugin-collection-source",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(PLUGIN_ROOT),
+        timeout=20,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert f"plugin collection source: {plugins} (available; {len(expected)} plugins)" in result.stdout

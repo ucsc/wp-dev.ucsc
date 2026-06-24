@@ -1,6 +1,7 @@
 ---
 name: maintainer
-description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, review or promote contributed skills, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, contribution review, slide publishing, or release readiness.
+description: Maintain the ucsc-wp-block-dev plugin itself — validate structure, run tests, study upstream plugin patterns, review or promote contributed skills, verify ADR consistency, review skills, and publish the maintainer-owned slide deck. Use for plugin health checks, source-guided training, contribution review, slide publishing, or release readiness.
+argument-hint: "[backlog|adr|skill|training|retro|self-test|validate|publish|all|...]"
 disable-model-invocation: true
 user-invocable: true
 allowed-tools:
@@ -29,9 +30,10 @@ use `develop`/`develop fix`/`run` for that). Invoke as `maintainer`. For
 Markdown artifact regeneration, read
 [`references/generate-docs.md`](references/generate-docs.md).
 
-Use this skill with one mode: `validate`, `self-test`, `review-skills`,
+Use this skill with one mode: `backlog`, `adr`, `skill`, `training`, `retro`,
+`validate`, `self-test`, `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`,
-`generate-docs`, `publish` (bare = both; or `guide`/`deck`), `adr`, `sync-inventory`,
+`training`, `generate-docs`, `publish` (bare = both; or `guide`/`deck`), `adr`, `sync-inventory`,
 `skill-details`, `backlog`, or `all`. `test` remains a legacy alias for
 `self-test`; `new-adr` remains a legacy alias for `adr`. Run all commands below
 from the repo root.
@@ -74,23 +76,33 @@ skills:
 ## External references
 
 - [`references/external-references.md`](references/external-references.md) —
-  upstream source-of-truth links for skill and command authoring: the Anthropic
-  `skill-creator` skill and the Claude Code slash-command docs. Consult these
-  over any in-repo paraphrase when creating or refining skills, commands, or the
-  run/verify drivers.
+  upstream source-of-truth links for skill and command authoring: Anthropic's
+  `plugin-dev` toolkit, the `skill-creator` skill, and the Claude Code
+  slash-command docs. Consult these over any in-repo paraphrase when creating or
+  refining skills, commands, or the run/verify drivers.
+- [`references/self-test.md`](references/self-test.md) — deterministic pytest
+  and upstream-inspired plugin checks, local-source options, deliberate
+  adaptations, and companion-plugin guidance.
+- [`references/upstream-plugin-patterns.md`](references/upstream-plugin-patterns.md)
+  — a focused comparison matrix for Anthropic's broader plugin collection.
+  Consult one or two analogous examples before major workflow, hook, agent,
+  command, or validation architecture changes.
+- [`references/training.md`](references/training.md) — source-guided maintainer
+  training workflow for comparing selected upstream examples and applying
+  evidence-backed local improvements.
 
 ## Universal Command Intake
 
 Resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do, offering the available modes as options: `validate`, `self-test`, `review-skills`, `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`, `generate-docs`, `publish` (bare = both; or `guide`/`deck`), `adr`, `sync-inventory`, `skill-details`, `backlog`, and `all`. Per ADR-064, when presenting these, flag that `validate` and `review-skills` each spawn a token-heavy Anthropic `plugin-dev` agent so the choice is informed; never run them automatically. Run the chosen mode only after they pick. When the user already named a mode (e.g. `maintainer self-test` or legacy `maintainer test`), honor it directly without prompting. Treat `test` as a legacy alias for `self-test` and `new-adr` as a legacy alias for `adr`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do. Present the durable modes first: `backlog`, `adr`, `skill`, `training`, and `retro`; then offer `self-test`, `validate`, `generate-docs`, `publish`, and `all`, with detailed compatibility modes available when needed. Per ADR-064, flag that `skill review`/`review-skills` and Tier 2 `validate` spawn token-heavy Anthropic `plugin-dev` agents; never run them automatically. Run the chosen mode only after selection. Treat `test` as a legacy alias for `self-test`, `new-adr` as a legacy alias for `adr`, and the older skill-specific modes as aliases under `skill`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
 ## Anthropic plugin-dev tools
 
 `plugin-dev` is the required companion plugin for all Tier 2 operations (ADR-079).
 Docs: https://code.claude.com/docs/en/plugins  
-Source: https://github.com/anthropics/claude-plugins-official
+Source: https://github.com/anthropics/claude-code/tree/main/plugins/plugin-dev
 
 **Before running any Tier 2 operation, verify it is installed:**
 
@@ -101,7 +113,7 @@ claude plugin list | grep plugin-dev
 If absent, install it then reload:
 
 ```text
-/plugin install plugin-dev@claude-plugins-official
+/plugin install plugin-dev@claude-code-marketplace
 /reload-plugins
 ```
 
@@ -111,6 +123,9 @@ If absent, install it then reload:
 | `plugin-dev:skill-reviewer` | Agent | Reviews skill quality — description clarity, triggering effectiveness, best practices |
 | `plugin-dev:skill-development` | Skill | Guidance for writing and improving skills — frontmatter fields, description patterns, argument handling |
 | `plugin-dev:plugin-structure` | Skill | Plugin directory layout, manifest configuration, component organization |
+
+The local deterministic profile is part of `maintainer self-test`; see
+[`references/self-test.md`](references/self-test.md).
 
 ## validate
 
@@ -138,15 +153,25 @@ Relay only the findings that matter; fix critical errors before publishing.
 
 ## self-test
 
-Run the plugin's own deterministic tests. This mode tests the
+Run the plugin's own deterministic tests:
+
+```bash
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+```
+
+This runs both the bundled pytest contracts and upstream-inspired plugin/skill
+best-practice checks from
+[`scripts/check_plugin_best_practices.py`](scripts/check_plugin_best_practices.py).
+It tests the
 `ucsc-wp-block-dev` Claude Code plugin: manifest contracts, skill frontmatter,
 ADR integrity, support-file references, script CLI contracts, generated-doc
-contracts, and inventory consistency. It does **not** test the WordPress GUI
+contracts, inventory consistency, structure, naming, progressive disclosure,
+repository hygiene, or secret signatures. It does **not** test the WordPress GUI
 app, running Docker stack, block rendering, browser behavior, PHP block logic,
 or Jest/e2e suites; use `validate`, `run`, and `verify` for product/plugin
 runtime validation.
 
-Run the bundled pytest suite (manifest validity, skill frontmatter, ADR index consistency, file layout).
+For pytest-only diagnosis, run:
 
 If `pytest` is installed globally:
 
@@ -192,13 +217,25 @@ Relay actionable findings; fix description or frontmatter issues before publishi
 
 ## skill-development
 
-When creating or modifying skills, invoke the `plugin-dev:skill-development` skill for guidance on skill structure, frontmatter conventions, description writing, and best practices.
+Before creating or substantially refactoring a `SKILL.md`, invoke
+`plugin-dev:skill-development` for structure, frontmatter, trigger-description,
+argument, and progressive-disclosure guidance.
 
-Use the Skill tool:
+## skill
 
-- `skill`: `plugin-dev:skill-development`
+Use this umbrella mode for maintaining plugin skills:
 
-Consult this before writing a new `SKILL.md` or refactoring an existing one to ensure correct frontmatter fields, argument patterns, and triggering descriptions.
+| Submode | Compatibility mode | Purpose |
+|---|---|---|
+| `skill details [name]` | `skill-details` | Show live frontmatter and invocation settings. |
+| `skill review [name\|all]` | `review-skills` | Run the opt-in plugin-dev qualitative reviewer. |
+| `skill review-contrib <candidate>` | `review-contrib` | Review a proposed or incubating skill. |
+| `skill promote <candidate>` | `promote-contrib` | Promote an accepted incubator candidate. |
+| `skill sync` | `sync-inventory` | Reconcile skill inventories in docs and tests. |
+
+When `skill` is invoked without a submode, show this table and wait for a
+selection. Keep compatibility modes working, but prefer `maintainer skill
+<submode>` in new guidance.
 
 ## review-contrib
 
@@ -274,6 +311,21 @@ It runs two checks: a hard **reverse** gate (every ADR named in an `implements:`
 marker must resolve to an existing, active ADR) and an advisory **forward**
 coverage report (active ADRs not yet implemented by any skill or script). Pass
 `--strict` to also fail on coverage gaps once the per-skill rollout is complete.
+
+## training
+
+Read [`references/training.md`](references/training.md), resolve a concrete
+local target, and compare one or two examples from
+[`references/upstream-plugin-patterns.md`](references/upstream-plugin-patterns.md).
+Study/report requests are read-only; requests to apply lessons make focused local changes and run `maintainer all`. Never execute or vendor upstream code.
+
+## retro
+
+Invoke the hidden [`retrospective/SKILL.md`](retrospective/SKILL.md)
+sub-workflow to capture reusable session lessons into the closest skill,
+reference, script, test, or ADR. `retro` is the public maintainer mode name;
+`retrospective` remains the internal sub-skill directory name. Do not use this
+mode merely to summarize a task.
 
 ## backlog
 
@@ -442,9 +494,9 @@ Run after any `SKILL.md` frontmatter change to confirm the invocation posture is
 
 ## all
 
-Run the token-frugal deterministic checks in order: `self-test` (pytest suite),
-`check-references`, then the CLI structural validator. Report a single combined
-summary.
+Run the token-frugal deterministic checks in order: `self-test`,
+`check-references`, then the CLI structural validator.
+Report a single combined summary.
 
 **Single-command wrapper (preferred):** run the whole battery at once with
 

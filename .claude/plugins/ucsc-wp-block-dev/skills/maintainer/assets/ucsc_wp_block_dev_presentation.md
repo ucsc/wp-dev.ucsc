@@ -272,7 +272,7 @@ Builds and launches from the recorded `run` recipe, then verifies acceptance cri
   * Launches Anthropic’s `plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer` agents.
   * Invokes `plugin-dev:skill-development` for guidance when writing or refactoring skills.
   * Runs `check-references` to enforce that every skill support file is linked from its `SKILL.md` (ADR-032).
-  * `maintainer self-test` runs the plugin's own pytest suite (manifest, frontmatter, ADR/reference integrity, script CLI contracts, and inventory). It does not test the WordPress GUI app.
+  * `maintainer self-test` runs the Claude plugin's pytest contracts plus deterministic plugin/skill best-practice checks. It does not test WordPress block targets or the GUI app.
   * See the plugin [README](../../../README.md) for plugin-dev tool install and usage (ADR-013).
 * **`maintainer/references/generate-docs/generate-docs.md` (Portable Markdown Artifacts):**
   * Regenerates the main guide and slide deck as Markdown under `skills/maintainer/references/generate-docs/assets/`.

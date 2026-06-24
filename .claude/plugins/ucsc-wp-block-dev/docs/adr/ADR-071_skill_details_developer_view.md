@@ -40,6 +40,9 @@ frontmatter present.
 
 The hub's static grid remains for quick orientation. `skill-details` is the
 authoritative live source; run it after any `SKILL.md` frontmatter change.
+`maintainer skill details [name]` is the preferred durable entry point;
+`skill-details` remains a compatibility mode. The `skill` umbrella also groups
+qualitative review, contribution review/promotion, and inventory sync.
 
 ## Consequences
 

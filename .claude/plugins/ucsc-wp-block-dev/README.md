@@ -40,11 +40,23 @@ reference.
 Use `maintainer` when you need to validate structure, run plugin self-tests,
 review or promote contributed skills, verify ADR consistency, or check skill
 reference integrity. The skill is user-invocable only; model auto-invocation is disabled.
-Use `maintainer self-test` for the Claude plugin's own pytest suite; it does
-not test the WordPress GUI app.
+Use `maintainer self-test` for this Claude plugin's pytest contracts and
+deterministic best-practice checks; it does not test WordPress block targets or
+the GUI app.
 
-Retrospectives are a `maintainer` sub-workflow at `maintainer/retrospective`,
-kept off the public workflow list. Reach them through `maintainer`, or by
+Use `maintainer training <goal>` to compare a focused local target with selected
+Anthropic plugin or skill examples. Training can return a study report or, when
+requested, enrich local skills, references, scripts, and tests. It never
+executes or vendors upstream code merely for inspection.
+
+The maintainer's durable entry points are `maintainer backlog`, `maintainer
+adr`, `maintainer skill`, `maintainer training`, and `maintainer retro`.
+Use `maintainer skill` for skill details, reviews, contribution promotion, and
+inventory synchronization. Use `maintainer retro` to capture session lessons
+through the hidden retrospective sub-workflow.
+
+Retrospectives are a hidden `maintainer` sub-workflow at
+`maintainer/retrospective`. Reach them through `maintainer retro`, or by
 describing the goal at the end of a fix, feature, review, or run session, when
 lessons should be saved into skill references (ADR-083).
 
@@ -67,8 +79,8 @@ contrib/proposals/<skill-name>.md
 ```
 
 Use `contrib/proposals/TEMPLATE.md` for suggestions. A maintainer reviews
-candidates with `maintainer review-contrib <candidate>` and owns final
-integration through `maintainer promote-contrib <candidate>`. Drafts under
+candidates with `maintainer skill review-contrib <candidate>` and owns final
+integration through `maintainer skill promote <candidate>`. Drafts under
 `contrib/` are not discovered or invoked as plugin skills.
 
 ## Plugin location
@@ -181,12 +193,18 @@ You can combine multiple `--plugin-dir` flags to load several plugins at once.
 
 ### Validate the plugin
 
-Maintenance and validation run through the `maintainer` skill (see ADR-004). It launches Anthropic's `plugin-dev:plugin-validator` agent and runs the test suite.
+Maintenance and validation run through the `maintainer` skill (see ADR-004).
+Deterministic checks run locally; Anthropic's `plugin-dev:plugin-validator`
+agent remains an opt-in qualitative second tier.
 
-Install the validator dependency:
+The current upstream source and recommended companion toolkit are:
+
+- https://github.com/anthropics/claude-code/tree/main/plugins/plugin-dev
+
+Install the companion plugin when Tier 2 review is wanted:
 
 ```
-/plugin install plugin-dev@claude-plugins-official
+/plugin install plugin-dev@claude-code-marketplace
 ```
 
 Then run validation from Claude Code:
@@ -197,7 +215,15 @@ Or run the full check (tests + validation):
 
 Use the `maintainer` skill with the `all` operation.
 
-The `all` flow also runs `check-references`, which enforces ADR-032 — every supporting file under a skill directory must be linked from that skill's `SKILL.md`. The pytest suite enforces the same invariant, so unreferenced reference/asset/script files fail `validate` too.
+The `all` flow runs `self-test`, then `check-references`, which enforces ADR-032
+— every supporting file under a skill directory must be linked from that
+skill's `SKILL.md`. The pytest suite enforces the same invariant.
+
+Run the complete plugin self-test with:
+
+```bash
+bash .claude/plugins/ucsc-wp-block-dev/skills/maintainer/scripts/run_self_test.sh
+```
 
 To validate without the skill, ask Claude to "validate the plugin at `.claude/plugins/ucsc-wp-block-dev`" — it will launch the `plugin-dev:plugin-validator` agent. Run the bundled tests directly with:
 

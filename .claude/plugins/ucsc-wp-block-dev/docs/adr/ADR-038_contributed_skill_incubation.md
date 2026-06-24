@@ -30,7 +30,9 @@ The lifecycle is `proposal -> incubator -> skills`. Only maintainers promote a
 candidate into `skills/`, after checking scope overlap, frontmatter, references,
 tests, realistic trigger examples, and documentation impact.
 
-The maintainer skill exposes `review-contrib` and `promote-contrib` operations.
+The maintainer skill exposes `skill review-contrib` and `skill promote` as the
+preferred entry points. `review-contrib` and `promote-contrib` remain
+compatibility operations.
 Normal plugin validation and skill discovery exclude `contrib/` so incomplete
 candidates cannot trigger accidentally.
 
@@ -46,4 +48,3 @@ repository contribution channel before a maintainer can review it.
   command surface.
 - The repository carries a small amount of additional process documentation
   and template content.
-

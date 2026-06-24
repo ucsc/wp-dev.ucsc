@@ -1,6 +1,7 @@
 ---
 name: develop
 description: This skill should be used when the user asks to "add a block", "create a Gutenberg block", "implement a feature", "modify block code", "extend a block", or when feature/fix scope is already defined and implementation is ready to begin on ucsc-gutenberg-blocks.
+argument-hint: "[feature|fix] [block] [description]"
 ---
 
 # Develop — Add a Block or Feature

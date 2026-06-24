@@ -3,7 +3,7 @@
 # run_all_plugin_tests.sh — run the `maintainer all` deterministic battery in one command.
 #
 # Battery (token-frugal, no agents):
-#   1. self-test         — bundled pytest suite (venv pytest, else host python3)
+#   1. self-test         — pytest contracts + upstream-inspired best-practice checks
 #   2. check-references  — every skill support file linked from its SKILL.md
 #   3. validate          — `claude plugin validate --strict` structural check
 #
@@ -27,7 +27,6 @@ esac
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # scripts -> maintainer -> skills -> plugin root
 PLUGIN_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-VENV_PYTEST="$PLUGIN_ROOT-venv/bin/pytest"
 
 step_status=()
 overall=0
@@ -45,13 +44,7 @@ run_step() {
 }
 
 self_test() {
-  if [ -x "$VENV_PYTEST" ]; then
-    ( cd "$PLUGIN_ROOT" && "$VENV_PYTEST" -q )
-  elif command -v pytest >/dev/null 2>&1; then
-    ( cd "$PLUGIN_ROOT" && pytest -q )
-  else
-    ( cd "$PLUGIN_ROOT" && python3 -m pytest -q )
-  fi
+  bash "$SCRIPT_DIR/run_self_test.sh"
 }
 
 check_references() {
@@ -66,7 +59,7 @@ validate() {
   claude plugin validate --strict "$PLUGIN_ROOT"
 }
 
-run_step "self-test (pytest)" self_test
+run_step "self-test" self_test
 run_step "check-references" check_references
 run_step "validate (claude plugin validate --strict)" validate
 

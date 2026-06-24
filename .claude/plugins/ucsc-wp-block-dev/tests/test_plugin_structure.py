@@ -199,8 +199,11 @@ class TestSkillFrontmatter:
         assert "`maintainer` | user-invocable plugin maintenance skill" in hub
         assert "`maintainer adr`" in hub
         assert "`maintainer backlog`" in hub
+        assert "`maintainer skill`" in hub
+        assert "`maintainer training`" in hub
+        assert "`maintainer retro`" in hub
         assert "`maintainer self-test`" in hub
-        assert "does not test the wordpress gui app" in hub
+        assert "does not test wordpress block targets or the gui app" in hub
 
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill (flat per AgentSkills spec)."""
@@ -474,6 +477,111 @@ class TestSkillFrontmatter:
         assert "`new-adr` remains a legacy alias" in text
         assert "one adr per skill" in text
         assert "default to updating the existing adr" in text
+
+    def test_maintainer_self_test_includes_best_practice_checks(self):
+        """ADR-079 folds deterministic upstream guidance into self-test."""
+        maintainer = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text()
+        external = (
+            SKILLS_DIR / "maintainer" / "references" / "external-references.md"
+        ).read_text()
+        profile = (
+            SKILLS_DIR / "maintainer" / "references" / "self-test.md"
+        ).read_text()
+        runner = (
+            SKILLS_DIR / "maintainer" / "scripts" / "run_all_plugin_tests.sh"
+        ).read_text()
+        upstream = "https://github.com/anthropics/claude-code/tree/main/plugins/plugin-dev"
+
+        assert "## plugin-dev-audit" not in maintainer
+        assert "scripts/run_self_test.sh" in maintainer
+        assert "check_plugin_best_practices.py" in profile
+        assert upstream in maintainer
+        assert upstream in external
+        assert upstream in profile
+        assert "plugin-dev@claude-code-marketplace" in maintainer
+        assert 'run_step "self-test"' in runner
+        assert "plugin-dev-audit" not in runner
+
+    def test_maintainer_links_upstream_plugin_pattern_library(self):
+        """Maintainers can compare against focused production plugin examples."""
+        maintainer = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text()
+        external = (
+            SKILLS_DIR / "maintainer" / "references" / "external-references.md"
+        ).read_text()
+        patterns = (
+            SKILLS_DIR / "maintainer" / "references" / "upstream-plugin-patterns.md"
+        ).read_text()
+        collection = "https://github.com/anthropics/claude-code/tree/main/plugins"
+
+        assert "references/upstream-plugin-patterns.md" in maintainer
+        assert collection in external
+        assert collection in patterns
+        for plugin in [
+            "feature-dev",
+            "hookify",
+            "security-guidance",
+            "code-review",
+            "pr-review-toolkit",
+            "commit-commands",
+        ]:
+            assert f"plugins/{plugin}" in patterns
+        assert "preserve this repository's no-push rule" in patterns.lower()
+
+    def test_maintainer_training_is_a_first_class_mode(self):
+        """ADR-079 routes focused upstream study through maintainer training."""
+        maintainer = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text()
+        menu = (SKILLS_DIR / "maintainer" / "skill-menu-mode.md").read_text()
+        training = (
+            SKILLS_DIR / "maintainer" / "references" / "training.md"
+        ).read_text()
+        hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
+
+        assert "## training" in maintainer
+        assert "`training`" in maintainer.split("## Universal Command Intake", 1)[0]
+        assert "references/training.md" in maintainer
+        assert "| `training` |" in menu
+        assert "`maintainer training`" in hub
+        normalized = re.sub(r"\s+", " ", training.lower())
+        for requirement in [
+            "not model fine-tuning",
+            "do not scan every upstream plugin",
+            "one or two analogous upstream plugins",
+            "record the local git commit or public review date",
+            "do not run upstream scripts",
+            "run `maintainer all`",
+        ]:
+            assert requirement in normalized
+
+    def test_maintainer_has_durable_core_modes(self):
+        """The maintainer menu leads with backlog, ADR, skill, training, and retro."""
+        maintainer = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text()
+        menu = (SKILLS_DIR / "maintainer" / "skill-menu-mode.md").read_text()
+        launcher = (SKILLS_DIR / "maintainer" / "launcher.md").read_text()
+
+        for mode in ["backlog", "adr", "skill", "training", "retro"]:
+            assert f"`{mode}`" in maintainer
+            assert f"| `{mode}` |" in menu
+
+        rows = [
+            line for line in menu.splitlines()
+            if line.startswith("| `") and not line.startswith("| `validate`")
+        ]
+        assert [re.search(r"`([^`]+)`", row).group(1) for row in rows[:5]] == [
+            "backlog",
+            "adr",
+            "skill",
+            "training",
+            "retro",
+        ]
+        assert "## skill" in maintainer
+        assert "skill details [name]" in maintainer
+        assert "skill review [name\\|all]" in maintainer
+        assert "skill review-contrib <candidate>" in maintainer
+        assert "skill promote <candidate>" in maintainer
+        assert "skill sync" in maintainer
+        assert "## retro" in maintainer
+        assert "retrospective/SKILL.md" in maintainer
+        assert "route `retro` to `retrospective/skill.md`" in launcher.lower()
 
     def test_documentation_generator_writes_to_maintainer_reference(self):
         """The regenerate script uses flat paths per AgentSkills spec (no nested generate-docs/ dir)."""

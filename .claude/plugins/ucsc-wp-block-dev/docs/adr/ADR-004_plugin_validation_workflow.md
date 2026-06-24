@@ -28,4 +28,5 @@ Plugin self-maintenance lives in a dedicated `maintainer` skill, separate from t
 
 - Validation guidance has one home (`maintainer` skill + README), discoverable near other maintainer setup steps.
 - Block-dev skills stay focused on code.
-- Maintainers must install `plugin-dev@claude-plugins-official` before validating.
+- Maintainers install `plugin-dev@claude-code-marketplace` before optional
+  Tier 2 agent review; deterministic validation does not require it.

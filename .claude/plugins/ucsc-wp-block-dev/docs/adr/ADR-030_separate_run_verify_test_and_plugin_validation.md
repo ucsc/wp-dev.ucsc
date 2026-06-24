@@ -23,6 +23,38 @@ Runtime verification must not claim success from a build, lint, type check, or a
 
 The environment `README.md` remains authoritative for clean setup. The `ucsc-gutenberg-blocks` `README.md` and `package.json` remain authoritative for product test commands.
 
+### 2026-06-23 amendment — "is it alive?" boundary between `run` and `verify`
+
+Anthropic's run-and-verify guidance frames `verify` as an "are you alive?"
+check: prove the change is actually live by observing concrete signals in the
+running application, not by trusting the build. This amendment sharpens the
+`run`/`verify` split accordingly:
+
+- **`run` only has to prove a DOM is served.** Its success bar is that the
+  `wp-dev.ucsc` stack is up and the WordPress app returns a rendered page
+  (HTTP 200 with HTML) at the expected URL. `run` does not assert anything about
+  a specific block's correctness.
+- **`verify` is the per-block "alive" test.** It loads the relevant page(s) in
+  the running editor/frontend and asserts on **DOM vitals** — concrete
+  landmarks/signals that prove the target block rendered and behaves as
+  specified (expected wrapper/class, block markup, rendered content, interactive
+  state). `verify` is what actually tests each block; an `argument-hint` of
+  `[block] [behavior or acceptance criterion]` reflects this.
+
+**Block fixtures for `verify`.** Preferred: seed a known **sample block on
+sample page(s)** as part of the `wp-dev.ucsc` bring-up, so `verify` always has a
+deterministic place to look for each block's DOM vitals. Until such fixtures
+exist, `verify` falls back to a **smoke test**: look for general signals and
+landmarks on the site's main page (and optionally a few other pages) confirming
+the app and target block are alive, rather than asserting against a guaranteed
+fixture. Seeding the sample-block fixtures during bring-up is a recommended
+follow-up, not a precondition for `verify` to run.
+
+This refinement is consistent with the per-repo coverage scope in
+[ADR-074](ADR-074_verify_skill_block_coverage_scope.md) and the run-target
+resolution in
+[ADR-091](ADR-091_run_target_identify_the_run_target_before_invoking_the_driver.md).
+
 ## Consequences
 
 The plugin follows the same responsibility split as Anthropic's `/run` and `/verify` workflow while preserving a separate UCSC plugin-maintenance validator. Agents reuse the recorded launch recipe instead of rediscovering it, and verification produces runtime evidence rather than reporting automated checks as proof.

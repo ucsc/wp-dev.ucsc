@@ -1,6 +1,7 @@
 ---
 name: run
 description: Build, launch, and drive the ucsc-gutenberg-blocks plugin in the wp-dev.ucsc Docker environment. Use when asked to run, start, build, watch, open, or interact with the WordPress app; use verify for acceptance checking and validate for automated tests.
+argument-hint: "[block] [start|build|watch|open]"
 allowed-tools:
   - bash
   - docker
@@ -17,6 +18,16 @@ allowed-tools:
 implements: ADR-002-RUN-WP-DEV, ADR-030-RUN-SEPARATION, ADR-073-RUN-CLAUDE-ONLY, ADR-091-RUN-TARGET, ADR-092-RUN-SHELL, ADR-093-RUN-BLOCK-TARGET, ADR-095-RUN-WP-EVAL
 
 Follow this recorded project recipe instead of rediscovering the launch process. Work from the `wp-dev.ucsc` root.
+
+## What `run` proves — a DOM is served
+
+Per the ADR-030 (2026-06-23) amendment, `run`'s success bar is that the
+`wp-dev.ucsc` stack is up and the WordPress app **serves a rendered page**
+(HTTP 200 with HTML) at the expected URL. `run` does not assert that a specific
+block is correct — proving a block actually rendered and behaves (its DOM vitals,
+the "is it alive?" check) belongs to `verify`. The seed helpers below
+(`seed_demo_page.sh`, `seed_events_cache.sh`) exist so `run` can stand up
+deterministic sample pages during bring-up that `verify` then drives.
 
 ## Launcher
 

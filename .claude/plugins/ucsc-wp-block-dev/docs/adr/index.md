@@ -75,7 +75,7 @@ Retired (superseded/deprecated/rejected) ADRs are listed in [adrs_retired.md](ad
 | [ADR-076](ADR-076_token_burn_log.md) | track token-heavy operations in a usage log for retrospective review | Accepted | 2026-06-17 |
 | [ADR-077](ADR-077_lessons_learned_to_scripts_and_skills.md) | always consider lessons learned and token-reduction opportunities via scripts and skill improvements | Accepted | 2026-06-17 |
 | [ADR-078](ADR-078_cli_validate_as_primary_check.md) | use claude plugin validate ./path as the primary structural check before the plugin-dev agent | Accepted | 2026-06-17 |
-| [ADR-079](ADR-079_plugin_dev_companion_plugin.md) | plugin-dev from claude-plugins-official is the required companion for Tier 2 maintainer operations | Accepted | 2026-06-17 |
+| [ADR-079](ADR-079_plugin_dev_companion_plugin.md) | Anthropic plugin-dev is the upstream reference and optional Tier 2 companion | Accepted | 2026-06-17 |
 | [ADR-080](ADR-080_agents_md_skill_inventory.md) | Keep AGENTS.md synchronized with live skill inventory | Accepted | 2026-06-17 |
 | [ADR-081](ADR-081_sub_skill_directories_under_skill.md) | Sub-skill directories nested under a parent skill are permitted | Accepted | 2026-06-18 |
 | [ADR-083](ADR-083_move_retrospective_under_maintainer.md) | Retrospective is a maintainer sub-skill | Accepted | 2026-06-18 |

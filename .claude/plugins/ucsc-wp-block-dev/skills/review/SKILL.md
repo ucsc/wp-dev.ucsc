@@ -1,6 +1,7 @@
 ---
 name: review
 description: Review a WordPress block diff, branch, file, pull request, or Jira-scoped change for bugs, regressions, security, accessibility, and missing tests.
+argument-hint: "[block | PR | branch | file | diff] [focus]"
 ---
 
 # Review Mode

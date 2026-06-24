@@ -1,6 +1,7 @@
 ---
 name: validate
 description: Create or run automated PHP, Jest, or e2e tests for a ucsc-gutenberg-blocks block, feature, fix, or Jira acceptance criterion. Modes are `create` and `run`. Use `verify` instead when proving behavior in the live running editor or frontend — `validate` is for automated test suites only.
+argument-hint: "[create|run] [block | feature | Jira]"
 allowed-tools:
   - bash
   - python

@@ -41,3 +41,32 @@ to `map` for routing when the user is unsure which to use.
 - **Negative:** The hub inventory is another surface to keep in sync with the
   skill set; the maintainer `check-references` / structural tests should guard it
   against drift.
+
+## Amendment (2026-06-23): repository detection and session-target setting
+
+Block work spans two repos with different layouts — `ucsc-blocks`
+(`src/blocks/<slug>/`) and `ucsc-gutenberg-blocks` (`src/blocks/<Name>.js`).
+Users repeatedly re-specified the block target across skills, and `:hub` already
+sits at the start of a session, so it is the natural place to establish that
+target once.
+
+Extend `:hub` so it can resolve, validate, and **set** the session block target
+(the ADR-093 contract) in addition to enumerating skills:
+
+1. **Repository detection is allowed, scans are not.** `:hub` may inspect the
+   working-directory *path string* to determine which repo it is in and offer
+   that repo's targets. This is a token-free string operation
+   (`resolve_target.sh`), not the filesystem scan that decision point 3 of this
+   ADR forbids; that prohibition still stands for building the inventory.
+2. **A passed target is validated before adoption.** When the user runs
+   `:hub <block>`, validate it with `block_target_check.sh` and resolve its repo
+   and on-disk path from `targets.md` before persisting. An invalid target is
+   reported and not persisted; resolution falls through to CWD detection.
+3. **`:hub` sets the session target but still does not route.** Persisting the
+   target via `session_target.sh set <slug> <repo> <path>` lets later skills
+   reuse it without re-asking. `:hub` still never invokes a workflow skill —
+   setting session state is not routing.
+
+This adds `argument-hint: "[block]"` to the hub skill and a "Current repository
+and its block targets" section to its `SKILL.md`. The drift surface noted above
+now also includes `targets.md` as the canonical per-repo target list.
