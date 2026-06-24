@@ -1,7 +1,7 @@
 <?php
 /**
- * list_blocks.php — print every `ucsc/*` block registered in the RUNNING
- * WordPress, one per line, sorted.
+ * list_blocks.php — print every UCSC block (ucsc/* and ucscblocks/*) registered
+ * in the RUNNING WordPress, one per line, sorted.
  *
  * This is the runtime source of truth for "all blocks, all plugins": it reads
  * the live WP_Block_Type_Registry, which already spans every activated plugin
@@ -18,7 +18,10 @@ $registry = WP_Block_Type_Registry::get_instance();
 $names     = array();
 
 foreach ( $registry->get_all_registered() as $name => $block_type ) {
-	if ( strpos( $name, 'ucsc/' ) === 0 ) {
+	// Match every UCSC namespace, not just ucsc/* — ucsc-gutenberg-blocks
+	// registers under ucscblocks/* (e.g. ucscblocks/classschedule), so an
+	// 'ucsc/' prefix would silently drop that whole plugin's blocks.
+	if ( strpos( $name, 'ucsc' ) === 0 ) {
 		$names[] = $name;
 	}
 }

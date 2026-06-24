@@ -238,7 +238,10 @@ do_drive() {
   # Dump the post-JS DOM so callers can grep for hydrated markup.
   if "$chrome" "${common[@]}" --dump-dom "$url" >"${LOG}.dom" 2>>"$LOG"; then
     local nblocks
-    nblocks=$(grep -oE 'wp-block-ucsc-[a-z-]+' "${LOG}.dom" 2>/dev/null | sort -u | grep -c . || true)
+    # Match both namespaces' wrapper classes: wp-block-ucsc-<name> (ucsc/*) and
+    # wp-block-ucscblocks-<name> (ucsc-gutenberg-blocks' ucscblocks/*). The looser
+    # 'ucsc[a-z-]+' covers both without a false FAIL on ucscblocks/* blocks.
+    nblocks=$(grep -oE 'wp-block-ucsc[a-z-]+' "${LOG}.dom" 2>/dev/null | sort -u | grep -c . || true)
     [ "$nblocks" -gt 0 ] && pass "$nblocks ucsc block class(es) in rendered DOM" \
                          || fail "no ucsc block classes in rendered DOM"
     echo "  ...  DOM dump: ${LOG}.dom"

@@ -210,10 +210,29 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/run/list_blocks.sh"
 
 [`list_blocks.sh`](list_blocks.sh) resolves the repo root via `source_base.sh`
 and pipes [`helpers/list_blocks.php`](helpers/list_blocks.php) into
-`wp eval-file -` over STDIN — listing every `ucsc/*` block in the live registry
-across all activated plugins, with no PHP embedded in a shell string. For other
-runtime queries, add a sibling `helpers/<name>.php` and a thin `*.sh` wrapper on
-the same pattern rather than crafting an inline eval.
+`wp eval-file -` over STDIN — listing every UCSC block (both `ucsc/*` and
+`ucscblocks/*`) in the live registry across all activated plugins, with no PHP
+embedded in a shell string. For other runtime queries, prefer the generic
+substrate [`wp_eval.sh`](wp_eval.sh) — it locates the root and pipes any
+`helpers/<name>.php` to `wp eval-file -`, forwarding `KEY=VAL` args as container
+env (`getenv()`), so a new query is just a reviewed PHP file plus a thin `*.sh`
+wrapper, never an inline eval.
+
+### Diagnose a block that renders a fallback — `block_doctor.sh`
+
+When a dynamic block shows a placeholder or "No X available" and the cause is
+unclear, [`block_doctor.sh`](block_doctor.sh) (PHP in
+[`helpers/block_doctor.php`](helpers/block_doctor.php)) explains it in one call:
+it renders the block server-side as the anonymous user and flags whether the
+output looks like a fallback, then audits the anonymous permission posture of
+every REST route in a namespace. A dynamic block that fetches via its own
+`rest_do_request()` endpoints falls back silently when those routes deny
+anonymous access during a logged-out frontend render, and this surfaces exactly
+which route is the culprit:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/run/block_doctor.sh" ucscblocks/classschedule
+```
 
 ## Gotchas
 
