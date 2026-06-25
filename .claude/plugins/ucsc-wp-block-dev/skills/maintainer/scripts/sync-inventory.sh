@@ -30,6 +30,7 @@ python3 - "$@" <<'EOF'
 import os
 import sys
 import re
+import json
 
 # Determine directories
 SCRIPT_DIR = os.environ.get("SCRIPT_DIR")
@@ -195,6 +196,104 @@ MODES = {
     "validate": ["validate php", "validate jest", "validate e2e", "validate all"],
 }
 
+TREE_DATA_PATH = os.path.join(skills_dir, "hub", "references", "skill-tree.json")
+with open(TREE_DATA_PATH) as tree_file:
+    TREE_DATA = json.load(tree_file)
+
+
+def validate_tree_node(node, path):
+    """Validate the data contract that drives every rendered tree."""
+    for key in ["name", "argument_hint", "short_description"]:
+        if not isinstance(node.get(key), str) or not node[key].strip():
+            raise ValueError(f"{path}: missing non-empty {key}")
+    if "\n" in node["short_description"]:
+        raise ValueError(f"{path}: short_description must fit on one line")
+    if len(node["short_description"]) > 88:
+        raise ValueError(f"{path}: short_description exceeds 88 characters")
+    for index, child in enumerate(node.get("modes", [])):
+        validate_tree_node(child, f"{path}.modes[{index}]")
+
+
+TREE_SKILLS = TREE_DATA.get("skills", [])
+for index, node in enumerate(TREE_SKILLS):
+    validate_tree_node(node, f"skills[{index}]")
+
+tree_skill_names = [node["name"] for node in TREE_SKILLS]
+if set(tree_skill_names) != set(live_skills):
+    missing = sorted(set(live_skills) - set(tree_skill_names))
+    stale = sorted(set(tree_skill_names) - set(live_skills))
+    raise ValueError(f"skill-tree.json drift: missing={missing}, stale={stale}")
+
+for node in TREE_SKILLS:
+    full_hint = get_argument_hint(os.path.join(skills_dir, node["name"], "SKILL.md"))
+    if not full_hint or full_hint == "—":
+        raise ValueError(f"{node['name']}: top-level SKILL.md lacks argument-hint")
+    if node.get("modes"):
+        match = re.match(r"^\[([^\]]+)\]", full_hint.replace("\\|", "|"))
+        advertised = match.group(1).split("|") if match else []
+        configured = [mode["name"] for mode in node["modes"]]
+        if advertised != configured:
+            raise ValueError(
+                f"{node['name']}: frontmatter modes {advertised} "
+                f"do not match skill-tree.json {configured}"
+            )
+
+maintainer_node = next(node for node in TREE_SKILLS if node["name"] == "maintainer")
+maintainer_contexts = set(maintainer_node.get("contexts", []))
+if "public" in maintainer_contexts or "maintainer" not in maintainer_contexts:
+    raise ValueError(
+        "maintainer must be hidden from public context and visible in maintainer context"
+    )
+
+
+def tree_nodes_for_context(context):
+    """Select top-level skills using the data-owned visibility policy."""
+    return [node for node in TREE_SKILLS if context in node.get("contexts", [])]
+
+
+def render_node_group(nodes, prefix=""):
+    """Render sibling nodes with columns aligned at their current depth."""
+    if not nodes:
+        return []
+    name_width = max(len(node["name"]) for node in nodes)
+    display_hints = [
+        "" if node["argument_hint"] == "—" else node["argument_hint"]
+        for node in nodes
+    ]
+    hint_width = max(len(hint) for hint in display_hints)
+    lines = []
+    for index, node in enumerate(nodes):
+        last = index == len(nodes) - 1
+        branch = "└─ " if last else "├─ "
+        continuation = "   " if last else "│  "
+        display_hint = display_hints[index]
+        hint_column = f"  {display_hint:<{hint_width}}" if hint_width else ""
+        lines.append(
+            f"{prefix}{branch}{node['name']:<{name_width}}"
+            f"{hint_column}  — {node['short_description']}"
+        )
+        lines.extend(render_node_group(node.get("modes", []), prefix + continuation))
+    return lines
+
+
+def workflow_tree(context):
+    """Build a complete context-specific skills tree from skill-tree.json."""
+    return "\n".join(["skills", *render_node_group(tree_nodes_for_context(context))])
+
+
+def skill_subtree(name):
+    """Build a single skill's hub-style subtree: the skill as root with its modes
+    (and sub-modes) as indented children. Used for every mode-bearing skill's
+    bare-invocation menu so they match the hub format (ADR-088, 2026-06-25)."""
+    node = next(n for n in TREE_SKILLS if n["name"] == name)
+    root = f"{node['name']}  {node['argument_hint']}  — {node['short_description']}"
+    return "\n".join([root, *render_node_group(node.get("modes", []))])
+
+
+def maintainer_tree():
+    """Build the explicitly invoked maintainer-only tree."""
+    return skill_subtree("maintainer")
+
 
 def fold_modes(skill, key):
     """Return a '<br>- `mode` - desc' suffix listing a skill's modes inside its
@@ -216,37 +315,26 @@ readme_path = os.path.join(PLUGIN_DIR, "README.md")
 if os.path.exists(readme_path):
     readme_content = open(readme_path).read()
     
-    # Generate README table
-    lines = [
-        "| Skill or mode | Purpose |",
-        "|---|---|"
-    ]
-    for s in live_skills:
-        if s in ["retrospective"]:
-            continue
-        desc = METADATA.get(s, {}).get("readme") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-        desc += fold_modes(s, "readme")
-        lines.append(f"| `{s}` | {desc} |")
-    
-    pattern = r"(\| Skill or mode \| Purpose \|\s*\n\|---\|---\|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
+    expected_tree = workflow_tree("readme")
+    pattern = r"(\*\*On `ucsc-gutenberg-blocks` \(the WordPress plugin — the product\):\*\*\s*\n\n```text\n)(.*?)(\n```)"
     match = re.search(pattern, readme_content, re.DOTALL)
     if match:
         current_body = match.group(2).strip()
-        expected_body = "\n".join(lines[2:]).strip()
+        expected_body = expected_tree.strip()
         if current_body != expected_body:
             if write_mode:
-                new_table = match.group(1) + expected_body
-                new_content = readme_content[:match.start()] + new_table + readme_content[match.end():]
+                new_tree = match.group(1) + expected_body + match.group(3)
+                new_content = readme_content[:match.start()] + new_tree + readme_content[match.end():]
                 with open(readme_path, "w") as f:
                     f.write(new_content)
-                print("  [ OK ] README.md skills table updated")
+                print("  [ OK ] README.md skills tree updated")
             else:
-                print("  [FAIL] README.md skills table is out of sync")
+                print("  [FAIL] README.md skills tree is out of sync")
                 success = False
         else:
-            print("  [ OK ] README.md skills table is in sync")
+            print("  [ OK ] README.md skills tree is in sync")
     else:
-        print("  [FAIL] README.md: skills table not found")
+        print("  [FAIL] README.md: skills tree not found")
         success = False
 else:
     print(f"  [FAIL] README.md not found at {readme_path}")
@@ -295,35 +383,14 @@ hub_path = os.path.join(skills_dir, "hub", "SKILL.md")
 if os.path.exists(hub_path):
     hub_content = open(hub_path).read()
     
-    # Public workflows — a nested list (ADR-088): each skill on its own line with
-    # its argument hint and purpose; its modes indented beneath it. This is a
-    # list, not a table, so pipes inside the `code spans` are not escaped.
-    list_lines = []
-    for s in live_skills:
-        if s in ["hub", "maintainer", "retrospective"]:
-            continue
-        desc = METADATA.get(s, {}).get("hub") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-        if not desc:
-            continue
-        hint = get_argument_hint(os.path.join(skills_dir, s, "SKILL.md")).replace("\\|", "|")
-        list_lines.append(f"- **`{s}`** — `{hint}` — {desc}")
-        for mode in MODES.get(s, []):
-            mode_desc = METADATA.get(mode, {}).get("hub")
-            if not mode_desc:
-                continue
-            mode_desc = re.sub(r"^Mode of `[^`]+` for ", "", mode_desc).rstrip(".")
-            mode_label = mode.split()[-1]
-            mode_hint = MODE_HINTS.get(mode, "—")
-            list_lines.append(f"  - **`{mode_label}`** — `{mode_hint}` — {mode_desc}.")
-
-    pattern_pub = r"(## Public workflows\s*\n\nEach skill is listed with its argument hint and purpose; a skill's modes are\nindented beneath it\.\n\n)(.*?)(?=\n\n)"
+    expected_pub = workflow_tree("public")
+    pattern_pub = r"(## Public workflows\s*\n\nThe compact tree below lists each top-level skill with its argument hint and\nnests public modes beneath their parent\.\n\n```text\n)(.*?)(\n```)"
     match_pub = re.search(pattern_pub, hub_content, re.DOTALL)
 
     pub_ok = False
     if match_pub:
         current_pub = match_pub.group(2).strip()
-        expected_pub = "\n".join(list_lines).strip()
-        pub_ok = current_pub == expected_pub
+        pub_ok = current_pub == expected_pub.strip()
         
     if pub_ok:
         print("  [ OK ] skills/hub/SKILL.md is in sync")
@@ -331,18 +398,94 @@ if os.path.exists(hub_path):
         if write_mode:
             new_content = hub_content
             if match_pub:
-                new_pub = match_pub.group(1) + expected_pub
+                new_pub = match_pub.group(1) + expected_pub.strip() + match_pub.group(3)
                 new_content = new_content[:match_pub.start()] + new_pub + new_content[match_pub.end():]
             with open(hub_path, "w") as f:
                 f.write(new_content)
             print("  [ OK ] skills/hub/SKILL.md updated")
         else:
             if not pub_ok:
-                print("  [FAIL] skills/hub/SKILL.md public workflows table is out of sync")
+                print("  [FAIL] skills/hub/SKILL.md public workflows tree is out of sync")
             success = False
 else:
     print(f"  [FAIL] skills/hub/SKILL.md not found")
     success = False
+
+# 3b. Sync the explicitly invoked maintainer trees.
+expected_maintainer = maintainer_tree()
+if os.path.exists(hub_path):
+    hub_content = open(hub_path).read()
+    pattern_maint = r"(## Maintainer Workflows\s*\n\nPrint this section only when `:hub` is shown from an active `maintainer`\nworkflow\.\n\n```text\n)(.*?)(\n```)"
+    match_maint = re.search(pattern_maint, hub_content, re.DOTALL)
+    maint_ok = bool(
+        match_maint
+        and match_maint.group(2).strip() == expected_maintainer.strip()
+    )
+    if maint_ok:
+        print("  [ OK ] skills/hub/SKILL.md maintainer tree is in sync")
+    elif write_mode and match_maint:
+        new_tree = match_maint.group(1) + expected_maintainer + match_maint.group(3)
+        hub_content = hub_content[:match_maint.start()] + new_tree + hub_content[match_maint.end():]
+        with open(hub_path, "w") as f:
+            f.write(hub_content)
+        print("  [ OK ] skills/hub/SKILL.md maintainer tree updated")
+    else:
+        print("  [FAIL] skills/hub/SKILL.md maintainer tree is out of sync")
+        success = False
+
+maintainer_menu_path = os.path.join(skills_dir, "maintainer", "skill-menu-mode.md")
+if os.path.exists(maintainer_menu_path):
+    menu_content = open(maintainer_menu_path).read()
+    pattern_menu = r"(When maintainer is invoked without a mode, present this menu and wait for the\nuser to choose\.\n\n```text\n)(.*?)(\n```)"
+    match_menu = re.search(pattern_menu, menu_content, re.DOTALL)
+    menu_ok = bool(
+        match_menu
+        and match_menu.group(2).strip() == expected_maintainer.strip()
+    )
+    if menu_ok:
+        print("  [ OK ] maintainer/skill-menu-mode.md tree is in sync")
+    elif write_mode and match_menu:
+        new_tree = match_menu.group(1) + expected_maintainer + match_menu.group(3)
+        menu_content = menu_content[:match_menu.start()] + new_tree + menu_content[match_menu.end():]
+        with open(maintainer_menu_path, "w") as f:
+            f.write(menu_content)
+        print("  [ OK ] maintainer/skill-menu-mode.md tree updated")
+    else:
+        print("  [FAIL] maintainer/skill-menu-mode.md tree is out of sync")
+        success = False
+else:
+    print(f"  [FAIL] maintainer menu not found at {maintainer_menu_path}")
+    success = False
+
+# 3c. Sync each mode-bearing skill's bare menu as the hub subtree for that skill
+# (ADR-088, 2026-06-25). The menu's single ```text block is rendered from
+# skill-tree.json, so develop/validate menus stay identical in shape to the hub.
+def sync_skill_menu(skill_name):
+    global success
+    menu_path = os.path.join(skills_dir, skill_name, "skill-menu-mode.md")
+    if not os.path.exists(menu_path):
+        print(f"  [FAIL] {skill_name} menu not found at {menu_path}")
+        success = False
+        return
+    expected = skill_subtree(skill_name)
+    content = open(menu_path).read()
+    m = re.search(r"(```text\n)(.*?)(\n```)", content, re.DOTALL)
+    if m and m.group(2).strip() == expected.strip():
+        print(f"  [ OK ] {skill_name}/skill-menu-mode.md tree is in sync")
+    elif write_mode and m:
+        new_block = m.group(1) + expected + m.group(3)
+        content = content[:m.start()] + new_block + content[m.end():]
+        with open(menu_path, "w") as f:
+            f.write(content)
+        print(f"  [ OK ] {skill_name}/skill-menu-mode.md tree updated")
+    else:
+        print(f"  [FAIL] {skill_name}/skill-menu-mode.md tree is out of sync")
+        success = False
+
+# Render for every mode-bearing skill except maintainer (handled above).
+for _menu_skill in [node["name"] for node in TREE_SKILLS
+                    if node.get("modes") and node["name"] != "maintainer"]:
+    sync_skill_menu(_menu_skill)
 
 # 4. Sync Presentation Deck
 deck_path = os.path.join(skills_dir, "maintainer", "assets", "ucsc-wp-block-dev-presentation.md")

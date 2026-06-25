@@ -9,10 +9,12 @@ Two checks:
      (status Accepted or Proposed; not Superseded/Deprecated/Rejected).
      Any violation exits non-zero.
 
-  2. Forward (coverage, advisory): every active ADR should be implemented by at
-     least one skill or script. Uncovered active ADRs are reported as warnings.
-     With --strict, uncovered ADRs also fail the run (intended once the per-skill
-     rollout completes).
+  2. Forward (coverage, advisory): every *Accepted* ADR should be implemented by
+     at least one skill or script. Uncovered Accepted ADRs are reported as
+     warnings. With --strict, uncovered ADRs also fail the run (intended once the
+     per-skill rollout completes). `Proposed` ADRs are exempt — a proposal is a
+     forward-looking idea that is intentionally not yet implemented, so it is a
+     valid `implements:` target (reverse check) but is not required to have one.
 
 `implements:` markers:
   - In SKILL.md (and other .md): a body line `implements: ADR-086-FOO, ADR-089-BAR`.
@@ -38,6 +40,9 @@ ADR_DIR = PLUGIN_ROOT / "docs" / "adr"
 SKILLS_DIR = PLUGIN_ROOT / "skills"
 
 ACTIVE_STATUSES = {"Accepted", "Proposed"}
+# Forward-coverage applies only to decisions that are meant to be implemented.
+# A `Proposed` ADR is a forward-looking idea, intentionally not yet implemented.
+IMPLEMENTED_STATUSES = {"Accepted"}
 ADR_KEY_RE = re.compile(r"ADR-(\d{3,})")
 IMPLEMENTS_MD_RE = re.compile(r"^\s*implements:\s*(.+)$", re.IGNORECASE)
 IMPLEMENTS_CODE_RE = re.compile(r"^\s*#\s*implements:\s*(.+)$", re.IGNORECASE)
@@ -116,9 +121,10 @@ def main(argv: list[str] | None = None) -> int:
                 f"ADR-{num} referenced by {flist} is '{entry[1]}' (not active)"
             )
 
-    # Check 2 — forward (coverage, advisory unless --strict)
-    uncovered = sorted(num for num, (_p, _s, active) in adr_index.items()
-                       if active and num not in refs)
+    # Check 2 — forward (coverage, advisory unless --strict).
+    # Only Accepted ADRs must be implemented; Proposed (forward-looking) ADRs are exempt.
+    uncovered = sorted(num for num, (_p, status, _active) in adr_index.items()
+                       if status in IMPLEMENTED_STATUSES and num not in refs)
 
     print("----")
     if reverse_violations:
@@ -130,7 +136,7 @@ def main(argv: list[str] | None = None) -> int:
 
     label = "FAIL" if strict else "WARN"
     if uncovered:
-        print(f"[{label}] forward coverage — {len(uncovered)} active ADR(s) not yet "
+        print(f"[{label}] forward coverage — {len(uncovered)} Accepted ADR(s) not yet "
               f"implemented by any skill or script:")
         print("   " + ", ".join(f"ADR-{n}" for n in uncovered))
     else:

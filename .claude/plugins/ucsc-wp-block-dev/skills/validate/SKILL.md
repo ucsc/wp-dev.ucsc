@@ -16,7 +16,7 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-019-VALIDATE-CHECKIN-TEXT, ADR-030-VALIDATE-SEPARATION, ADR-042-VALIDATE-REFERENCES, ADR-050-VALIDATE-NO-LOCAL-DEPS, ADR-066-VALIDATE-DRIVER, ADR-087-VALIDATE-RENAME, ADR-088-VALIDATE-MODES, ADR-093-VALIDATE-BLOCK-TARGET, ADR-101-VALIDATE-ALL-SEQUENTIAL, ADR-102-VALIDATE-OUTPUT-ISOLATION
+implements: ADR-019-VALIDATE-CHECKIN-TEXT, ADR-030-VALIDATE-SEPARATION, ADR-042-VALIDATE-REFERENCES, ADR-050-VALIDATE-NO-LOCAL-DEPS, ADR-066-VALIDATE-DRIVER, ADR-087-VALIDATE-RENAME, ADR-088-VALIDATE-MODES, ADR-093-VALIDATE-BLOCK-TARGET, ADR-101-VALIDATE-ALL-SEQUENTIAL, ADR-102-VALIDATE-OUTPUT-ISOLATION, ADR-103-VALIDATE-VERIFY-STACK-DEPENDENCY
 
 ## Launcher
 
@@ -52,8 +52,7 @@ require host PHP or Node.
 | `bash bin/validate-e2e.sh` | wraps `tests/e2e/run-e2e.sh` | `ucsc-validate-e2e.log` |
 | `bash bin/validate.sh [php] [jest] [e2e]` | battery — all suites (run with no args) or a named subset, with a per-suite PASS/FAIL summary. Do not pass 'all' as an argument. | — |
 
-Logs land in `$UCSC_LOG_DIR` (default `/tmp`). The e2e suite needs the stack up
-(run `run` first); php and jest run fully offline.
+Logs land in `$UCSC_LOG_DIR` (default `/tmp`). The e2e suite needs the stack up; if the docker container is not running, you must invoke the `run` skill first before running e2e or all tests (ADR-103). PHP and Jest run fully offline.
 
 **Output isolation (ADR-102).** Test logs and artifacts must be session- and
 block-target-specific — never static global paths — to avoid concurrent runs

@@ -25,6 +25,17 @@ Build and launch the app, then use the recorded driver/browser path to interact
 with the requested surface and observe it working. `run` demonstrates the app;
 `verify` applies a specific acceptance criterion without falling back to tests.
 
+## Environment — home-rolled Docker Compose (ADR-002)
+
+`wp-dev.ucsc` is a **home-rolled Docker Compose** stack — **not** wp-env, Local,
+ddev, or WP Engine. There is no framework CLI: a custom `Dockerfile`
+(WordPress 6.5.5 + PHP 8.1 + **LDAP** + Xdebug) plus three layered compose files
+(`docker-compose.yml` base, `docker-compose-start.yml` dev/watch overlay,
+`docker-compose-install.yml` bootstrap jobs), driven by plain `docker compose`
+and WP-CLI inside the `wpcli` container. It is **dev-only**; the real site is
+production. Do not assume any environment-manager conventions. Full details:
+[`references/environment.md`](references/environment.md).
+
 ## Launcher
 
 - [`launcher.md`](launcher.md) — slash-command launcher (ADR-086). `run` has no
@@ -162,104 +173,45 @@ when a screenshot materially helps. Use `verify` when the request provides a
 specific change or acceptance criterion to confirm. Use `validate` for PHP,
 Jest, or e2e suites.
 
-## Runtime Introspection — `wp-eval.sh`
+## Runtime introspection & diagnostics
 
-To inspect WordPress runtime state (registered blocks, options, transients) with
-PHP, **do not** pipe an inline heredoc into `wp eval-file` — a command like
-`printf '... $n[] = $name; ...' | docker compose exec -T wpcli wp eval-file -`
-embeds PHP on the command line and trips zsh array/arith expansion permission
-prompts. Instead run a bundled PHP file through a wrapper that pipes it over
-STDIN (ADR-095):
+Used only when inspecting live state or diagnosing a block — not every run. All
+runtime queries run a reviewed `helpers/<name>.php` piped to `wp eval-file -`
+over STDIN, never an inline heredoc (ADR-095). Bundled wrappers:
 
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/run/list-blocks.sh"
-```
+- [`list-blocks.sh`](list-blocks.sh) (PHP [`helpers/list-blocks.php`](helpers/list-blocks.php))
+  — list every live UCSC block (`ucsc/*` and `ucscblocks/*`).
+- [`wp-eval.sh`](wp-eval.sh) — generic substrate: pipe any `helpers/<name>.php`,
+  forwarding `KEY=VAL` args as container env, so a new query is a reviewed PHP
+  file plus a thin wrapper.
+- [`block-doctor.sh`](block-doctor.sh) (PHP [`helpers/block-doctor.php`](helpers/block-doctor.php))
+  — diagnose a fallback render by rendering the block logged-out and auditing
+  anonymous REST access across a namespace.
 
-[`list-blocks.sh`](list-blocks.sh) resolves the repo root via `source-base.sh`
-and pipes [`helpers/list-blocks.php`](helpers/list-blocks.php) into
-`wp eval-file -` over STDIN — listing every UCSC block (both `ucsc/*` and
-`ucscblocks/*`) in the live registry across all activated plugins, with no PHP
-embedded in a shell string. For other runtime queries, prefer the generic
-substrate [`wp-eval.sh`](wp-eval.sh) — it locates the root and pipes any
-`helpers/<name>.php` to `wp eval-file -`, forwarding `KEY=VAL` args as container
-env (`getenv()`), so a new query is just a reviewed PHP file plus a thin `*.sh`
-wrapper, never an inline eval.
-
-### Diagnose a block that renders a fallback — `block-doctor.sh`
-
-When a dynamic block shows a placeholder or "No X available" and the cause is
-unclear, [`block-doctor.sh`](block-doctor.sh) (PHP in
-[`helpers/block-doctor.php`](helpers/block-doctor.php)) explains it in one call:
-it renders the block server-side as the anonymous user and flags whether the
-output looks like a fallback, then audits the anonymous permission posture of
-every REST route in a namespace. A dynamic block that fetches via its own
-`rest_do_request()` endpoints falls back silently when those routes deny
-anonymous access during a logged-out frontend render, and this surfaces exactly
-which route is the culprit:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/run/block-doctor.sh" ucscblocks/classschedule
-```
+Full usage and rationale: [`references/diagnostics.md`](references/diagnostics.md).
 
 ## Gotchas
 
-- **Never `composer install` a plugin — the README install flow is the contract.**
-  The wp-dev.ucsc README installs Composer deps for the *theme* only; plugins are
-  brought up with `plugin_npm_install` (npm) and activated by `wordpress_install`.
-  Any plugin that hard-`require`s a Composer-vendored library at load (as an early
-  `ucsc-blocks` did with `plugin-update-checker`) will fatal on a clean checkout —
-  that is a **plugin bug to fix**, not a reason to run `composer install`. Guard
-  such requires with `file_exists()` so the dev environment activates without
-  Composer (`ucsc-blocks.php` does this; production still ships the vendored lib).
+Situational traps hit only in specific scenarios — not every run:
 
-- **Seed the events cache to render cards without the live API.** `ucsc/events`
-  renders a placeholder until `ucsc_events_fetch_data()` has data; that data is a
-  transient keyed `ucsc_events_<md5(apiUrl)>`. Seed it so the block renders real
-  `.ucsc-event-item` cards offline by running the bundled seeder (the PHP lives in
-  [`helpers/seed-events-cache.php`](helpers/seed-events-cache.php) and is piped to
-  wp-cli over STDIN — no inline eval heredoc, ADR-095):
+- **Never `composer install` a plugin** — plugins come up via `plugin_npm_install`
+  and `wordpress_install`; guard any Composer-vendored `require` with
+  `file_exists()` (a hard-require fatal is a plugin bug, not a reason to install).
+- **Seed the `ucsc/events` transient cache** to render cards offline with
+  [`seed-events-cache.sh`](seed-events-cache.sh) (PHP
+  [`helpers/seed-events-cache.php`](helpers/seed-events-cache.php)).
+- **Seed an all-blocks demo page** for one drive/verify URL with
+  [`seed-demo-page.sh`](seed-demo-page.sh) (PHP
+  [`helpers/seed-demo-page.php`](helpers/seed-demo-page.php)).
+- **Chrome headless** against the self-signed vanity host — `driver.sh drive`
+  supplies the host-resolver/cert flags, so no `/etc/hosts` edit is needed.
 
-  ```bash
-  bash "${CLAUDE_PLUGIN_ROOT}/skills/run/seed-events-cache.sh"
-  ```
-
-  [`seed-events-cache.sh`](seed-events-cache.sh) seeds the transient; clear it
-  again with `wp transient delete --all`.
-
-- **Seed a demo page that contains every registered `ucsc/*` block** for a single
-  frontend URL to drive/verify against, via
-  [`seed-demo-page.sh`](seed-demo-page.sh) (PHP in
-  [`helpers/seed-demo-page.php`](helpers/seed-demo-page.php)). It upserts the page
-  and prints its URL:
-
-  ```bash
-  bash "${CLAUDE_PLUGIN_ROOT}/skills/run/seed-demo-page.sh"
-  ```
-
-- **Chrome headless against the vanity host.** The page lives at the self-signed
-  `https://wp-dev.ucsc/` vhost. `driver.sh drive` passes
-  `--host-resolver-rules="MAP wp-dev.ucsc 127.0.0.1"`, `--ignore-certificate-errors`,
-  and `--virtual-time-budget=6000` (so `DOMContentLoaded` JS runs); the headless
-  path does not require an `/etc/hosts` edit.
+Details: [`references/gotchas.md`](references/gotchas.md).
 
 ## Recovery
 
-- **`driver.sh` exits with "Docker daemon not running — start Docker Desktop"**
-  — the driver pre-flights `docker info` and fails fast with this single line
-  when the daemon is stopped (rather than flooding the log with repeated "Cannot
-  connect to the Docker daemon" socket errors). It is not a stack fault. Start
-  Docker Desktop and wait for the daemon before re-running:
-
-  ```bash
-  open -a Docker
-  for i in $(seq 1 40); do docker info >/dev/null 2>&1 && break; sleep 3; done
-  ```
-
-  Then re-run the same `UCSC_PLUGIN=<slug> bash .../driver.sh all`. The daemon is
-  typically ready within a few seconds of the app window appearing.
-- If Compose reports orphan containers, add `--remove-orphans`.
-- **"Error establishing a database connection" right after `up -d`** — the `db` container needs a few seconds before wp-cli can connect. Wait and retry; `driver.sh launch` polls `wp option get siteurl` for up to 60s before activating the plugin.
-- **`wp db <cmd>` fails with `caching_sha2_password could not be loaded`** — that is the bundled mysql CLI client, not a real database fault. Use PHP/mysqli-path commands instead (`wp option get`, `wp eval`, `wp plugin …`). The driver's readiness probe relies on this.
-- If API output is stale, run `docker compose exec wpcli wp transient delete --all`.
-- If Campus Directory fails locally, confirm VPN access and `DOCKER_DEV=docker_dev`.
-- Do not delete containers, volumes, repositories, or user data without explicit approval.
+When the stack misbehaves — Docker daemon down, orphan containers, DB-connection
+races right after `up -d`, the `caching_sha2_password` mysql-client red herring,
+stale API caches, or Campus Directory VPN — see
+[`references/recovery.md`](references/recovery.md). Never delete containers,
+volumes, repositories, or user data without explicit approval.

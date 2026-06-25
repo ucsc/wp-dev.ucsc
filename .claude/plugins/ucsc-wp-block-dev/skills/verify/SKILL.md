@@ -15,7 +15,7 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE, ADR-093-VERIFY-BLOCK-TARGET
+implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE, ADR-093-VERIFY-BLOCK-TARGET, ADR-103-VALIDATE-VERIFY-STACK-DEPENDENCY
 
 Verify behavior against the live `wp-dev.ucsc` application, following the
 recorded launch recipe in the `run` skill.
@@ -56,10 +56,11 @@ resolved target with `session-target.sh set`.
 
 ## Build And Launch
 
-1. Use the `run` recipe to inspect prerequisites and start only what is missing.
-2. Build the current plugin source in Docker.
-3. Confirm the plugin is active and the WordPress services are running.
-4. Open the canonical app at `https://wp-dev.ucsc/wp-admin/`.
+1. **Stack Dependency (ADR-103):** The verify skill requires the local WordPress environment to be running. If the docker container is not up (e.g. `wp-dev.ucsc` connection refused), you must proactively invoke the `run` skill first.
+2. Use the `run` recipe to inspect prerequisites and start only what is missing.
+3. Build the current plugin source in Docker.
+4. Confirm the plugin is active and the WordPress services are running.
+5. Open the canonical app at `https://wp-dev.ucsc/wp-admin/`.
 
 Do not use Jest, PHP tests, lint, type checks, or a successful build as proof
 that the user-facing behavior works. Those checks belong to the `validate` skill.

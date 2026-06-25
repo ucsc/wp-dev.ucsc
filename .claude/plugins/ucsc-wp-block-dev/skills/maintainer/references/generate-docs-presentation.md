@@ -1,4 +1,4 @@
-<!-- Generated: 2026-06-24 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
+<!-- Generated: 2026-06-25 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
 
 ---
 marp: true
@@ -38,7 +38,7 @@ style: |
 
 **Presented by:** UCSC ITS<br />
 **Date:** June 2026<br />
-**Generated:** 2026-06-24<br />
+**Generated:** 2026-06-25<br />
 **Target Product:** `ucsc-gutenberg-blocks`<br />
 **Local Environment:** `wp-dev.ucsc`
 
@@ -126,6 +126,7 @@ references:
 | **`develop`** | Block code changes, new behavior, or bug repair | Adds or modifies PHP class, template, JS editor, REST, and build steps. |
 | **`develop feature`** | New behavior | Defines requirements and implements a feature, editor enhancement, or new block. |
 | **`develop fix`** | Bug repair | Reproduces, diagnoses, and repairs a described block defect. |
+| **`feedback`** | "Submit feedback" / report a bug about a skill | Collects a feedback note plus session context and delivers it to a configured endpoint/email (else saves locally). |
 | **`hub`** | "List the skills" (`:hub`) | Enumerates the available skills and commands; does not route (ADR-060). |
 | **`maintainer`** | Plugin maintenance | User-invocable as `/ucsc-wp-block-dev:maintainer`; validates and improves the plugin, skills, ADRs, docs, and release readiness. |
 | **`review`** | Review request | Reviews a diff, branch, file, or Jira-scoped change. |
@@ -134,6 +135,7 @@ references:
 | **`validate php`** | PHP test request | Creates or runs PHP tests. |
 | **`validate jest`** | Jest test request | Creates or runs JavaScript tests. |
 | **`validate e2e`** | Browser test request | Creates or runs end-to-end tests. |
+| **`validate all`** | Full-suite validation | Runs PHP, Jest, and end-to-end suites sequentially in a single agent. |
 | **`verify`** | Change verification | Builds/runs the app and confirms a specific change without substituting tests. |
 
 **Hidden reference material:**

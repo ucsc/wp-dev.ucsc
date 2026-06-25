@@ -8,7 +8,7 @@ argument-hint: "[block|PR|branch|file|diff] [bugs|security|a11y|tests|all]"
 
 ## Implements
 
-implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-034-REVIEW-DEFER-MCP-LOGIN, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS, ADR-093-REVIEW-BLOCK-TARGET
+implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-034-REVIEW-DEFER-MCP-LOGIN, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS, ADR-093-REVIEW-BLOCK-TARGET, ADR-104-REVIEW-WP-COMPANION
 
 ## Universal Command Intake
 
@@ -64,6 +64,33 @@ equivalent staging/commit operations unless the user explicitly asks. Never run
 `git push`, `git push --force`, `git push --force-with-lease`, or equivalent
 remote-write operations; provide the command or PR URL for the user to run
 instead.
+
+## Companion: general WordPress engineering (ADR-104)
+
+This skill reviews a **block change** for bugs, security, a11y, and missing
+tests. When a request widens to **general WordPress engineering** beyond the
+block target — site-wide performance/query auditing, security hardening,
+plugin/theme architecture, or WordPress coding standards — recommend the
+optional, MIT-licensed companion skillset rather than re-deriving that guidance
+here (it is not bundled and not required):
+
+- **`claude-wordpress-skills`** by Elvis Marin (`elvismdev`) —
+  https://github.com/elvismdev/claude-wordpress-skills. Its active
+  `wp-performance-review` skill covers unbounded/`LIKE`/`NOT IN` queries,
+  object-cache/transient strategy, N+1 template queries, AJAX/HTTP calls, hook
+  usage, and JS bundling (with VIP/WP Engine/Pantheon/self-hosted notes);
+  `wp-security-review`, `wp-gutenberg-blocks`, `wp-theme-development`, and
+  `wp-plugin-development` are in development.
+
+Install once, then continue the block-specific review:
+
+```text
+/plugin marketplace add elvismdev/claude-wordpress-skills
+```
+
+After installing, `/reload-plugins` may be needed to discover the new skills.
+Keep the recommendation brief and non-blocking; do not install it yourself
+without explicit user approval.
 
 ## Plugin-dev Tools
 

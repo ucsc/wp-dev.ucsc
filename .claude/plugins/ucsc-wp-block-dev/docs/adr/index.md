@@ -98,3 +98,7 @@ Retired (superseded/deprecated/rejected) ADRs are listed in [adrs_retired.md](ad
 | [ADR-100](ADR-100-feedback-submit-mode-add-a-user-feedback-skill-for-the-plugin.md) | Add a user feedback skill for the plugin | Accepted | 2026-06-24 |
 | [ADR-101](ADR-101-validate-single-agent-sequential-suites.md) | validate 'all' mode runs suites sequentially in a single agent | Accepted | 2026-06-24 |
 | [ADR-102](ADR-102-validate-session-and-block-specific-test-output.md) | test results, logs, and artifacts must be session and block-target specific | Accepted | 2026-06-24 |
+| [ADR-103](ADR-103-validate-verify-stack-dependency.md) | Validate and verify should invoke run skill if docker is down | Accepted | 2026-06-24 |
+| [ADR-104](ADR-104-develop-companion-mode-claude-wordpress-skills-is-a-recommended-companion-skillset-for-wp-work.md) | claude-wordpress-skills is a recommended companion skillset for WP work | Accepted | 2026-06-25 |
+| [ADR-105](ADR-105-run-runtime-mode-support-multiple-wp-local-runtimes-wp-env-local-wp-engine-beyond-home-rolled-wp-dev-ucsc.md) | Support multiple WP local runtimes (wp-env, Local, WP Engine) beyond home-rolled wp-dev.ucsc | Proposed | 2026-06-25 |
+| [ADR-106](ADR-106-maintainer-generate-docs-mode-marker-driven-documentation-harvest-doc-landmarks-like-implements-markers.md) | Marker-driven documentation — harvest doc landmarks like implements: markers | Proposed | 2026-06-25 |

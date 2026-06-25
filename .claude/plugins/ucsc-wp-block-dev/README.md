@@ -17,16 +17,38 @@ directly.
 
 **On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
 
-| Skill or mode | Purpose |
-|---|---|
-| `develop` | Add or modify block code directly<br>- `develop feature` - defining and implementing new behavior<br>- `develop fix` - reproducing and repairing defects |
-| `feedback` | Report a bug or suggestion about the plugin's skills (the `/bug` analog) |
-| `hub` | List every available skill and command (`:hub`) — enumeration only |
-| `maintainer` | Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness |
-| `review` | Review a diff, branch, file, block, or Jira-scoped change |
-| `run` | Launch and drive wp-dev.ucsc to see a change working |
-| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate php` - PHP tests<br>- `validate jest` - Jest tests<br>- `validate e2e` - end-to-end tests<br>- `validate all` - the full sequential battery (PHP -> Jest -> E2E) |
-| `verify` | Build and run the app to confirm a specific change without substituting tests or type checks |
+```text
+skills
+├─ hub         [block]                                   — list skills and set an optional session block target
+├─ develop     [feature|fix] [block] [request]           — add or modify WordPress block code
+│  ├─ feature  [block] [request]  — implement planned block behavior
+│  └─ fix      [block] [problem]  — diagnose and repair a block defect
+├─ feedback    [bug|idea|question] [note]                — report a bug or idea about the plugin skills
+├─ review      [target] [focus]                          — review code for bugs, security, a11y, and tests
+├─ run         [block] [change|URL]                      — launch and drive wp-dev.ucsc
+├─ validate    [php|jest|e2e|all] [create|run] [target]  — create or run automated test suites
+│  ├─ php   [create|run] [target]  — create or run PHP tests
+│  ├─ jest  [create|run] [target]  — create or run Jest tests
+│  ├─ e2e   [create|run] [target]  — create or run browser-driven tests
+│  └─ all   [block]                — run PHP, Jest, and E2E sequentially
+├─ verify      [block] [criterion]                       — confirm a change in the running app
+└─ maintainer  [mode] [submode|target]                   — maintain this plugin package
+   ├─ backlog                                   — build the personal and unimplemented-ADR backlog
+   ├─ adr            [action] [ADR|decision]    — author, retire, inspect, and reconcile ADRs
+   ├─ skill          [action] [name|candidate]  — maintain plugin skills, references, scripts, and inventory
+   │  ├─ details         [name]       — inspect live frontmatter and invocation settings
+   │  ├─ review          [name|all]   — run the opt-in qualitative skill reviewer
+   │  ├─ review-contrib  <candidate>  — review a proposed or incubating skill
+   │  ├─ promote         <candidate>  — promote an accepted candidate
+   │  └─ sync                         — reconcile skill inventories across docs and tests
+   ├─ training       [goal]                     — study upstream patterns and apply relevant lessons
+   ├─ retro          [lesson|skill]             — capture reusable session lessons
+   ├─ self-test                                 — run pytest contracts and deterministic plugin checks
+   ├─ validate       [tier1|tier2]              — run structural validation; Tier 2 is opt-in
+   ├─ generate-docs                             — regenerate portable guide and deck Markdown
+   ├─ publish        [guide|deck|all]           — publish the guide, deck, or both after approval
+   └─ all                                       — run the deterministic maintainer health checks
+```
 
 `run` and `verify` follow the bundled Claude Code v2.1.145+ contract. The
 recorded recipe in this plugin plays the role of `/run-skill-generator`: `run`
@@ -72,6 +94,42 @@ Markdown artifacts before copying the guide or deck into Google Docs or
 Confluence. Use `maintainer generate-docs` for regeneration and
 `maintainer publish` (bare = both; or `guide`/`deck`) only when publishing the guide or
 deck to Google Docs.
+
+## Companion skills (recommended)
+
+This plugin is intentionally scoped to UCSC **block** development in
+`wp-dev.ucsc`. For **general WordPress engineering** that falls outside a block
+target — site-wide performance/query auditing, security hardening, plugin/theme
+architecture, and WordPress coding standards — install the optional,
+MIT-licensed companion skillset by Elvis Marin (`elvismdev`). It complements
+`review`/`validate` without overlapping their block scope (ADR-104):
+
+- **`claude-wordpress-skills`** — https://github.com/elvismdev/claude-wordpress-skills
+  - `wp-performance-review` (active) — DB query, caching/transient, N+1,
+    AJAX/HTTP, hook, and JS-bundling analysis, with VIP/WP Engine/Pantheon/
+    self-hosted notes.
+  - `wp-security-review`, `wp-gutenberg-blocks`, `wp-theme-development`,
+    `wp-plugin-development` — in development.
+
+Install it (marketplace preferred):
+
+```text
+/plugin marketplace add elvismdev/claude-wordpress-skills
+```
+
+Alternatives:
+
+```bash
+git clone https://github.com/elvismdev/claude-wordpress-skills.git ~/.claude/plugins/wordpress
+git submodule add https://github.com/elvismdev/claude-wordpress-skills.git .claude/plugins/wordpress
+```
+
+Run `/reload-plugins` after installing if the new skills aren't discovered yet.
+It is a recommendation, not a dependency — every `ucsc-wp-block-dev` workflow
+works without it. A formal dependency is deferred until its in-development skills
+reach a stable release (ADR-104). This is separate from the Anthropic
+`plugin-dev` companion used for plugin *maintenance* (see
+[Validate the plugin](#validate-the-plugin) and ADR-079).
 
 ## Contributing skills
 

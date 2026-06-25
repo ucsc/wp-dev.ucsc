@@ -1,6 +1,6 @@
 ---
 title: UCSC WordPress Block Development Plugin Guide
-generated: 2026-06-24
+generated: 2026-06-25
 source: README.md
 ---
 
@@ -23,15 +23,38 @@ directly.
 
 **On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
 
-| Skill or mode | Purpose |
-|---|---|
-| `develop` | Add or modify block code directly<br>- `develop feature` - defining and implementing new behavior<br>- `develop fix` - reproducing and repairing defects |
-| `hub` | List every available skill and command (`:hub`) — enumeration only |
-| `maintainer` | Maintain this plugin for validation, skill upkeep, ADRs, docs, and release readiness |
-| `review` | Review a diff, branch, file, block, or Jira-scoped change |
-| `run` | Launch and drive wp-dev.ucsc to see a change working |
-| `validate` | Create or run automated PHP, Jest, or e2e tests<br>- `validate php` - PHP tests<br>- `validate jest` - Jest tests<br>- `validate e2e` - end-to-end tests |
-| `verify` | Build and run the app to confirm a specific change without substituting tests or type checks |
+```text
+skills
+├─ hub         [block]                                   — list skills and set an optional session block target
+├─ develop     [feature|fix] [block] [request]           — add or modify WordPress block code
+│  ├─ feature  [block] [request]  — implement planned block behavior
+│  └─ fix      [block] [problem]  — diagnose and repair a block defect
+├─ feedback    [bug|idea|question] [note]                — report a bug or idea about the plugin skills
+├─ review      [target] [focus]                          — review code for bugs, security, a11y, and tests
+├─ run         [block] [change|URL]                      — launch and drive wp-dev.ucsc
+├─ validate    [php|jest|e2e|all] [create|run] [target]  — create or run automated test suites
+│  ├─ php   [create|run] [target]  — create or run PHP tests
+│  ├─ jest  [create|run] [target]  — create or run Jest tests
+│  ├─ e2e   [create|run] [target]  — create or run browser-driven tests
+│  └─ all   [block]                — run PHP, Jest, and E2E sequentially
+├─ verify      [block] [criterion]                       — confirm a change in the running app
+└─ maintainer  [mode] [submode|target]                   — maintain this plugin package
+   ├─ backlog                                   — build the personal and unimplemented-ADR backlog
+   ├─ adr            [action] [ADR|decision]    — author, retire, inspect, and reconcile ADRs
+   ├─ skill          [action] [name|candidate]  — maintain plugin skills, references, scripts, and inventory
+   │  ├─ details         [name]       — inspect live frontmatter and invocation settings
+   │  ├─ review          [name|all]   — run the opt-in qualitative skill reviewer
+   │  ├─ review-contrib  <candidate>  — review a proposed or incubating skill
+   │  ├─ promote         <candidate>  — promote an accepted candidate
+   │  └─ sync                         — reconcile skill inventories across docs and tests
+   ├─ training       [goal]                     — study upstream patterns and apply relevant lessons
+   ├─ retro          [lesson|skill]             — capture reusable session lessons
+   ├─ self-test                                 — run pytest contracts and deterministic plugin checks
+   ├─ validate       [tier1|tier2]              — run structural validation; Tier 2 is opt-in
+   ├─ generate-docs                             — regenerate portable guide and deck Markdown
+   ├─ publish        [guide|deck|all]           — publish the guide, deck, or both after approval
+   └─ all                                       — run the deterministic maintainer health checks
+```
 
 `run` and `verify` follow the bundled Claude Code v2.1.145+ contract. The
 recorded recipe in this plugin plays the role of `/run-skill-generator`: `run`

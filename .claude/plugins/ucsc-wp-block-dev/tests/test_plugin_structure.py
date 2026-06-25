@@ -31,6 +31,18 @@ EXPECTED_LIVE_SKILLS = {
 EXPECTED_DEVELOP_MODES = {"feature", "fix"}
 EXPECTED_MAINTAINER_SUB_SKILLS = {"retrospective"}
 EXPECTED_PUBLIC_WORKFLOW_SKILLS = EXPECTED_LIVE_SKILLS
+SKILL_TREE_PATH = SKILLS_DIR / "hub" / "references" / "skill-tree.json"
+SKILL_TREE = json.loads(SKILL_TREE_PATH.read_text())
+
+
+def tree_skill(name: str) -> dict:
+    return next(node for node in SKILL_TREE["skills"] if node["name"] == name)
+
+
+def flatten_tree(nodes):
+    for node in nodes:
+        yield node
+        yield from flatten_tree(node.get("modes", []))
 
 
 def read_frontmatter(skill_dir: Path) -> dict:
@@ -159,11 +171,11 @@ class TestSkillFrontmatter:
         readme = (PLUGIN_ROOT / "README.md").read_text()
 
         for skill_name in sorted(EXPECTED_PUBLIC_WORKFLOW_SKILLS):
-            assert f"| `{skill_name}` |" in readme
+            assert re.search(rf"^[├└]─ {re.escape(skill_name)}\s", readme, re.MULTILINE)
 
-        assert "| `retrospective` |" not in readme
-        assert "| `survey` |" not in readme
-        assert "| `maintainer` |" in readme
+        assert not re.search(r"^[├└]─ retrospective\s", readme, re.MULTILINE)
+        assert not re.search(r"^[├└]─ survey\s", readme, re.MULTILINE)
+        assert re.search(r"^[├└]─ maintainer\s", readme, re.MULTILINE)
         assert "user-invocable only" in readme.lower()
         assert "model auto-invocation is disabled" in readme.lower()
         # retrospective is a hidden maintainer sub-skill (ADR-083).
@@ -178,17 +190,25 @@ class TestSkillFrontmatter:
             hub,
             re.DOTALL,
         ).group(1)
-        for skill_name in sorted(EXPECTED_LIVE_SKILLS - {"hub", "maintainer"}):
-            assert f"`{skill_name}`" in public, f"hub is missing skill '{skill_name}'"
-        # Public workflows is a nested list: modes appear as bare backticked
-        # names indented under their parent skill (e.g. `feature` under develop).
-        for skill_name in sorted(EXPECTED_DEVELOP_MODES):
-            assert f"`{skill_name}`" in public, f"hub is missing develop mode '{skill_name}'"
-        for mode_name in ["php", "jest", "e2e"]:
-            assert f"`{mode_name}`" in public, f"hub is missing validate mode '{mode_name}'"
-        assert "`test`" not in public
+        public_nodes = [
+            node for node in SKILL_TREE["skills"] if "public" in node["contexts"]
+        ]
+        for skill_name in [node["name"] for node in public_nodes]:
+            assert re.search(
+                rf"^[├└]─ {re.escape(skill_name)}\s",
+                public,
+                re.MULTILINE,
+            ), f"hub is missing skill '{skill_name}'"
+        for node in public_nodes:
+            for mode in flatten_tree(node.get("modes", [])):
+                assert re.search(
+                    rf"^[│ ]+[├└]─ {re.escape(mode['name'])}\s",
+                    public,
+                    re.MULTILINE,
+                ), f"hub is missing mode '{node['name']} {mode['name']}'"
+        assert not re.search(r"^[│ ]+[├└]─ test\s", public, re.MULTILINE)
         assert "develop/survey" not in public
-        assert "`maintainer`" not in public
+        assert not re.search(r"^[├└]─ maintainer\s", public, re.MULTILINE)
         assert "maintainer/retrospective" not in public
         # hub enumerates; it does not route (ADR-061).
         assert "invoke the specific skill directly" in hub.lower()
@@ -199,24 +219,20 @@ class TestSkillFrontmatter:
         assert "when `:hub` is shown while the `maintainer` skill is already active" in hub
         assert "## maintainer workflows" in hub
         assert "print this section only when `:hub` is shown from an active `maintainer`" in hub
-        assert "`maintainer` | `[backlog\\|adr\\|skill\\|training\\|retro" in hub
-        assert "user-invocable plugin maintenance skill" in hub
-        assert "`maintainer adr`" in hub
-        assert "`maintainer backlog`" in hub
-        assert "`maintainer skill`" in hub
-        assert "`maintainer training`" in hub
-        assert "`maintainer retro`" in hub
-        assert "`maintainer self-test`" in hub
-        assert "does not test wordpress block targets or the gui app" in hub
+        maintainer = tree_skill("maintainer")
+        assert "public" not in maintainer["contexts"]
+        assert "maintainer" in maintainer["contexts"]
+        for mode in flatten_tree(maintainer["modes"]):
+            assert re.search(
+                rf"^[│ ]*[├└]─ {re.escape(mode['name'])}\s",
+                hub,
+                re.MULTILINE,
+            )
+        assert "tier 2 is opt-in" in hub
 
     def test_hub_argument_hints_match_frontmatter(self):
-        """Hub syntax must reproduce top-level frontmatter argument-hints."""
+        """Hub tree includes compact basic argument hints for top-level skills."""
         hub = (SKILLS_DIR / "hub" / "SKILL.md").read_text()
-        invocation = re.search(
-            r"## Skill invocation settings\s*\n(.*?)(?=\n## Public workflows)",
-            hub,
-            re.DOTALL,
-        ).group(1)
         public = re.search(
             r"## Public workflows\s*\n(.*?)(?=\n## Block target)",
             hub,
@@ -228,45 +244,90 @@ class TestSkillFrontmatter:
             re.DOTALL,
         ).group(1)
 
-        for name in ["develop", "hub", "review", "run", "validate", "verify"]:
-            hint = read_frontmatter(SKILLS_DIR / name).get("argument-hint")
-            assert hint, f"{name} must declare argument-hint"
-            escaped = hint.replace("|", "\\|")
-            # Skill invocation settings is a Markdown table (pipes escaped).
-            assert f"| `{name}` | `{escaped}` |" in invocation
-            # Public workflows is a nested list: `**`skill`** — `hint` — …`
-            # (a code span, so the pipes are not escaped).
-            if name not in {"hub"}:
-                assert f"**`{name}`** — `{hint}`" in public, (
-                    f"hub public list missing {name} argument hint"
-                )
+        public_nodes = [
+            node for node in SKILL_TREE["skills"] if "public" in node["contexts"]
+        ]
+        for node in public_nodes:
+            name = node["name"]
+            hint = node["argument_hint"]
+            assert read_frontmatter(SKILLS_DIR / name).get("argument-hint")
+            assert re.search(
+                rf"^[├└]─ {name}\s+{re.escape(hint)}\s+—",
+                public,
+                re.MULTILINE,
+            ), f"hub tree missing compact hint for {name}"
 
-        hint = read_frontmatter(SKILLS_DIR / "maintainer").get("argument-hint")
-        escaped = hint.replace("|", "\\|")
-        assert f"| `maintainer` | `{escaped}` |" in maintainer
+        maintainer_node = tree_skill("maintainer")
+        assert re.search(
+            rf"^maintainer\s+{re.escape(maintainer_node['argument_hint'])}\s+—",
+            maintainer,
+            re.MULTILINE,
+        )
+
+    def test_skill_tree_data_contract(self):
+        """The tree model owns skills, modes, hints, descriptions, and visibility."""
+        assert SKILL_TREE["version"] == 1
+        assert {node["name"] for node in SKILL_TREE["skills"]} == EXPECTED_LIVE_SKILLS
+        for node in flatten_tree(SKILL_TREE["skills"]):
+            assert node["argument_hint"]
+            assert node["short_description"]
+            assert "\n" not in node["short_description"]
+            assert len(node["short_description"]) <= 88
+
+        maintainer = tree_skill("maintainer")
+        assert "public" not in maintainer["contexts"]
+        assert {"readme", "maintainer"} <= set(maintainer["contexts"])
 
     def test_mode_hints_match_skill_menus(self):
-        """Every advertised first-position mode appears in its skill menu."""
-        for name in ["develop", "validate", "maintainer"]:
-            hint = read_frontmatter(SKILLS_DIR / name).get("argument-hint", "")
-            match = re.match(r"^\[([^\]]+)\]", hint)
-            assert match, f"{name} argument-hint must begin with a mode group"
-            modes = match.group(1).split("|")
+        """ADR-088 (2026-06-25): every mode-bearing skill's bare menu is the
+        hub-style subtree for that skill — the skill as the root line and each
+        mode (and sub-mode) as a tree branch — rendered from skill-tree.json.
+        This replaced the old per-skill Markdown tables."""
+        mode_bearing = [
+            node["name"] for node in SKILL_TREE["skills"] if node.get("modes")
+        ]
+        # develop, validate, and maintainer all carry modes.
+        assert {"develop", "validate", "maintainer"} <= set(mode_bearing)
+
+        for name in mode_bearing:
+            node = tree_skill(name)
             menu = (SKILLS_DIR / name / "skill-menu-mode.md").read_text()
-            for mode in modes:
-                assert f"`{mode}`" in menu or f"`{name} {mode}" in menu, (
-                    f"{name} advertises mode '{mode}' but its menu does not explain it"
-                )
+            # The menu carries exactly one ```text``` tree block (the subtree).
+            assert "```text" in menu, f"{name} menu must render its modes as a text tree"
+            # Root line: the skill with its argument hint, hub-style.
+            assert f"{name}  {node['argument_hint']}" in menu, (
+                f"{name} menu must show the hub-style root line for the skill"
+            )
+            # Every mode (and nested sub-mode) appears as a tree branch.
+            for mode in flatten_tree(node["modes"]):
+                assert re.search(
+                    rf"^[│ ]*[├└]─ {re.escape(mode['name'])}\s",
+                    menu,
+                    re.MULTILINE,
+                ), f"{name} menu missing tree branch for mode '{mode['name']}'"
 
-        develop_menu = (SKILLS_DIR / "develop" / "skill-menu-mode.md").read_text()
-        for mode in ["feature", "fix"]:
-            hint = read_frontmatter(SKILLS_DIR / "develop" / mode).get("argument-hint")
-            assert hint
-            escaped_hint = hint.replace("|", "\\|")
-            assert f"`{escaped_hint}`" in develop_menu
+    def test_skill_menus_match_sync_inventory(self):
+        """ADR-088: the rendered per-skill menu trees (and all other inventory
+        surfaces) must not drift from skill-tree.json — sync-inventory --check
+        is the single source of truth and is run here as a hard gate."""
+        import subprocess
 
-        validate_menu = (SKILLS_DIR / "validate" / "skill-menu-mode.md").read_text()
-        assert "`[create\\|run] [block\\|feature\\|Jira]`" in validate_menu
+        script = (
+            SKILLS_DIR / "maintainer" / "scripts" / "sync-inventory.sh"
+        )
+        result = subprocess.run(
+            ["bash", str(script), "--check"],
+            capture_output=True,
+            text=True,
+            cwd=str(PLUGIN_ROOT),
+            timeout=30,
+        )
+        assert result.returncode == 0, (
+            "sync-inventory.sh --check reported drift "
+            "(run sync-inventory.sh --write to regenerate):\n"
+            + result.stdout
+            + result.stderr
+        )
 
     def test_blocks_guidance_is_hidden_reference(self):
         """Domain guidance should stay available without becoming a top-level skill (flat per AgentSkills spec)."""
@@ -601,8 +662,8 @@ class TestSkillFrontmatter:
         assert "## training" in maintainer
         assert "`training`" in maintainer.split("## Universal Command Intake", 1)[0]
         assert "references/training.md" in maintainer
-        assert "| `training` |" in menu
-        assert "`maintainer training`" in hub
+        assert re.search(r"^[│ ]*[├└]─ training\s", menu, re.MULTILINE)
+        assert re.search(r"^[│ ]*[├└]─ training\s", hub, re.MULTILINE)
         normalized = re.sub(r"\s+", " ", training.lower())
         for requirement in [
             "not model fine-tuning",
@@ -622,13 +683,14 @@ class TestSkillFrontmatter:
 
         for mode in ["backlog", "adr", "skill", "training", "retro"]:
             assert f"`{mode}`" in maintainer
-            assert f"| `{mode}` |" in menu
+            assert re.search(rf"^[│ ]*[├└]─ {mode}\s", menu, re.MULTILINE)
 
-        rows = [
-            line for line in menu.splitlines()
-            if line.startswith("| `") and not line.startswith("| `validate`")
+        top_modes = [
+            re.search(r"^[├└]─ (\S+)", line).group(1)
+            for line in menu.splitlines()
+            if re.search(r"^[├└]─ \S+", line)
         ]
-        assert [re.search(r"`([^`]+)`", row).group(1) for row in rows[:5]] == [
+        assert top_modes[:5] == [
             "backlog",
             "adr",
             "skill",

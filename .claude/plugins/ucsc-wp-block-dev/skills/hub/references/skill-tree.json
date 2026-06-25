@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "name": "hub",
+      "argument_hint": "[block]",
+      "short_description": "list skills and set an optional session block target",
+      "contexts": ["public", "readme"]
+    },
+    {
+      "name": "develop",
+      "argument_hint": "[feature|fix] [block] [request]",
+      "short_description": "add or modify WordPress block code",
+      "contexts": ["public", "readme"],
+      "modes": [
+        {
+          "name": "feature",
+          "argument_hint": "[block] [request]",
+          "short_description": "implement planned block behavior"
+        },
+        {
+          "name": "fix",
+          "argument_hint": "[block] [problem]",
+          "short_description": "diagnose and repair a block defect"
+        }
+      ]
+    },
+    {
+      "name": "feedback",
+      "argument_hint": "[bug|idea|question] [note]",
+      "short_description": "report a bug or idea about the plugin skills",
+      "contexts": ["public", "readme"]
+    },
+    {
+      "name": "review",
+      "argument_hint": "[target] [focus]",
+      "short_description": "review code for bugs, security, a11y, and tests",
+      "contexts": ["public", "readme"]
+    },
+    {
+      "name": "run",
+      "argument_hint": "[block] [change|URL]",
+      "short_description": "launch and drive wp-dev.ucsc",
+      "contexts": ["public", "readme"]
+    },
+    {
+      "name": "validate",
+      "argument_hint": "[php|jest|e2e|all] [create|run] [target]",
+      "short_description": "create or run automated test suites",
+      "contexts": ["public", "readme"],
+      "modes": [
+        {
+          "name": "php",
+          "argument_hint": "[create|run] [target]",
+          "short_description": "create or run PHP tests"
+        },
+        {
+          "name": "jest",
+          "argument_hint": "[create|run] [target]",
+          "short_description": "create or run Jest tests"
+        },
+        {
+          "name": "e2e",
+          "argument_hint": "[create|run] [target]",
+          "short_description": "create or run browser-driven tests"
+        },
+        {
+          "name": "all",
+          "argument_hint": "[block]",
+          "short_description": "run PHP, Jest, and E2E sequentially"
+        }
+      ]
+    },
+    {
+      "name": "verify",
+      "argument_hint": "[block] [criterion]",
+      "short_description": "confirm a change in the running app",
+      "contexts": ["public", "readme"]
+    },
+    {
+      "name": "maintainer",
+      "argument_hint": "[mode] [submode|target]",
+      "short_description": "maintain this plugin package",
+      "contexts": ["readme", "maintainer"],
+      "modes": [
+        {
+          "name": "backlog",
+          "argument_hint": "—",
+          "short_description": "build the personal and unimplemented-ADR backlog"
+        },
+        {
+          "name": "adr",
+          "argument_hint": "[action] [ADR|decision]",
+          "short_description": "author, retire, inspect, and reconcile ADRs"
+        },
+        {
+          "name": "skill",
+          "argument_hint": "[action] [name|candidate]",
+          "short_description": "maintain plugin skills, references, scripts, and inventory",
+          "modes": [
+            {
+              "name": "details",
+              "argument_hint": "[name]",
+              "short_description": "inspect live frontmatter and invocation settings"
+            },
+            {
+              "name": "review",
+              "argument_hint": "[name|all]",
+              "short_description": "run the opt-in qualitative skill reviewer"
+            },
+            {
+              "name": "review-contrib",
+              "argument_hint": "<candidate>",
+              "short_description": "review a proposed or incubating skill"
+            },
+            {
+              "name": "promote",
+              "argument_hint": "<candidate>",
+              "short_description": "promote an accepted candidate"
+            },
+            {
+              "name": "sync",
+              "argument_hint": "—",
+              "short_description": "reconcile skill inventories across docs and tests"
+            }
+          ]
+        },
+        {
+          "name": "training",
+          "argument_hint": "[goal]",
+          "short_description": "study upstream patterns and apply relevant lessons"
+        },
+        {
+          "name": "retro",
+          "argument_hint": "[lesson|skill]",
+          "short_description": "capture reusable session lessons"
+        },
+        {
+          "name": "self-test",
+          "argument_hint": "—",
+          "short_description": "run pytest contracts and deterministic plugin checks"
+        },
+        {
+          "name": "validate",
+          "argument_hint": "[tier1|tier2]",
+          "short_description": "run structural validation; Tier 2 is opt-in"
+        },
+        {
+          "name": "generate-docs",
+          "argument_hint": "—",
+          "short_description": "regenerate portable guide and deck Markdown"
+        },
+        {
+          "name": "publish",
+          "argument_hint": "[guide|deck|all]",
+          "short_description": "publish the guide, deck, or both after approval"
+        },
+        {
+          "name": "all",
+          "argument_hint": "—",
+          "short_description": "run the deterministic maintainer health checks"
+        }
+      ]
+    }
+  ]
+}
