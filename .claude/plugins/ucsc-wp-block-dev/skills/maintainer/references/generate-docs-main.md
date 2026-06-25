@@ -1,10 +1,15 @@
 ---
 title: UCSC WordPress Block Development Plugin Guide
 generated: 2026-06-25
+version: 0.2.0
+git-commit: 806515b4fc94fbe2020b103330e6116b60b54f61
 source: README.md
+source-hash: aca92aad9ca27d38563a09d1247637b60db268eea456599c55f3c4023b73e7d2
 ---
 
 # ucsc-wp-block-dev
+
+**Generated:** 2026-06-25 · **Plugin version:** 0.2.0 · **Git commit:** `806515b4fc94`
 
 Claude Code plugin for developing the `ucsc-gutenberg-blocks` WordPress plugin at UCSC ITS.
 
@@ -39,21 +44,22 @@ skills
 │  └─ all   [block]                — run PHP, Jest, and E2E sequentially
 ├─ verify      [block] [criterion]                       — confirm a change in the running app
 └─ maintainer  [mode] [submode|target]                   — maintain this plugin package
-   ├─ backlog                                   — build the personal and unimplemented-ADR backlog
-   ├─ adr            [action] [ADR|decision]    — author, retire, inspect, and reconcile ADRs
-   ├─ skill          [action] [name|candidate]  — maintain plugin skills, references, scripts, and inventory
+   ├─ backlog                                    — build the personal and unimplemented-ADR backlog
+   ├─ adr        [action] [ADR|decision]         — author, retire, inspect, and reconcile ADRs
+   ├─ skill      [action] [name|candidate]       — maintain plugin skills, references, scripts, and inventory
    │  ├─ details         [name]       — inspect live frontmatter and invocation settings
    │  ├─ review          [name|all]   — run the opt-in qualitative skill reviewer
    │  ├─ review-contrib  <candidate>  — review a proposed or incubating skill
    │  ├─ promote         <candidate>  — promote an accepted candidate
    │  └─ sync                         — reconcile skill inventories across docs and tests
-   ├─ training       [goal]                     — study upstream patterns and apply relevant lessons
-   ├─ retro          [lesson|skill]             — capture reusable session lessons
-   ├─ self-test                                 — run pytest contracts and deterministic plugin checks
-   ├─ validate       [tier1|tier2]              — run structural validation; Tier 2 is opt-in
-   ├─ generate-docs                             — regenerate portable guide and deck Markdown
-   ├─ publish        [guide|deck|all]           — publish the guide, deck, or both after approval
-   └─ all                                       — run the deterministic maintainer health checks
+   ├─ training   [goal]                          — study upstream patterns and apply relevant lessons
+   ├─ retro      [lesson|skill]                  — capture reusable session lessons
+   ├─ self-test                                  — run pytest contracts and deterministic plugin checks
+   ├─ validate   [tier1|tier2]                   — run structural validation; Tier 2 is opt-in
+   ├─ docs       [check|publish [guide|slides]]  — regenerate portable guide+slides Markdown (publish is the optional final step)
+   │  ├─ check                    — report whether generated docs are stale vs. their sources (git hash)
+   │  └─ publish  [guide|slides]  — publish both by default; name one to publish only that output
+   └─ all                                        — run the deterministic maintainer health checks
 ```
 
 `run` and `verify` follow the bundled Claude Code v2.1.145+ contract. The
@@ -94,12 +100,51 @@ Retrospectives are a hidden `maintainer` sub-workflow at
 describing the goal at the end of a fix, feature, review, or run session, when
 lessons should be saved into skill references (ADR-083).
 
-Use the maintainer `generate-docs` reference at
+Use the maintainer `docs` reference at
 `maintainer/references/generate-docs.md` to regenerate portable
 Markdown artifacts before copying the guide or deck into Google Docs or
-Confluence. Use `maintainer generate-docs` for regeneration and
-`maintainer publish` (bare = both; or `guide`/`deck`) only when publishing the guide or
-deck to Google Docs.
+Confluence. Use `maintainer docs` for regeneration, `maintainer docs check` to
+detect (via a git source hash) whether the artifacts are stale, and
+`maintainer docs publish` to publish both slides and guide by default; name
+`guide` or `slides` only to publish one. `deck` remains a compatibility alias.
+`generate-docs` and `publish` remain legacy
+aliases for `docs` and `docs publish`.
+
+## Companion skills (recommended)
+
+This plugin is intentionally scoped to UCSC **block** development in
+`wp-dev.ucsc`. For **general WordPress engineering** that falls outside a block
+target — site-wide performance/query auditing, security hardening, plugin/theme
+architecture, and WordPress coding standards — install the optional,
+MIT-licensed companion skillset by Elvis Marin (`elvismdev`). It complements
+`review`/`validate` without overlapping their block scope (ADR-104):
+
+- **`claude-wordpress-skills`** — https://github.com/elvismdev/claude-wordpress-skills
+  - `wp-performance-review` (active) — DB query, caching/transient, N+1,
+    AJAX/HTTP, hook, and JS-bundling analysis, with VIP/WP Engine/Pantheon/
+    self-hosted notes.
+  - `wp-security-review`, `wp-gutenberg-blocks`, `wp-theme-development`,
+    `wp-plugin-development` — in development.
+
+Install it (marketplace preferred):
+
+```text
+/plugin marketplace add elvismdev/claude-wordpress-skills
+```
+
+Alternatives:
+
+```bash
+git clone https://github.com/elvismdev/claude-wordpress-skills.git ~/.claude/plugins/wordpress
+git submodule add https://github.com/elvismdev/claude-wordpress-skills.git .claude/plugins/wordpress
+```
+
+Run `/reload-plugins` after installing if the new skills aren't discovered yet.
+It is a recommendation, not a dependency — every `ucsc-wp-block-dev` workflow
+works without it. A formal dependency is deferred until its in-development skills
+reach a stable release (ADR-104). This is separate from the Anthropic
+`plugin-dev` companion used for plugin *maintenance* (see
+[Validate the plugin](#validate-the-plugin) and ADR-079).
 
 ## Contributing skills
 

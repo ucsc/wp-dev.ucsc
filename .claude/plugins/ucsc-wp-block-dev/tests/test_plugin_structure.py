@@ -585,13 +585,127 @@ class TestSkillFrontmatter:
         assert "superseded adr behavior" in text
         assert "future roadmap slide" in text
 
-    def test_maintainer_documents_generate_docs_operation(self):
-        """Documentation regeneration is an operation on maintainer, not its own skill (flat per AgentSkills spec)."""
+    def test_docs_mode_has_staleness_detection(self):
+        """ADR-107: the regenerate script stamps a source hash and offers a
+        report-only --check mode; the reference documents the staleness signal."""
+        script = (
+            SKILLS_DIR / "maintainer" / "scripts" / "regenerate-docs.sh"
+        ).read_text()
+        assert "--check" in script
+        assert "source-hash" in script
+        assert "git hash-object" in script
+        ref = (
+            SKILLS_DIR / "maintainer" / "references" / "generate-docs.md"
+        ).read_text().lower()
+        assert "--check" in ref
+        assert "source hash" in ref or "source-hash" in ref
+        assert "docs publish" in ref
+
+    def test_docs_publish_defaults_to_both_outputs(self):
+        """Bare docs publish has an explicit, stable two-output dispatch."""
+        launcher = (SKILLS_DIR / "maintainer" / "launcher.md").read_text().lower()
+        publish_ref = (
+            SKILLS_DIR / "maintainer" / "references" / "publish.md"
+        ).read_text().lower()
+        tree = json.loads(
+            (SKILLS_DIR / "hub" / "references" / "skill-tree.json").read_text()
+        )
+        docs_mode = next(
+            mode
+            for mode in next(
+                skill for skill in tree["skills"] if skill["name"] == "maintainer"
+            )["modes"]
+            if mode["name"] == "docs"
+        )
+        publish_mode = next(
+            mode for mode in docs_mode["modes"] if mode["name"] == "publish"
+        )
+
+        assert "default to publishing both outputs" in launcher
+        assert "scripts/publish-docs.sh --target both --confirm" in launcher
+        assert "slides, then guide" in publish_ref
+        assert publish_mode["argument_hint"] == "[guide|slides]"
+        assert "publish both by default" in publish_mode["short_description"]
+
+    def test_hardened_docs_publisher_contract(self):
+        script_path = (
+            SKILLS_DIR / "maintainer" / "scripts" / "publish-docs.sh"
+        )
+        assert script_path.exists()
+        script = script_path.read_text()
+        for requirement in [
+            "set -euo pipefail",
+            "--target both|slides|guide",
+            "--confirm",
+            "--dry-run",
+            "SLIDES_DOC_ID",
+            "GUIDE_DOC_ID",
+            "refresh-and-publish-slides.sh",
+            "refresh-and-publish-docs.sh",
+            "check-skill-references.sh",
+            "regenerate-docs.sh",
+            "BLOCKED",
+        ]:
+            assert requirement in script
+
+    def test_generated_guide_has_visible_release_metadata(self):
+        """The published guide exposes its date, plugin version, and Git commit
+        at the top instead of hiding all provenance in stripped frontmatter."""
+        script = (
+            SKILLS_DIR / "maintainer" / "scripts" / "regenerate-docs.sh"
+        ).read_text()
+        for marker in [
+            "manifest_source",
+            "plugin_version",
+            "git_commit",
+            "**Generated:**",
+            "**Plugin version:**",
+            "**Git commit:**",
+        ]:
+            assert marker in script
+
+        guide = (
+            SKILLS_DIR / "maintainer" / "references" / "generate-docs-main.md"
+        ).read_text()
+        assert re.search(r"^generated: \d{4}-\d{2}-\d{2}$", guide, re.MULTILINE)
+        assert re.search(r"^version: \d+\.\d+\.\d+", guide, re.MULTILINE)
+        assert re.search(r"^git-commit: [0-9a-f]{40}$", guide, re.MULTILINE)
+        assert re.search(
+            r"^\*\*Generated:\*\* \d{4}-\d{2}-\d{2} · "
+            r"\*\*Plugin version:\*\* \d+\.\d+\.\d+ · "
+            r"\*\*Git commit:\*\* `[0-9a-f]{12}`$",
+            guide,
+            re.MULTILINE,
+        )
+
+    def test_maintainer_documents_docs_operation(self):
+        """Documentation regeneration is the `docs` operation on maintainer, not its
+        own skill (flat per AgentSkills spec). `generate-docs` is a legacy alias
+        (ADR-107)."""
         text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text().lower()
-        assert "## generate-docs" in text
+        assert "## docs" in text
         assert "references/generate-docs.md" in text
         assert "scripts/regenerate-docs.sh" in text
-        assert "generate-docs` operation" in text
+        assert "`docs` operation" in text
+        # publish is folded in as the optional final step of docs (ADR-107).
+        assert "docs publish" in text
+        # staleness detection via --check / source hash (ADR-107).
+        assert "--check" in text
+        # generate-docs remains an accepted legacy alias.
+        assert "generate-docs` = `docs" in text or "legacy alias" in text
+
+    def test_every_maintainer_mode_has_a_skill_section(self):
+        """Every top-level maintainer mode in skill-tree.json must have a matching
+        `## <mode>` section in maintainer/SKILL.md. Guards the recurring add/rename/
+        fold-a-mode task (ADR-107 retro): a mode added to the tree but left
+        undocumented in SKILL.md fails here, not in review."""
+        maintainer_node = tree_skill("maintainer")
+        skill_text = (SKILLS_DIR / "maintainer" / "SKILL.md").read_text()
+        for mode in maintainer_node["modes"]:
+            assert re.search(rf"^## {re.escape(mode['name'])}\b", skill_text, re.M), (
+                f"maintainer/SKILL.md has no '## {mode['name']}' section for the "
+                f"mode declared in skill-tree.json"
+            )
 
     def test_maintainer_documents_adr_mode(self):
         """ADR work is a maintainer mode; new-adr remains a legacy alias."""

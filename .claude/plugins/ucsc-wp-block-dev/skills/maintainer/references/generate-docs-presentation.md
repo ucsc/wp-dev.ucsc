@@ -1,4 +1,5 @@
 <!-- Generated: 2026-06-25 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
+<!-- source-hash: aca92aad9ca27d38563a09d1247637b60db268eea456599c55f3c4023b73e7d2 -->
 
 ---
 marp: true

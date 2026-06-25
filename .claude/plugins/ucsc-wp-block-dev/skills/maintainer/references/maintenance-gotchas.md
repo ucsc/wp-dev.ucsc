@@ -16,17 +16,29 @@ Concurrent edits can grab the next sequential number while you work, causing a c
 - Root `AGENTS.md` routing table
 - `EXPECTED_LIVE_SKILLS` in `tests/test_plugin_structure.py`
 - Any hardcoded skill lists in other tests (e.g., `test_plugin_validity.py::test_core_skills_present`)
-- Generated `generate-docs` assets (run `generate-docs` to refresh)
+- Generated `docs` assets (run `docs` to refresh; `docs check` reports staleness)
 
 Run `sync-inventory.sh --write` first, then `check-references` and `test`.
 
+## Renaming, folding, or adding a maintainer mode — `skill-tree.json` is the source of truth
+
+A mode rename/fold/add is a recurring task; do it in this order so the gates pass first try:
+
+1. **Edit `skills/hub/references/skill-tree.json`** — the canonical mode list. Add/rename/nest modes here (nested `modes:` render as sub-branches). Never hand-edit the menu trees in `skill-menu-mode.md`, `hub/SKILL.md`, or `README.md`; `sync-inventory.sh --write` regenerates them and will overwrite manual edits (and `--check`/`test` fail on the drift).
+2. **Update the SKILL.md `argument-hint`** to list **exactly** the top-level modes in `skill-tree.json` — `sync-inventory.sh` hard-fails if they differ. **Legacy aliases must NOT appear in `argument-hint`** (e.g. `test`, `new-adr`, `generate-docs`, `publish`); list them only in prose as aliases.
+3. Run `sync-inventory.sh --write` to regenerate every menu surface, then update the prose: the `## <mode>` section, the intake paragraph, and launcher alias routing.
+4. Prefer **non-breaking**: keep the old mode name as a legacy alias and keep generated artifact filenames stable (rename the mode, not the files) to avoid churn across scripts and tests. See ADR-107 for the `generate-docs`→`docs` worked example.
+5. Add/extend an ADR, update any test asserting the old `## heading` or operation phrasing, then run `all`.
+
 ## Publishing is per-target
 
-Each `publish` target has its own destination Google Doc. `publish_to_gdoc.py --source <md> --doc <url>` publishes any markdown. Each fast-path script holds its own `GDOC_URL` (ADR-063).
+Each `docs publish` target has its own destination Google Doc. `publish_to_gdoc.py --source <md> --doc <url>` publishes any markdown. Each fast-path script holds its own `GDOC_URL` (ADR-063).
 
 ## Markdown links to local absolute paths — use `file://`
 
 When referencing generated local files (e.g., code reviews) via absolute paths, use the `file://` scheme (e.g., `file:///path/to/file`). The `test_all_markdown_links_resolve` test ignores `file://` links; bare absolute paths are parsed as relative and flagged as broken.
+
+`test_all_markdown_links_resolve` also parses a link of the form `[text]` immediately followed by `(path)` even **inside backticks / code spans**, so an illustrative example link must still resolve from the containing file's directory. When writing an example link, either point it at a real file (relative to that `.md`) or separate the brackets from the parenthetical so the two are not adjacent (then it is not parsed as a link).
 
 ## Superseding an ADR can leave a stale test
 

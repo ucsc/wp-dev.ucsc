@@ -1,18 +1,49 @@
 # Publish workflow
 
-implements: ADR-063-MAINTAINER-PUBLISH, ADR-018-MAINTAINER-SLIDE-DECK, ADR-015-MAINTAINER-SLIDE-DATE
+implements: ADR-063-MAINTAINER-PUBLISH, ADR-018-MAINTAINER-SLIDE-DECK, ADR-015-MAINTAINER-SLIDE-DATE, ADR-107-MAINTAINER-DOCS-MODE-CONSOLIDATION
 
-Full workflow for the maintainer `publish` mode. The `## publish` section in
-`SKILL.md` is the lean dispatch stub; this file is the operational detail.
+Full workflow for publishing the maintainer docs. Per ADR-107, publishing is the
+optional final step of the `docs` mode: invoke it as `docs publish`. The
+top-level `publish` mode remains a legacy alias for `docs publish`. The
+`## docs` section in `SKILL.md` is the lean dispatch stub; this file is the
+operational detail.
 
-Per ADR-063, **bare `publish` publishes both** the guide and the deck. A specific
-output is named: `guide` (the prose docs) or `deck` (the slides). Publishing is
-always explicit and is never part of the `all` health-check mode. Legacy aliases:
-`docs` = `guide`, `slides` = `deck`, and `all` = both.
+Per ADR-063, **bare `docs publish` (or `publish`) publishes both**, in this
+order: slides, then guide. A specific output is named only to publish it alone:
+`docs publish guide` (the prose docs) or `docs publish slides`. `deck` remains a
+compatibility alias for `slides`. Publishing is always explicit and is never
+part of the `all` health-check mode. Legacy aliases include `publish slides`
+and `publish all`.
 
-## publish deck
+## Hardened publisher
 
-(Legacy alias: `publish slides`.)
+Use the bundled orchestrator for all new publishing flows:
+
+```bash
+# Bare docs publish: validate everything, then publish slides and guide.
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/publish-docs.sh" \
+  --target both --confirm
+
+# Full local preflight with no Google Docs writes.
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/publish-docs.sh" --dry-run
+```
+
+The orchestrator:
+
+1. Verifies the fixed Google Doc IDs, local publisher, credentials, and Python
+   dependencies.
+2. Refreshes and tests every selected output with uploads disabled.
+3. Runs reference and freshness checks before any external write.
+4. Publishes slides first, then guide, keeping separate logs.
+5. Stops the guide upload when slides fail and reports `BLOCKED`, avoiding a
+   misleading partial-success result.
+
+`--confirm` is required for external writes. Use `--target guide` or
+`--target slides` only when intentionally publishing one output.
+
+## publish slides
+
+(Compatibility target: `docs publish deck`.)
 
 The canonical Marp source is maintainer-owned:
 
@@ -63,5 +94,6 @@ python3 .claude/scripts/publish_to_gdoc.py \
 
 ## publish (both)
 
-Bare `publish` runs `publish deck` then `publish guide`. (Legacy alias:
-`publish all`.)
+Bare `docs publish` runs the hardened `publish-docs.sh --target both --confirm`
+orchestrator. The top-level bare `publish` and `publish all` compatibility forms
+do the same.

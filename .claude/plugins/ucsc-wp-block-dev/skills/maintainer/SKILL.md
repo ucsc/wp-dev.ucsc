@@ -1,7 +1,7 @@
 ---
 name: maintainer
 description: This skill should be used when the user asks to "maintain the plugin", "validate the plugin structure", "run the plugin self-tests", "review or promote a skill", "check ADR consistency", "study upstream plugin patterns", "publish the maintainer docs", or prepare ucsc-wp-block-dev for release.
-argument-hint: "[backlog|adr|skill|training|retro|self-test|validate|generate-docs|publish|all] [submode or target]"
+argument-hint: "[backlog|adr|skill|training|retro|self-test|validate|docs|all] [submode or target]"
 disable-model-invocation: true
 user-invocable: true
 allowed-tools:
@@ -19,7 +19,7 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS
+implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS, ADR-107-MAINTAINER-DOCS-MODE-CONSOLIDATION
 
 This body marker traces the skill to the ADRs it implements (ADR-086, decision C).
 `scripts/check-adr-implements.py` validates that every referenced ADR is active.
@@ -31,8 +31,10 @@ Markdown artifact regeneration, read
 [`references/generate-docs.md`](references/generate-docs.md).
 
 Use this skill with one mode: `backlog`, `adr`, `skill`, `training`, `retro`,
-`self-test`, `validate`, `generate-docs`, `publish` (bare = both; or
-`guide`/`deck`), or `all`. Detailed compatibility modes: `review-skills`,
+`self-test`, `validate`, `docs` (bare regenerates; `docs check` reports
+staleness; bare `docs publish` publishes guide + slides), or `all`. `publish` and
+`generate-docs` remain legacy aliases (`publish` = `docs publish`,
+`generate-docs` = `docs`). Detailed compatibility modes: `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`,
 `sync-inventory`, and `skill-details`. `test` remains a legacy alias for
 `self-test`; `new-adr` remains a legacy alias for `adr`. Run all commands below
@@ -96,7 +98,7 @@ skills:
 
 Resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do. Present the durable modes first: `backlog`, `adr`, `skill`, `training`, and `retro`; then offer `self-test`, `validate`, `generate-docs`, `publish`, and `all`, with detailed compatibility modes available when needed. Per ADR-064, flag that `skill review`/`review-skills` and Tier 2 `validate` spawn token-heavy Anthropic `plugin-dev` agents; never run them automatically. Run the chosen mode only after selection. Treat `test` as a legacy alias for `self-test`, `new-adr` as a legacy alias for `adr`, and the older skill-specific modes as aliases under `skill`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do. Present the durable modes first: `backlog`, `adr`, `skill`, `training`, and `retro`; then offer `self-test`, `validate`, `docs` (with `docs check` and `docs publish`), and `all`, with detailed compatibility modes available when needed. Per ADR-064, flag that `skill review`/`review-skills` and Tier 2 `validate` spawn token-heavy Anthropic `plugin-dev` agents; never run them automatically. Run the chosen mode only after selection. Treat `test` as a legacy alias for `self-test`, `new-adr` as a legacy alias for `adr`, and the older skill-specific modes as aliases under `skill`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
 
@@ -265,32 +267,42 @@ rather than one by one. See
 [`references/refactor-links.md`](references/refactor-links.md) for the
 `find`/`sed` one-liner and the threshold for manual vs. bulk approach.
 
-## generate-docs
+## docs
 
-Regenerate portable Markdown documentation artifacts for Google Docs or
-Confluence. Read
-[`references/generate-docs.md`](references/generate-docs.md),
-then run:
+Regenerate (and optionally publish) the portable Markdown documentation
+artifacts for Google Docs or Confluence. Per ADR-107, `docs` is the single
+documentation mode; `generate-docs` remains a legacy alias. Read
+[`references/generate-docs.md`](references/generate-docs.md), then run one of:
 
 ```bash
+# Regenerate the guide and deck artifacts (default; does not publish).
 bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/regenerate-docs.sh"
+
+# Report-only: are the generated docs stale vs. their sources? (git source hash)
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/regenerate-docs.sh" --check
 ```
 
-This writes generated artifacts under
+The default run writes generated artifacts under
 `skills/maintainer/references/`, including
 [`references/generate-docs-main.md`](references/generate-docs-main.md)
 and
-[`references/generate-docs-presentation.md`](references/generate-docs-presentation.md).
-It does not publish or upload anything.
+[`references/generate-docs-presentation.md`](references/generate-docs-presentation.md),
+and stamps a `source-hash` derived from the artifacts' sources (README.md and
+the canonical deck). `docs check` (the `--check` flag) recomputes that hash and
+reports `FRESH` or `STALE` without writing anything — use it to decide whether a
+regeneration is needed. The bare default never publishes or uploads.
 
-## publish
+### docs publish
 
-Per ADR-063, **bare `publish` publishes both** the guide and the deck; or name a
-single output (`guide` for the prose docs, `deck` for the slides). Publishing is
-always explicit and is **never** part of the `all` health-check mode. Legacy
-aliases: `docs` = `guide`, `slides` = `deck`, `all` = both. The canonical Marp
-deck source is maintainer-owned at `assets/ucsc-wp-block-dev-presentation.md`; do
-not restore a second deck at the repository root (ADR-018).
+Publishing is the optional final step of `docs`, always explicit and **never**
+part of the `all` health-check mode. `docs publish` with no target publishes
+**both** outputs, slides first and then the guide. Name a single output only
+when intentionally publishing one: `docs publish guide` (prose docs) or
+`docs publish slides`. Accept `docs publish deck` as a compatibility alias for
+slides. The top-level `publish` mode is a legacy alias for `docs publish` (and
+`publish docs`/`publish slides` remain accepted). The canonical Marp deck source is maintainer-owned at
+`assets/ucsc-wp-block-dev-presentation.md`; do not restore a second deck at the
+repository root (ADR-018).
 
 Fast paths — each refreshes the date/artifacts, runs the contract tests, then
 publishes in one call (pass `--no-publish` to refresh and test only):
@@ -298,9 +310,27 @@ publishes in one call (pass `--no-publish` to refresh and test only):
 - deck: `bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/refresh-and-publish-slides.sh"`
 - guide: `bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/refresh-and-publish-docs.sh"`
 
+For bare `docs publish`, prefer the hardened all-output orchestrator. It
+preflights both destinations and credentials, refreshes and validates everything
+before the first upload, publishes slides then guide, and reports partial
+failure explicitly:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/publish-docs.sh" --target both --confirm
+```
+
+Use `--dry-run` to perform the complete local preflight without external writes.
+
 For the pre-publish reconciliation steps and the explicit `publish_to_gdoc.py`
 invocations and destination docs, read
 [`references/publish.md`](references/publish.md).
+
+## publish
+
+Legacy alias for `docs publish` (ADR-107). Bare `publish` publishes both the
+slides and guide; or name `guide`/`slides` (`deck` is accepted as an alias).
+See the `docs publish` section above
+and [`references/publish.md`](references/publish.md).
 
 ## adr
 
@@ -407,7 +437,7 @@ For frontmatter fields (`user-invocable`, `disable-model-invocation`), combined 
 
 ## When the manifest or skills change
 
-After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills. When the main guide or deck should be prepared for Google Docs or Confluence without publishing, use the `generate-docs` operation in this skill.
+After editing `plugin.json`, any `SKILL.md`, or adding components, run `validate` to catch structure regressions, `check-references` to catch unreferenced support files, and `review-skills` to catch description and quality issues early. Use `skill-development` for guidance when writing new skills. When the main guide or deck should be prepared for Google Docs or Confluence without publishing, use the `docs` operation in this skill (`generate-docs` legacy alias).
 
 ## Maintenance gotchas
 

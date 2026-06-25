@@ -57,7 +57,7 @@ one-paragraph stub.
 - **Move to references:** setup/first-run procedures, diagnostics, gotchas,
   recovery/failure paths, long checklists, deep rationale.
 - **Stub pattern:** replace a moved section with 3–5 sentences + a link, e.g.
-  `Full workflow: [references/publish.md](references/publish.md).`
+  `Full workflow:` [references/publish.md](skills/maintainer/references/publish.md).
 
 *Laravel/Vue adaptation:* the same split applies — e.g. a `develop` skill's body
 holds the vertical-slice workflow; `references/fields-config.md`,

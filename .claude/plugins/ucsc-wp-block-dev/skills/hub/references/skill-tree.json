@@ -146,14 +146,21 @@
           "short_description": "run structural validation; Tier 2 is opt-in"
         },
         {
-          "name": "generate-docs",
-          "argument_hint": "—",
-          "short_description": "regenerate portable guide and deck Markdown"
-        },
-        {
-          "name": "publish",
-          "argument_hint": "[guide|deck|all]",
-          "short_description": "publish the guide, deck, or both after approval"
+          "name": "docs",
+          "argument_hint": "[check|publish [guide|slides]]",
+          "short_description": "regenerate portable guide+slides Markdown (publish is the optional final step)",
+          "modes": [
+            {
+              "name": "check",
+              "argument_hint": "—",
+              "short_description": "report whether generated docs are stale vs. their sources (git hash)"
+            },
+            {
+              "name": "publish",
+              "argument_hint": "[guide|slides]",
+              "short_description": "publish both by default; name one to publish only that output"
+            }
+          ]
         },
         {
           "name": "all",
