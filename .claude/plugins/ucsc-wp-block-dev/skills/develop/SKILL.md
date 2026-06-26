@@ -6,6 +6,8 @@ argument-hint: "[feature|fix] [block] [description or Jira/GitHub URL or ID]"
 
 # Develop — Add a Block or Feature
 
+<!-- doc-slide: Adds or modifies block code — `feature` plans and builds new behavior, `fix` reproduces and repairs a described defect. -->
+
 Guided flow for adding a new Gutenberg block or extending an existing one in `ucsc-gutenberg-blocks`.
 
 ## Implements

@@ -147,9 +147,14 @@
         },
         {
           "name": "docs",
-          "argument_hint": "[check|publish [guide|slides]]",
+          "argument_hint": "[update|check|publish [guide|slides]]",
           "short_description": "regenerate portable guide+slides Markdown (publish is the optional final step)",
           "modes": [
+            {
+              "name": "update",
+              "argument_hint": "—",
+              "short_description": "regenerate the guide+slides artifacts from their sources (synonym for bare docs)"
+            },
             {
               "name": "check",
               "argument_hint": "—",

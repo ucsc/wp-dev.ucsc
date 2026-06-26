@@ -31,6 +31,7 @@ import os
 import sys
 import re
 import json
+import subprocess
 
 # Determine directories
 SCRIPT_DIR = os.environ.get("SCRIPT_DIR")
@@ -487,52 +488,29 @@ for _menu_skill in [node["name"] for node in TREE_SKILLS
                     if node.get("modes") and node["name"] != "maintainer"]:
     sync_skill_menu(_menu_skill)
 
-# 4. Sync Presentation Deck
+# 4. Sync Presentation Deck (delegated to the marker-driven harvester, ADR-106)
+# The deck's per-skill slides and roadmap are AUTO regions harvested by
+# build-slides.py from the same skill-tree.json source of truth, so reconcile the
+# deck by running that harvester rather than maintaining a second skills table here.
 deck_path = os.path.join(skills_dir, "maintainer", "assets", "ucsc-wp-block-dev-presentation.md")
-if os.path.exists(deck_path):
-    deck_content = open(deck_path).read()
-    
-    lines = [
-        "| Skill or mode | Trigger | Purpose |",
-        "| :--- | :--- | :--- |"
-    ]
-    for s in live_skills:
-        if s in ["retrospective"]:
-            continue
-        trigger = METADATA.get(s, {}).get("deck_trigger") or f'"{s}"'
-        desc = METADATA.get(s, {}).get("deck_desc") or get_skill_description(s, os.path.join(skills_dir, s, "SKILL.md"))
-        if desc:
-            lines.append(f"| **`{s}`** | {trigger} | {desc} |")
-        if s == "develop":
-            for mode in ["develop feature", "develop fix"]:
-                lines.append(f"| **`{mode}`** | {METADATA[mode]['deck_trigger']} | {METADATA[mode]['deck_desc']} |")
-        if s == "validate":
-            for mode in ["validate php", "validate jest", "validate e2e", "validate all"]:
-                lines.append(f"| **`{mode}`** | {METADATA[mode]['deck_trigger']} | {METADATA[mode]['deck_desc']} |")
-        
-    pattern = r"(\| Skill or mode \| Trigger \| Purpose \|\s*\n\| :---\ \| :---\ \| :---\ \|\s*\n)(.*?)(?=\n\n|\n[^|]|\Z)"
-    match = re.search(pattern, deck_content, re.DOTALL)
-    if match:
-        current_body = match.group(2).strip()
-        expected_body = "\n".join(lines[2:]).strip()
-        if current_body != expected_body:
-            if write_mode:
-                new_table = match.group(1) + expected_body
-                new_content = deck_content[:match.start()] + new_table + deck_content[match.end():]
-                with open(deck_path, "w") as f:
-                    f.write(new_content)
-                print("  [ OK ] Presentation deck skills table updated")
-            else:
-                print("  [FAIL] Presentation deck skills table is out of sync")
-                success = False
-        else:
-            print("  [ OK ] Presentation deck skills table is in sync")
-    else:
-        print("  [FAIL] Presentation deck skills table not found")
-        success = False
-else:
+build_slides = os.path.join(skills_dir, "maintainer", "scripts", "build-slides.py")
+if not os.path.exists(deck_path):
     print(f"  [FAIL] Presentation deck not found at {deck_path}")
     success = False
+elif write_mode:
+    rc = subprocess.run([sys.executable, build_slides], capture_output=True).returncode
+    if rc == 0:
+        print("  [ OK ] Presentation deck AUTO regions rebuilt (build-slides.py)")
+    else:
+        print("  [FAIL] build-slides.py could not rebuild the deck")
+        success = False
+else:
+    rc = subprocess.run([sys.executable, build_slides, "--check"], capture_output=True).returncode
+    if rc == 0:
+        print("  [ OK ] Presentation deck AUTO regions are in sync")
+    else:
+        print("  [FAIL] Presentation deck AUTO regions are out of sync (run build-slides.py)")
+        success = False
 
 # 5. Sync tests/test_plugin_structure.py
 tests_path = os.path.join(PLUGIN_DIR, "tests", "test_plugin_structure.py")

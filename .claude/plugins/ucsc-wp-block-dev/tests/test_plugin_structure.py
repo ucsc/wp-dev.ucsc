@@ -1041,10 +1041,42 @@ class TestMaintainerSlideDeck:
 
     def test_deck_has_adr_backed_future_roadmap(self):
         text = SLIDE_DECK.read_text()
-        assert "## **Future Roadmap**" in text
-        for adr in ["ADR-026", "ADR-027", "ADR-028", "ADR-047"]:
-            assert adr in text
-        assert "Roadmap themes are drawn from accepted and study-oriented ADRs" in text
+        # The roadmap is now harvested from Proposed ADRs (ADR-106), not a
+        # hand-maintained list. Assert the harvested region and heading exist.
+        assert "## **Roadmap — Proposed ADRs**" in text
+        assert "<!-- BEGIN AUTO:roadmap -->" in text
+        assert "<!-- END AUTO:roadmap -->" in text
+
+    def test_deck_auto_regions_are_current(self):
+        """The harvested AUTO regions must match the live skills + ADR roadmap
+        (ADR-106): build-slides.py --check exits 0 when fresh."""
+        import subprocess
+        import sys
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SKILLS_DIR / "maintainer" / "scripts" / "build-slides.py"),
+                "--check",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0, (
+            "deck AUTO regions are stale — run build-slides.py:\n"
+            f"{result.stdout}\n{result.stderr}"
+        )
+
+    def test_every_skill_has_a_doc_slide_landmark(self):
+        """Each public skill carries a doc-slide: landmark for the harvester
+        (ADR-106). Falls back to short_description, but we want them present."""
+        for path in sorted(p for p in SKILLS_DIR.iterdir() if p.is_dir()):
+            skill_md = path / "SKILL.md"
+            if not skill_md.exists():
+                continue
+            assert "doc-slide:" in skill_md.read_text(), (
+                f"{path.name}/SKILL.md is missing a <!-- doc-slide: ... --> landmark"
+            )
 
     def test_publisher_uses_maintainer_deck(self):
         text = PUBLISHER.read_text()

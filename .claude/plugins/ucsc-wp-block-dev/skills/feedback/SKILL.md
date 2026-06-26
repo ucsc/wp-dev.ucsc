@@ -6,6 +6,8 @@ argument-hint: "[bug|idea|question] [note]"
 
 # Feedback — report a bug or suggestion about the plugin
 
+<!-- doc-slide: The plugin's own `/bug`: captures a note plus session context and routes it to the configured destination. -->
+
 ## Implements
 
 implements: ADR-100-FEEDBACK-SUBMIT

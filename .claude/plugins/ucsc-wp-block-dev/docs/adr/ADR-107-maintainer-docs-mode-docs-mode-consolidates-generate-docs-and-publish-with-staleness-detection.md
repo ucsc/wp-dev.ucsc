@@ -42,8 +42,25 @@ is actually needed short of re-running it and diffing.
    reconciliation is deliberately excluded from the hash so docs are not flagged
    stale on every ADR edit.
 
+4. **Fix the content contract for the two artifacts** (added 2026-06-25):
+   - **Guide** (`generate-docs-main.md`, from `README.md`) is the *operator*
+     document — how to install, uninstall, reload, launch, and use the plugin
+     **now**, and nothing else. `regenerate-docs.sh` emits only the README span
+     between `<!-- BEGIN GUIDE -->` / `<!-- END GUIDE -->` markers (falling back
+     to the whole README if the markers are absent), so design history and
+     contributor material stay out of the guide.
+   - **Slides** (`generate-docs-presentation.md`, from the canonical deck) are the
+     *tour* — a Markdown file where each page is a slide: the plugin is a
+     skills-only plugin backed by scripts that self-learns via the `retrospective`
+     mode, one slide per public skill, a review of the ADR-driven design patterns,
+     and the future-ADR roadmap at the end. The per-skill slides and roadmap are
+     harvested by `build-slides.py` from `doc-slide:` landmarks and ADR status
+     (ADR-106); `regenerate-docs.sh` runs it before copying. Historical and
+     WordPress-product-internal material was removed from the deck.
+
 This ADR extends ADR-045 (docs is a maintainer reference), ADR-048 (ADR-derived
-content) and ADR-063 (unified publish), which remain in force.
+content), ADR-063 (unified publish), and ADR-106 (marker-driven harvest), which
+remain in force.
 
 ## Consequences
 

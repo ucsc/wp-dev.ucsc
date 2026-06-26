@@ -20,13 +20,39 @@ from the full input and session context. Ask one concise question only when the
 requested artifact is ambiguous and regenerating both artifacts would be
 inappropriate.
 
-## Artifacts
+## Artifacts and their content contract
 
-The generated files live under `references/` (alongside this file):
+The generated files live under `references/` (alongside this file). Per ADR-107
+each has a distinct audience — keep them in their lanes:
 
-- `generate-docs-main.md` — main plugin guide generated from `README.md`.
-- `generate-docs-presentation.md` — portable Markdown copy of the
-  maintainer-owned slide deck source.
+- `generate-docs-main.md` — the **guide**: the operator document (install,
+  uninstall, reload, launch, use the plugin *now*; no design history or
+  contributor material). It is generated from the `README.md` span between
+  `<!-- BEGIN GUIDE -->` and `<!-- END GUIDE -->` (whole README if the markers are
+  absent).
+- `generate-docs-presentation.md` — the **slides**: a guided *tour* of the plugin
+  (Markdown, one slide per page). It is a portable copy of the maintainer-owned
+  canonical deck. The deck's per-skill slides and roadmap are harvested, not
+  hand-written — see below.
+
+## Marker-driven slide harvest (ADR-106)
+
+The canonical deck (`assets/ucsc-wp-block-dev-presentation.md`) keeps hand-authored
+framing slides plus two regenerated regions: `<!-- BEGIN/END AUTO:skills -->` (one
+slide per public skill) and `<!-- BEGIN/END AUTO:roadmap -->` (Proposed ADRs).
+[`scripts/build-slides.py`](../scripts/build-slides.py) rewrites those regions from:
+
+- `skills/hub/references/skill-tree.json` — the ordered skill set, argument hints,
+  and sub-modes (so the slides can't drift from the live inventory), and
+- a `<!-- doc-slide: ... -->` landmark in each `SKILL.md` for the one-line tour
+  copy (falling back to the tree's `short_description`), and
+- `docs/adr/index.md` — Proposed ADRs become the roadmap; an ADR flipped to
+  Accepted drops off automatically.
+
+`regenerate-docs.sh` runs `build-slides.py` before copying, so a `docs` run always
+reflects the live tree. To add a skill's tour line, edit its `doc-slide:` landmark
+— never hand-edit inside the deck's AUTO markers. Run `build-slides.py --check` to
+report whether the regions are stale (the pytest suite runs this).
 
 ## Regenerate
 

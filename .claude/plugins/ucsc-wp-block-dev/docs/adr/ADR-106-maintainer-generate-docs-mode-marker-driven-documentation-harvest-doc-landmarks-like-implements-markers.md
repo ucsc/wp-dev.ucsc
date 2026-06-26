@@ -1,19 +1,15 @@
 ---
 title: "ADR-106: Marker-driven documentation — harvest doc landmarks like implements: markers"
-status: Proposed
+status: Accepted
 date: 2026-06-25
-related: ["ADR-045", "ADR-048", "ADR-086", "ADR-099"]
+related: ["ADR-018", "ADR-045", "ADR-048", "ADR-086", "ADR-099", "ADR-107"]
 ---
 
 # ADR-106: Marker-driven documentation — harvest doc landmarks like implements: markers
 
 ## Status
 
-Proposed
-
-> Forward-looking idea, not yet built. Extracted from the (now-removed)
-> `PORTABLE-PATTERNS.md` working note so it is not lost. Nothing behaves
-> differently because of it yet.
+Accepted (first harvester built 2026-06-25; superseding the original Proposed sketch below).
 
 ## Context
 
@@ -34,40 +30,49 @@ doc-generation problem, pointed the other way.
 
 ## Decision
 
-**Direction (not adopted yet):** extend the marker-harvest pattern from ADRs to
-**documentation landmarks**. Sketch only, to be designed if prioritized:
+Adopt marker-driven harvest for the **slide deck**, the first artifact to consume
+it. The slides are a tour of the plugin itself, so their per-skill content should
+live next to each skill, not in the generator.
 
-1. **Doc landmark markers.** Allow a lightweight, full-slug marker (e.g.
-   `doc:` / `landmark:` lines, mirroring the `implements:` convention) placed in
-   skills and scripts at the spots worth surfacing in published docs — the
-   capability, the primary command, the gotcha — right where it is true.
+1. **Doc landmark markers.** Each `SKILL.md` may carry a single
+   `<!-- doc-slide: ... -->` landmark — a one-line tour summary placed where it is
+   true, mirroring the `implements:` convention (ADR-086). It is an HTML comment so
+   it adds zero render/token cost to the skill (ADR-003).
 
-2. **A dumb harvester.** A script collects those markers (the same harvesting
-   pattern as the `implements:` checker, and the orchestrating-wrapper discipline
-   of ADR-099) into the generated guide/deck artifact. The generator stays
-   deterministic and free of editorial prose; the *source* carries the signal of
-   what is interesting to document.
+2. **A dumb harvester.** `skills/maintainer/scripts/build-slides.py` collects those
+   landmarks and rewrites two AUTO-marked regions in the canonical deck in place:
+   `AUTO:skills` (one slide per public skill) and `AUTO:roadmap` (Proposed ADRs).
+   It draws structure (the ordered skill set, argument hints, sub-modes) from the
+   existing `skill-tree.json` source of truth, so the per-skill slides cannot
+   drift from the live inventory; the `doc-slide:` landmark (falling back to the
+   tree's `short_description`) supplies the prose. It follows the orchestrating
+   single-pass wrapper discipline (ADR-099) and supports `--check` (exit 3 when
+   regions are stale) for tests.
 
-3. **Sources stay canonical (ADR-045/048).** This complements, not replaces, the
-   README + ADR-index generation: markers add in-code landmarks; the README and
-   ADRs remain the canonical narrative sources. Reconcile against the live tree at
-   publish time as today.
+3. **Sources stay canonical (ADR-045/048).** Harvest complements, does not replace,
+   the README + ADR-index generation. The hand-authored framing slides remain in
+   the canonical deck (ADR-018) outside the AUTO markers; `regenerate-docs.sh`
+   runs `build-slides.py` before copying and hashing, so a `docs` run always
+   reflects the live tree. The roadmap is harvested from ADR status, so an ADR
+   moving Proposed → Accepted drops off the roadmap automatically.
 
-**Not deciding now:** the marker syntax, whether it shares the `implements:`
-harvester or gets its own, and which artifact consumes it first. Deferred until
-someone picks it up.
+**Scope today:** only the deck consumes landmarks; the guide stays README-derived
+(ADR-107). The `doc-slide:` vocabulary is deliberately the only marker for now —
+extend to other landmark kinds or artifacts only when a second need appears.
 
 ## Consequences
 
-- **Positive (if pursued):** documentation signal lives next to the code it
-  describes, reducing drift; the generator gets dumber and more deterministic;
-  reuses an already-proven, test-friendly harvest pattern (ADR-086) and the
-  single-pass wrapper discipline (ADR-099).
-- **Negative / risks:** another marker vocabulary to learn and keep tidy; markers
-  can rot if not enforced by a test the way `implements:` is; over-marking could
-  bloat the generated docs. Because this is **Proposed**, none of that cost is
-  incurred yet — the only risk today is the idea being forgotten, which this ADR
-  prevents.
-- **Provenance:** captured from `PORTABLE-PATTERNS.md` ("Emerging idea:
-  marker-driven documentation (not yet built)") before that working note was
-  deleted, so the idea survives the file.
+- **Positive:** documentation signal lives next to the skill it describes, reducing
+  drift; the generator is deterministic and free of editorial prose; reuses the
+  proven, test-friendly harvest pattern (ADR-086) and single-pass wrapper
+  discipline (ADR-099). Adding or renaming a skill, or flipping an ADR's status,
+  updates the slides on the next `docs` run with no deck edit.
+- **Negative / risks:** another marker vocabulary to keep tidy; a `doc-slide:`
+  landmark can rot if not refreshed with the skill. The pytest suite asserts the
+  AUTO regions are current (`build-slides.py --check`) so the deck cannot silently
+  drift, but it does not yet require every skill to carry a landmark (missing ones
+  fall back to `short_description`).
+- **Provenance:** the original Proposed sketch was captured from
+  `PORTABLE-PATTERNS.md` ("Emerging idea: marker-driven documentation (not yet
+  built)") before that working note was deleted; this revision records the built
+  system.

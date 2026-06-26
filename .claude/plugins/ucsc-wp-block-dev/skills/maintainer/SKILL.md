@@ -17,9 +17,11 @@ allowed-tools:
 
 # Maintainer — ucsc-wp-block-dev
 
+<!-- doc-slide: Maintains the plugin itself — ADRs, skills, self-tests, docs, and release readiness; it never touches block code. -->
+
 ## Implements
 
-implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS, ADR-107-MAINTAINER-DOCS-MODE-CONSOLIDATION
+implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS, ADR-106-MAINTAINER-GENERATE-DOCS-MODE-MARKER-DRIVEN-DOCUMENTATION, ADR-107-MAINTAINER-DOCS-MODE-CONSOLIDATION
 
 This body marker traces the skill to the ADRs it implements (ADR-086, decision C).
 `scripts/check-adr-implements.py` validates that every referenced ADR is active.
@@ -31,8 +33,9 @@ Markdown artifact regeneration, read
 [`references/generate-docs.md`](references/generate-docs.md).
 
 Use this skill with one mode: `backlog`, `adr`, `skill`, `training`, `retro`,
-`self-test`, `validate`, `docs` (bare regenerates; `docs check` reports
-staleness; bare `docs publish` publishes guide + slides), or `all`. `publish` and
+`self-test`, `validate`, `docs` (bare regenerates — `docs update`/`docs
+regenerate` are synonyms; `docs check` reports staleness; bare `docs publish`
+publishes guide + slides), or `all`. `publish` and
 `generate-docs` remain legacy aliases (`publish` = `docs publish`,
 `generate-docs` = `docs`). Detailed compatibility modes: `review-skills`,
 `review-contrib`, `promote-contrib`, `check-references`, `check-adr-implements`,
@@ -274,23 +277,38 @@ artifacts for Google Docs or Confluence. Per ADR-107, `docs` is the single
 documentation mode; `generate-docs` remains a legacy alias. Read
 [`references/generate-docs.md`](references/generate-docs.md), then run one of:
 
+The **update path** is the bare `docs` mode (also spelled `docs update` or `docs
+regenerate`): it never hand-edits the artifacts — it re-runs `regenerate-docs.sh`
+to rebuild the generated guide and deck from their sources (README.md, the plugin
+manifest, and the canonical deck) and re-stamps the `source-hash`. Use `docs
+check` first to see whether an update is needed, run `docs update` to apply it,
+and reach for `docs publish` only when the refreshed artifacts should go out.
+
 ```bash
-# Regenerate the guide and deck artifacts (default; does not publish).
+# Regenerate ("update") the guide and deck artifacts (default; does not publish).
+# `docs update` and `docs regenerate` are synonyms for this bare-`docs` path.
 bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/regenerate-docs.sh"
 
 # Report-only: are the generated docs stale vs. their sources? (git source hash)
 bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/regenerate-docs.sh" --check
 ```
 
-The default run writes generated artifacts under
-`skills/maintainer/references/`, including
-[`references/generate-docs-main.md`](references/generate-docs-main.md)
-and
-[`references/generate-docs-presentation.md`](references/generate-docs-presentation.md),
-and stamps a `source-hash` derived from the artifacts' sources (README.md and
-the canonical deck). `docs check` (the `--check` flag) recomputes that hash and
-reports `FRESH` or `STALE` without writing anything — use it to decide whether a
-regeneration is needed. The bare default never publishes or uploads.
+The default run first refreshes the canonical deck's harvested AUTO regions with
+[`scripts/build-slides.py`](scripts/build-slides.py) (the marker-driven harvester,
+ADR-106), then writes generated artifacts under `skills/maintainer/references/`,
+including [`references/generate-docs-main.md`](references/generate-docs-main.md)
+(the lean install/usage **guide**, from the README `GUIDE` span) and
+[`references/generate-docs-presentation.md`](references/generate-docs-presentation.md)
+(the **slides** tour), and stamps a `source-hash` derived from the artifacts'
+sources (README.md and the canonical deck). `docs check` (the `--check` flag)
+recomputes that hash and runs `build-slides.py --check`, reporting `FRESH` or
+`STALE` without writing anything — use it to decide whether a regeneration is
+needed. The bare default never publishes or uploads.
+
+To change a skill's tour slide, edit its `<!-- doc-slide: ... -->` landmark in
+that `SKILL.md`; never hand-edit inside the deck's `AUTO:` markers (they are
+overwritten). The guide↔slides content contract and harvest sources are documented
+in [`references/generate-docs.md`](references/generate-docs.md) (ADR-106, ADR-107).
 
 ### docs publish
 

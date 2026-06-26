@@ -37,6 +37,22 @@ esac
 maintainer_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 plugin_root="$(cd "$maintainer_dir/../.." && pwd)"
 out_dir="$maintainer_dir/references"
+scripts_dir="$maintainer_dir/scripts"
+
+# The guide is only the README span(s) between GUIDE markers — install/usage,
+# no design history or contributor material (ADR-107). Falls back to the whole
+# README when the markers are absent.
+guide_source_text() {
+  if grep -q '<!-- BEGIN GUIDE -->' "$main_source"; then
+    awk '
+      /<!-- BEGIN GUIDE -->/ { ing=1; next }
+      /<!-- END GUIDE -->/   { ing=0; print ""; next }
+      ing { print }
+    ' "$main_source"
+  else
+    cat "$main_source"
+  fi
+}
 
 main_source="$plugin_root/README.md"
 manifest_source="$plugin_root/.claude-plugin/plugin.json"
@@ -90,6 +106,22 @@ if [[ ! -f "$deck_source" ]]; then
   exit 1
 fi
 
+# Refresh the canonical deck's harvested AUTO regions from the live skills and
+# ADRs (ADR-106) before hashing/copying so a `docs` run reflects the live tree.
+# In check mode we only ask whether the regions are stale (it writes nothing).
+if [[ "$MODE" == "check" ]]; then
+  if ! python3 "$scripts_dir/build-slides.py" --check >/dev/null 2>&1; then
+    echo "STALE slide deck AUTO regions are out of date vs skills/ADRs"
+    echo "  run: bash skills/maintainer/scripts/regenerate-docs.sh"
+    exit 3
+  fi
+else
+  python3 "$scripts_dir/build-slides.py" >/dev/null || {
+    echo "FAIL build-slides.py could not refresh the deck" >&2
+    exit 1
+  }
+fi
+
 current_hash="$(compute_source_hash)"
 plugin_version="$(sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' "$manifest_source" | head -n 1)"
 [[ -n "$plugin_version" ]] || { echo "FAIL plugin version missing from manifest" >&2; exit 1; }
@@ -124,14 +156,14 @@ mkdir -p "$out_dir"  # references/ should already exist; guard for safety
   printf "source: README.md\n"
   printf "source-hash: %s\n" "$current_hash"
   printf -- "---\n\n"
-  awk -v generated="$generated_date" -v version="$plugin_version" -v commit="$git_commit_short" '
+  guide_source_text | awk -v generated="$generated_date" -v version="$plugin_version" -v commit="$git_commit_short" '
     { print }
     !inserted && /^# / {
       print ""
       printf "**Generated:** %s · **Plugin version:** %s · **Git commit:** `%s`\n", generated, version, commit
       inserted = 1
     }
-  ' "$main_source"
+  '
 } > "$main_out"
 
 {

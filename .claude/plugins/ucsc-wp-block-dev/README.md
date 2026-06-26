@@ -1,6 +1,12 @@
+<!-- BEGIN GUIDE -->
 # ucsc-wp-block-dev
 
 Claude Code plugin for developing the `ucsc-gutenberg-blocks` WordPress plugin at UCSC ITS.
+
+Install it with the steps below, then type `hub` (`:hub`) inside Claude Code to
+list the available skills. For a guided tour of every skill and the plugin's
+design, see the companion slide deck.
+<!-- END GUIDE -->
 
 ## Naming
 
@@ -14,6 +20,11 @@ Start with a target, describe the goal in ordinary language, and optionally
 include a Jira key or URL. Claude routes to the right skill from each skill's
 description; type `hub` (`:hub`) to list what's available, or invoke a skill
 directly.
+
+Although built for Claude Code, the same skills can be driven by natural-language
+invocation from other agent CLIs — **Codex**, **GitHub Copilot**, and **Gemini
+CLI** — which read the bundled root `AGENTS.md` routing table to see the live
+skill set (ADR-080).
 
 **On `ucsc-gutenberg-blocks` (the WordPress plugin — the product):**
 
@@ -33,22 +44,23 @@ skills
 │  └─ all   [block]                — run PHP, Jest, and E2E sequentially
 ├─ verify      [block] [criterion]                       — confirm a change in the running app
 └─ maintainer  [mode] [submode|target]                   — maintain this plugin package
-   ├─ backlog                                    — build the personal and unimplemented-ADR backlog
-   ├─ adr        [action] [ADR|decision]         — author, retire, inspect, and reconcile ADRs
-   ├─ skill      [action] [name|candidate]       — maintain plugin skills, references, scripts, and inventory
+   ├─ backlog                                           — build the personal and unimplemented-ADR backlog
+   ├─ adr        [action] [ADR|decision]                — author, retire, inspect, and reconcile ADRs
+   ├─ skill      [action] [name|candidate]              — maintain plugin skills, references, scripts, and inventory
    │  ├─ details         [name]       — inspect live frontmatter and invocation settings
    │  ├─ review          [name|all]   — run the opt-in qualitative skill reviewer
    │  ├─ review-contrib  <candidate>  — review a proposed or incubating skill
    │  ├─ promote         <candidate>  — promote an accepted candidate
    │  └─ sync                         — reconcile skill inventories across docs and tests
-   ├─ training   [goal]                          — study upstream patterns and apply relevant lessons
-   ├─ retro      [lesson|skill]                  — capture reusable session lessons
-   ├─ self-test                                  — run pytest contracts and deterministic plugin checks
-   ├─ validate   [tier1|tier2]                   — run structural validation; Tier 2 is opt-in
-   ├─ docs       [check|publish [guide|slides]]  — regenerate portable guide+slides Markdown (publish is the optional final step)
+   ├─ training   [goal]                                 — study upstream patterns and apply relevant lessons
+   ├─ retro      [lesson|skill]                         — capture reusable session lessons
+   ├─ self-test                                         — run pytest contracts and deterministic plugin checks
+   ├─ validate   [tier1|tier2]                          — run structural validation; Tier 2 is opt-in
+   ├─ docs       [update|check|publish [guide|slides]]  — regenerate portable guide+slides Markdown (publish is the optional final step)
+   │  ├─ update                   — regenerate the guide+slides artifacts from their sources (synonym for bare docs)
    │  ├─ check                    — report whether generated docs are stale vs. their sources (git hash)
    │  └─ publish  [guide|slides]  — publish both by default; name one to publish only that output
-   └─ all                                        — run the deterministic maintainer health checks
+   └─ all                                               — run the deterministic maintainer health checks
 ```
 
 `run` and `verify` follow the bundled Claude Code v2.1.145+ contract. The
@@ -195,6 +207,7 @@ docker run --rm -v "$PWD/public/wp-content/plugins/ucsc-gutenberg-blocks:/plugin
   -w /plugin php:8.1-cli php tests/php/ClassScheduleTest.php
 ```
 
+<!-- BEGIN GUIDE -->
 ## Plugin management
 
 ### Install
@@ -258,6 +271,7 @@ claude --plugin-dir .claude/plugins/ucsc-wp-block-dev
 
 This loads the plugin for the current session only — no install step needed.
 You can combine multiple `--plugin-dir` flags to load several plugins at once.
+<!-- END GUIDE -->
 
 ### Validate the plugin
 

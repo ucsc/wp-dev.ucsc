@@ -13,6 +13,8 @@ allowed-tools:
 
 # Run wp-dev.ucsc
 
+<!-- doc-slide: Launches and drives the wp-dev.ucsc Docker stack through one token-frugal driver to see a change working. -->
+
 ## Implements
 
 implements: ADR-002-RUN-WP-DEV, ADR-030-RUN-SEPARATION, ADR-073-RUN-CLAUDE-ONLY, ADR-091-RUN-TARGET, ADR-092-RUN-SHELL, ADR-093-RUN-BLOCK-TARGET, ADR-095-RUN-WP-EVAL, ADR-097-RUN-CONSOLE-CAPTURE

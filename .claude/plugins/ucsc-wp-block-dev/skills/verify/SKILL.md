@@ -13,6 +13,8 @@ allowed-tools:
 
 # Verify In The Running App
 
+<!-- doc-slide: Confirms one acceptance criterion in the live editor or frontend — a behavioral gate, never a stand-in for tests. -->
+
 ## Implements
 
 implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE, ADR-093-VERIFY-BLOCK-TARGET, ADR-103-VALIDATE-VERIFY-STACK-DEPENDENCY
