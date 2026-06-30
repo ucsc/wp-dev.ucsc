@@ -12,9 +12,9 @@ those inputs identifies work to summarize.
 
 Accept the Jira reference as either:
 
-- A bare issue key matching `[A-Z]+-\d+`, such as `WPM-97`.
+- A bare issue key matching `[A-Z]+-\d+`, such as `PROJECT-123`.
 - A full Atlassian URL such as
-  `https://ucsc-its.atlassian.net/browse/WPM-97`.
+  `https://example.atlassian.net/browse/PROJECT-123`.
 
 For a URL, extract the key from the trailing `/browse/<KEY>` segment and use
 that canonical key. Treat a token that is neither a valid key nor a parseable

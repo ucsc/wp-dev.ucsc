@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# implements: ADR-079-MAINTAINER-PLUGIN-DEV
+# implements: ADR-078-MAINTAINER-CLI-VALIDATE
 """Deterministic plugin best-practice checks used by maintainer self-test."""
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 ---
 title: "ADR-052: Allow Co-authored-by AI in commit messages"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 

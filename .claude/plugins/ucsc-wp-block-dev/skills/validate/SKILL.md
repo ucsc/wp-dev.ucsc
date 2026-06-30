@@ -1,6 +1,7 @@
 ---
 name: validate
 description: This skill should be used when the user asks to "create a PHP test", "run the PHP tests", "create a Jest test", "run the Jest tests", "create an e2e test", "run the e2e tests", or validate a ucsc-gutenberg-blocks feature, fix, or Jira acceptance criterion with an automated test suite. Use verify instead for live editor or frontend behavior.
+version: 0.1.0
 argument-hint: "[php|jest|e2e|all] [create|run] [block|feature|Jira]"
 allowed-tools:
   - bash
@@ -87,7 +88,7 @@ repo-local runner details, and stack gotchas.
 
 **`all` mode (ADR-101).** Run the suites **sequentially** — PHP → Jest → E2E —
 confirming each result before the next; never dispatch them as parallel commands
-and never spawn a subagent per suite (single-agent, ADR-075). When the target
+and never spawn a subagent per suite (single-agent, ADR-003). When the target
 repo ships the battery, that is the single call: `bash bin/validate.sh` (or a
 named subset like `bash bin/validate.sh php jest`); otherwise run the per-suite
 commands from [`references/run.md`](references/run.md) one at a time.
@@ -113,5 +114,12 @@ After confirmation, read exactly one mode reference:
 
 - For `create`, read [`references/create.md`](references/create.md).
 - For `run`, read [`references/run.md`](references/run.md).
+
+## Examples
+
+Copy-adapt working test stubs for new blocks:
+
+- [`examples/jest-test.js`](examples/jest-test.js) — Jest test template with `@wordpress/*` virtual mocks and `@testing-library/react`
+- [`examples/php-test.php`](examples/php-test.php) — Standalone PHP test template with WP stubs; runs via `php:8.1-cli`, no PHPUnit
 
 Jira acceptance criteria may define assertions, but Jira is optional.

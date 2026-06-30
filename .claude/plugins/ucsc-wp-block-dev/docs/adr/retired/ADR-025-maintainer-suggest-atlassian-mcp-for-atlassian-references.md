@@ -1,6 +1,6 @@
 ---
 title: "ADR-025: Suggest Atlassian MCP when Atlassian references are in use"
-status: Accepted
+status: Superseded
 date: 2026-06-10
 ---
 

@@ -37,7 +37,8 @@ Supporting changes:
    for back-compat), so the same publisher serves both artifacts.
 2. Each target keeps a focused token-frugal fast-path script
    (`refresh-and-publish-slides.sh`, `refresh-and-publish-docs.sh`).
-3. Each target has its own destination Google Doc URL.
+3. Each target has its own destination Google Doc URL, supplied through the
+   gitignored project-root `.env` rather than committed to the public plugin.
 
 This supersedes the `publish-slides` operation named in ADR-018. ADR-018's
 decision that the maintainer skill **owns the canonical deck** still stands;

@@ -26,8 +26,8 @@ the network or destination is unavailable.
 
 Add a user-invocable `feedback` skill — the plugin analog of Claude Code's
 `/bug`. It collects a short note plus a small, explicit set of session context
-(category, named skill/target, plugin version, timestamp, OS string, cwd, git
-branch) and delivers it through `scripts/submit-feedback.sh`.
+(category, named skill/target, plugin version, timestamp, and OS string) and
+delivers it through `scripts/submit-feedback.sh`.
 
 - **Configurable destination.** Delivery is chosen by environment variables, in
   order: a REST endpoint (`UCSC_FEEDBACK_ENDPOINT`, POST `application/json`,
@@ -37,7 +37,7 @@ branch) and delivers it through `scripts/submit-feedback.sh`.
   `ucsc-wp-block-dev` cache dir), then delivery is attempted; failures keep the
   saved copy and report its path.
 - **Minimal, explicit payload.** Only the fields above are sent — no file
-  contents, diffs, or conversation transcripts. The payload is built with
+  paths, branch names, contents, diffs, or conversation transcripts. The payload is built with
   `python3 json.dumps` (values passed via env) to avoid injection.
 - **Single deterministic script (ADR-094).** All collection, payload building,
   and transport live in one bundled wrapper the skill runs, rather than ad-hoc

@@ -1,5 +1,5 @@
 #!/bin/bash
-# implements: ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV
+# implements: ADR-078-MAINTAINER-CLI-VALIDATE
 # run-self-test.sh — deterministic self-test for the ucsc-wp-block-dev plugin.
 #
 # Runs:

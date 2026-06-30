@@ -96,7 +96,7 @@ class TestPluginJson:
         assert "author" in data
         assert isinstance(data["author"], dict)
         assert "name" in data["author"]
-        assert "email" in data["author"]
+        assert data["author"]["name"]
 
 
 class TestSkillFrontmatter:
@@ -421,7 +421,7 @@ class TestSkillFrontmatter:
             "name", "description", "when_to_use", "argument-hint", "arguments",
             "disable-model-invocation", "user-invocable", "allowed-tools",
             "disallowed-tools", "model", "effort", "context", "agent",
-            "hooks", "paths", "shell",
+            "hooks", "paths", "shell", "version",
         }
         for path in skill_files:
             text = path.read_text()
@@ -638,8 +638,9 @@ class TestSkillFrontmatter:
             "--target both|slides|guide",
             "--confirm",
             "--dry-run",
-            "SLIDES_DOC_ID",
-            "GUIDE_DOC_ID",
+            "UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL",
+            "UCSC_WP_BLOCK_DEV_GUIDE_DOC_URL",
+            "publish-env.sh",
             "refresh-and-publish-slides.sh",
             "refresh-and-publish-docs.sh",
             "check-skill-references.sh",
@@ -677,6 +678,21 @@ class TestSkillFrontmatter:
             guide,
             re.MULTILINE,
         )
+
+    def test_generated_guide_ends_with_post_install_hub_list(self):
+        """ADR-107: the guide closes with the brief `:hub` skill list so a reader
+        knows what to do after installing. Harvested from skill-tree.json."""
+        guide = (
+            SKILLS_DIR / "maintainer" / "references" / "generate-docs-main.md"
+        ).read_text()
+        assert "## After installing — what you can do" in guide
+        assert "`hub`" in guide
+        for skill_name in sorted(
+            p.name for p in SKILLS_DIR.iterdir() if p.is_dir()
+        ):
+            assert f"`{skill_name}`" in guide, (
+                f"guide post-install list is missing skill '{skill_name}'"
+            )
 
     def test_maintainer_documents_docs_operation(self):
         """Documentation regeneration is the `docs` operation on maintainer, not its
@@ -1172,8 +1188,8 @@ class TestAdrIndex:
         assert "do not weaken the required target-and-description intake gate" in text
 
     def test_mcp_token_study_compares_startup_strategies(self):
-        """ADR-027 must measure MCP savings against startup and unused-session cost."""
-        text = (ADR_DIR / "ADR-027-maintainer-study-github-atlassian-mcp-token-cost.md").read_text().lower()
+        """ADR-027 (retired into ADR-028) must preserve its measurement methodology."""
+        text = (ADR_DIR / "retired" / "ADR-027-maintainer-study-github-atlassian-mcp-token-cost.md").read_text().lower()
         for configuration in ["fallback only", "on demand", "always on"]:
             assert configuration in text
         assert "measure github and atlassian independently" in text
@@ -1218,6 +1234,35 @@ class TestFileLayout:
             f"Plugin contains potentially sensitive files: {[str(f) for f in dangerous]}"
         )
 
+    def test_public_artifacts_do_not_contain_private_identifiers(self):
+        """Known personal and organization-private examples stay out of releases."""
+        forbidden = [
+            "hen" + "ryh",
+            "ucsc-its" + ".atlassian.net",
+            "WPM" + "-97",
+            "ucscwebapps" + "/wdt-common",
+            "wordpress-dev" + ".ucsc.edu",
+            "1Qj8bnNorBnD_" + "ChbKD4BDLzBNFmTeqOArbrepNQh2Elw",
+            "18Ozi1BJ60eH2_" + "-mX5rpA08YsLtFwUAHC0nMErhsCxwo",
+        ]
+        text_files = []
+        for path in PLUGIN_ROOT.rglob("*"):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            content = path.read_bytes()
+            if b"\0" not in content:
+                text_files.append(content.decode(errors="ignore"))
+        corpus = "\n".join(text_files)
+        for identifier in forbidden:
+            assert identifier not in corpus, f"private identifier is public: {identifier}"
+
+    def test_feedback_payload_omits_local_path_and_branch(self):
+        script = (SKILLS_DIR / "feedback" / "scripts" / "submit-feedback.sh").read_text()
+        assert '"cwd"' not in script
+        assert '"git_branch"' not in script
+        assert "FB_" + "CWD" not in script
+        assert "FB_" + "BRANCH" not in script
+
     def test_no_stale_pycache_committed(self):
         """__pycache__ directories should not be tracked by git."""
         import subprocess
@@ -1231,6 +1276,19 @@ class TestFileLayout:
             assert r.stdout.strip() == "", (
                 f"__pycache__ tracked by git: {d.relative_to(PLUGIN_ROOT)}"
             )
+
+    def test_plugin_node_modules_not_committed(self):
+        """ADR-108: plugin-root node_modules/ must never be tracked by git."""
+        import subprocess
+        node_modules = PLUGIN_ROOT / "node_modules"
+        r = subprocess.run(
+            ["git", "ls-files", str(node_modules)],
+            capture_output=True, text=True,
+            cwd=str(PLUGIN_ROOT),
+        )
+        assert r.stdout.strip() == "", (
+            "Plugin-root node_modules/ is tracked by git — add it to .gitignore (ADR-108)"
+        )
 
     def test_all_markdown_links_resolve(self):
         """All relative file links inside markdown files must resolve to existing files."""

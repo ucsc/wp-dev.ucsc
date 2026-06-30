@@ -29,7 +29,11 @@ each has a distinct audience — keep them in their lanes:
   uninstall, reload, launch, use the plugin *now*; no design history or
   contributor material). It is generated from the `README.md` span between
   `<!-- BEGIN GUIDE -->` and `<!-- END GUIDE -->` (whole README if the markers are
-  absent).
+  absent), and **ends with a brief "After installing — what you can do" section**
+  — the `:hub` skill list, harvested from `skill-tree.json` by
+  `build-slides.py --guide-skills` and appended by `regenerate-docs.sh` — so a
+  reader knows the next step. The skill tree is therefore part of the guide's
+  staleness hash.
 - `generate-docs-presentation.md` — the **slides**: a guided *tour* of the plugin
   (Markdown, one slide per page). It is a portable copy of the maintainer-owned
   canonical deck. The deck's per-skill slides and roadmap are harvested, not

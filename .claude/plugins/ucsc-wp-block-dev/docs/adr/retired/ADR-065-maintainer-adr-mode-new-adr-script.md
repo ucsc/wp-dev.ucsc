@@ -1,6 +1,6 @@
 ---
 title: "ADR-065: ADR mode — automated creation script and naming convention"
-status: Accepted
+status: Superseded
 date: 2026-06-16
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: verify
 description: This skill should be used when the user asks to "verify this change", "confirm this works", "prove this acceptance criterion", "check the rendered block", or demonstrate that a ucsc-gutenberg-blocks change behaves correctly in the running WordPress editor or frontend without substituting automated tests or type checks.
+version: 0.1.0
 argument-hint: "[block] [change or acceptance criterion]"
 allowed-tools:
   - bash
@@ -128,7 +129,7 @@ The script lives in `_WP_tools` alongside the other reporting and regression too
 
 ```bash
 bash ~/\_code/\_WP\_tools/compare-blocks.sh \
-  --dev https://test-henryh.wordpress-dev.ucsc.edu/class-schedule-test/
+  --dev https://test-user.example.edu/class-schedule-test/
 ```
 
 The prod URL is detected by looking for a "compare with `<URL>`" note on the dev page, or any content-area link to a `*.ucsc.edu` prod site. The block type is detected from known container elements in the page. To enable auto-detect, add a note like "compare with https://philosophy.ucsc.edu/class-schedule/" to the dev test page.

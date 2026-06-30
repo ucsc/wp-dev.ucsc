@@ -1,6 +1,6 @@
 ---
 title: "ADR-054: Offer to create pull requests"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 

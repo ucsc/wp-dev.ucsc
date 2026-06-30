@@ -1,6 +1,7 @@
 ---
 name: develop
 description: This skill should be used when the user asks to "add a block", "create a Gutenberg block", "implement a feature", "modify block code", "extend a block", or when feature/fix scope is already defined and implementation is ready to begin on ucsc-gutenberg-blocks.
+version: 0.1.0
 argument-hint: "[feature|fix] [block] [description or Jira/GitHub URL or ID]"
 ---
 
@@ -12,7 +13,7 @@ Guided flow for adding a new Gutenberg block or extending an existing one in `uc
 
 ## Implements
 
-implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-008-DEVELOP-JIRA, ADR-009-DEVELOP-INTAKE, ADR-010-DEVELOP-JIRA-REPEAT, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET, ADR-093-DEVELOP-SESSION-TARGET, ADR-094-DEVELOP-SCRIPTS, ADR-095-DEVELOP-SOURCE-BASE, ADR-096-DEVELOP-STACK-CHECK
+implements: ADR-001-DEVELOP-PLUGIN-SCOPE, ADR-006-DEVELOP-WP-EXAMPLES, ADR-009-DEVELOP-INTAKE, ADR-021-DEVELOP-REFERENCES, ADR-036-DEVELOP-FIX-FEATURE, ADR-040-DEVELOP-ISSUE-CONTEXT, ADR-041-DEVELOP-BLOCK-TARGETS, ADR-044-DEVELOP-DOMAIN-GUIDANCE, ADR-084-DEVELOP-TARGET-SELECTION, ADR-090-DEVELOP-CWD-TARGET, ADR-093-DEVELOP-SESSION-TARGET, ADR-094-DEVELOP-SCRIPTS, ADR-095-DEVELOP-SOURCE-BASE, ADR-096-DEVELOP-STACK-CHECK
 
 ## Modes
 
@@ -151,7 +152,7 @@ Before using tools, investigating, or writing code, obtain both required inputs 
 1. **Target** — the block, GUI, or app being worked on.
 2. **Feature description** — what should be added or changed. A plain-language description is sufficient.
 
-If either input is missing, ask one concise question for all missing inputs and wait for the answer. Prompt for a Jira ID up front in the same clarification when none was supplied. When Atlassian MCP tools are available and a Jira ID or URL is supplied, fetch the Jira record before implementation. When Atlassian MCP tools are unavailable, ask the user to paste the ticket details or summarize the relevant requirements. Jira is preferred, not required. See ADR-008 and ADR-009.
+If either input is missing, ask one concise question for all missing inputs and wait for the answer. Prompt for a Jira ID up front in the same clarification when none was supplied. When Atlassian MCP tools are available and a Jira ID or URL is supplied, fetch the Jira record before implementation. When Atlassian MCP tools are unavailable, ask the user to paste the ticket details or summarize the relevant requirements. Jira is preferred, not required. See ADR-021 and ADR-009.
 
 For an unlisted target, confirm its canonical slug and scope before proceeding.
 Add a target reference only when the resulting domain guidance will be reused.
@@ -216,14 +217,18 @@ Jest tests are added in the future, run them **in-container** (never host
 After implementing, remind the user that this change needs build verification
 in the Docker environment with the `run` skill before it is treated as ready.
 
-If applicable validation is complete and no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
+If applicable validation is complete and no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-021.
 
-Per ADR-051, offer to generate Conventional Commit syntax for the completed
+Per ADR-023, offer to generate Conventional Commit syntax for the completed
 feature. Generate message text only if the user accepts. Manual check-in is the
 default: do not run `git add`, `git commit`, or equivalent staging/commit
 operations unless the user explicitly asks. Never run `git push`,
 `git push --force`, `git push --force-with-lease`, or equivalent remote-write
 operations; provide the command or PR URL for the user to run instead.
+
+## Examples
+
+- [`examples/conventional-commit.md`](examples/conventional-commit.md) — copy-ready Conventional Commit message patterns for block features, fixes, tests, and chores
 
 ## Plugin-dev Tools
 

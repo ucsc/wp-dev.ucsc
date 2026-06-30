@@ -1,6 +1,6 @@
 ---
 title: "ADR-007: Fix requires a user-provided concrete problem"
-status: Accepted
+status: Superseded
 date: 2026-06-09
 ---
 

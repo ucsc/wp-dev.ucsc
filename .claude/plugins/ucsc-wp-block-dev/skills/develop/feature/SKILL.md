@@ -1,6 +1,7 @@
 ---
 name: feature
 description: This skill should be used when the user asks to "add new behavior", "create a new block", "add a feature", "implement editor controls", "add frontend output", or describes new functionality for ucsc-gutenberg-blocks that is not a defect fix.
+version: 0.1.0
 argument-hint: "[block] [feature description] [Jira or GitHub URL/ID]"
 ---
 
@@ -8,7 +9,7 @@ argument-hint: "[block] [feature description] [Jira or GitHub URL/ID]"
 
 ## Implements
 
-implements: ADR-008-FEATURE-JIRA, ADR-009-FEATURE-INTAKE, ADR-010-FEATURE-JIRA-REPEAT, ADR-036-FEATURE-WORKFLOW, ADR-059-FEATURE-RETROSPECTIVE, ADR-093-FEATURE-BLOCK-TARGET
+implements: ADR-009-FEATURE-INTAKE, ADR-036-FEATURE-WORKFLOW, ADR-083-FEATURE-RETROSPECTIVE, ADR-093-FEATURE-BLOCK-TARGET
 
 Use this as the preferred workflow for new behavior. Use `fix` when existing
 behavior is incorrect.

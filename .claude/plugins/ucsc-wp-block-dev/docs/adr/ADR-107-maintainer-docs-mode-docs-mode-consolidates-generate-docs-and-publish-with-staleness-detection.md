@@ -48,7 +48,12 @@ is actually needed short of re-running it and diffing.
      **now**, and nothing else. `regenerate-docs.sh` emits only the README span
      between `<!-- BEGIN GUIDE -->` / `<!-- END GUIDE -->` markers (falling back
      to the whole README if the markers are absent), so design history and
-     contributor material stay out of the guide.
+     contributor material stay out of the guide. The guide must end with a brief
+     **"After installing — what you can do"** section so a reader knows the next
+     step: it is the `:hub` skill list, harvested from `skill-tree.json` by
+     `build-slides.py --guide-skills` and appended by `regenerate-docs.sh` (brief
+     by design — name, argument hint, one-line purpose per skill). The skill tree
+     therefore joins the guide's staleness hash.
    - **Slides** (`generate-docs-presentation.md`, from the canonical deck) are the
      *tour* — a Markdown file where each page is a slide: the plugin is a
      skills-only plugin backed by scripts that self-learns via the `retrospective`

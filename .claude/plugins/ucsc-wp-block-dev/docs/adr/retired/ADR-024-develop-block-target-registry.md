@@ -16,7 +16,7 @@ than top-level target skills.
 
 ## Decision
 
-Command arguments may include a **block target** token in any position, alongside the natural-language request, optional Jira reference ([ADR-021](../ADR-021-maintainer-accept-jira-id-or-url-in-arguments.md)), and optional PR reference ([ADR-022](../ADR-022-maintainer-accept-github-and-bitbucket-pr-references.md)).
+Command arguments may include a **block target** token in any position, alongside the natural-language request, optional Jira reference ([ADR-021](../ADR-021-maintainer-accept-jira-id-or-url-in-arguments.md)), and optional PR reference ([ADR-022](ADR-022-maintainer-accept-github-and-bitbucket-pr-references.md)).
 
 Known block targets are maintained in a single registry: `docs/target-blocks.md`. It records each block's slug, aliases, block name (`ucscblocks/*`), render class, owning skill, and data source. Universal command intake resolves a target token against that registry by **slug or alias** and routes to the owning skill:
 

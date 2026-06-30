@@ -1,6 +1,6 @@
 ---
 title: "ADR-008: Prefer a Jira ID for fix and develop work"
-status: Accepted
+status: Superseded
 date: 2026-06-09
 ---
 

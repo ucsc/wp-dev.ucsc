@@ -1,6 +1,7 @@
 ---
 name: hub
 description: This skill should be used when the user asks to "list skills", "what can you do", "show available commands", "what WordPress block skills are available", or invokes `:hub`. Lists the plugin inventory and can resolve, validate, and set the session block target (from a passed target or the current repo) so later skills reuse it; it does not route — to act, invoke the relevant skill directly.
+version: 0.1.0
 argument-hint: "[block]"
 ---
 

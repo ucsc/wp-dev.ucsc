@@ -30,7 +30,7 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/publish-docs.sh" --dry-run
 
 The orchestrator:
 
-1. Verifies the fixed Google Doc IDs, local publisher, credentials, and Python
+1. Loads and validates environment-configured Google Doc URLs, then verifies the local publisher, credentials, and Python
    dependencies.
 2. Refreshes and tests every selected output with uploads disabled.
 3. Runs reference and freshness checks before any external write.
@@ -40,6 +40,31 @@ The orchestrator:
 
 `--confirm` is required for external writes. Use `--target guide` or
 `--target slides` only when intentionally publishing one output.
+
+## Destination configuration
+
+Real Google Doc URLs are private operator configuration and are never committed
+to this plugin. Add them to the gitignored project-root `.env`:
+
+```dotenv
+UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL=https://docs.google.com/document/d/<SLIDES_DOCUMENT_ID>/edit
+UCSC_WP_BLOCK_DEV_GUIDE_DOC_URL=https://docs.google.com/document/d/<GUIDE_DOCUMENT_ID>/edit
+```
+
+The scripts load that file automatically. Set
+`UCSC_WP_BLOCK_DEV_ENV_FILE=/absolute/path/to/private.env` before invoking a
+publisher to use a different file. Existing exported environment variables also
+work and are overridden only when the selected env file defines the same name.
+
+The URL selects the destination; it does not grant access. Authentication is
+provided separately by `.claude/scripts/service_account.json`,
+`.claude/scripts/credentials.json`, `.claude/scripts/token.json`, or Google
+Application Default Credentials. These credential files must remain untracked,
+and the authenticated identity must have edit access to the configured docs.
+
+If a selected destination variable is absent or malformed, the publisher exits
+before any upload and prints the variable name, expected URL form, and README
+section to consult. `--no-publish` refresh operations need no destination URLs.
 
 ## publish slides
 
@@ -62,10 +87,10 @@ Before publishing:
 3. Refresh the title slide's `Generated:` value to the current date.
 4. Run the plugin tests, which enforce the deck path and inventory contract.
 
-Publish the verified deck to the existing Google Doc:
+Publish the verified deck to the configured Google Doc:
 
 ```bash
-python3 .claude/scripts/publish_to_gdoc.py --doc "https://docs.google.com/document/d/1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw/edit"
+python3 .claude/scripts/publish_to_gdoc.py --doc "$UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL"
 ```
 
 Do not restore a second deck at the repository root (ADR-018).
@@ -82,14 +107,14 @@ Publishes the generated prose guide
 regenerates the artifacts, runs the generate-docs contract tests, then
 publishes. Pass `--no-publish` to refresh and test without uploading.
 
-The guide's destination Google Doc URL must be set in `GDOC_URL` inside
-`refresh-and-publish-docs.sh` before first publish; until then the script refuses
-to upload. The underlying publisher accepts an explicit source:
+The guide's destination comes from `UCSC_WP_BLOCK_DEV_GUIDE_DOC_URL`; until it
+is configured the script refuses to upload. The underlying publisher accepts an
+explicit source:
 
 ```bash
 python3 .claude/scripts/publish_to_gdoc.py \
   --source skills/maintainer/references/generate-docs-main.md \
-  --doc "https://docs.google.com/document/d/18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo/edit"
+  --doc "$UCSC_WP_BLOCK_DEV_GUIDE_DOC_URL"
 ```
 
 ## publish (both)

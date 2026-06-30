@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# implements: ADR-065-MAINTAINER-NEW-ADR, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS
+# implements: ADR-086-MAINTAINER-CONVENTIONS, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS
 """rename-adrs.py — Bulk rename ADR files and update their references.
 
 Usage:

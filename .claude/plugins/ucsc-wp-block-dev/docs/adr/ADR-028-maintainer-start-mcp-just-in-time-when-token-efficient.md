@@ -1,5 +1,5 @@
 ---
-title: "ADR-028: Start MCP just in time when token-efficient"
+title: "ADR-028: MCP strategy — just-in-time activation, deferred login, one-time suggestion"
 status: Accepted
 date: 2026-06-10
 ---
@@ -55,6 +55,23 @@ The decision is based on estimated **total task tokens**, including tool schemas
 - Do not reload solely for a speculative future need.
 - Do not count omitted requirements, discussion, checks, or validation as token savings.
 - Reevaluate the threshold as MCP implementations and tool-schema costs change.
+
+## Deferred login (absorbed from ADR-034)
+
+Do not start, connect, authenticate, or log in to GitHub or Atlassian MCP during
+plugin or session startup. Keep both inactive until the current task needs that
+service. If authentication is required, request login only at that point and obtain
+user approval. Continue with fallbacks when activation is unnecessary, declined, or
+unsuccessful. Do not perform speculative login for possible later work.
+
+## Atlassian MCP suggestion (absorbed from ADR-025)
+
+When a Jira, Confluence, or Bitbucket reference is actively used and Atlassian MCP
+tools are unavailable, include one brief, non-blocking reminder that the user can
+set up Atlassian MCP for direct access. Mention the option once per task; do not
+repeat it. Continue with pasted details or other available tooling. Missing MCP must
+not block otherwise actionable work. Do not show the reminder when MCP is already
+available and do not prompt when no Atlassian reference is in use.
 
 ## Consequences
 

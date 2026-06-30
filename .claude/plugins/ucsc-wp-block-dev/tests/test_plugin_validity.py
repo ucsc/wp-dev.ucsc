@@ -198,7 +198,7 @@ class TestSkillRouting:
             "name", "description", "when_to_use", "argument-hint", "arguments",
             "disable-model-invocation", "user-invocable", "allowed-tools",
             "disallowed-tools", "model", "effort", "context", "agent",
-            "hooks", "paths", "shell",
+            "hooks", "paths", "shell", "version",
         }
         for skill_dir in sorted(SKILLS_DIR.iterdir()):
             if not (skill_dir / "SKILL.md").exists():

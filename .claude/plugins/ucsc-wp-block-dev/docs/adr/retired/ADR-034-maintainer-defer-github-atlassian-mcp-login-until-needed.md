@@ -1,6 +1,6 @@
 ---
 title: "ADR-034: Defer GitHub and Atlassian MCP login until needed"
-status: Accepted
+status: Superseded
 date: 2026-06-12
 ---
 

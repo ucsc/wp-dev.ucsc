@@ -43,7 +43,9 @@ docker compose -f docker-compose.yml -f docker-compose-start.yml up -d
 
 WordPress lives at `https://wp-dev.ucsc/` (self-signed cert; the vanity host is
 mapped via `/etc/hosts` → `127.0.0.1 wp-dev.ucsc`). Dev credentials:
-`admin` / `password`. WP-CLI is `docker compose exec wpcli wp <command>`.
+Administrator credentials are private local-environment configuration and are
+not recorded in this public plugin. WP-CLI is
+`docker compose exec wpcli wp <command>`.
 
 ## Why home-rolled (LDAP)
 

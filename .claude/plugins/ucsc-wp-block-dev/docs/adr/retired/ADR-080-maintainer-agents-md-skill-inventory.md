@@ -1,6 +1,6 @@
 ---
 title: "ADR-080: Keep AGENTS.md synchronized with live skill inventory"
-status: Accepted
+status: Superseded
 date: 2026-06-17
 related: ["ADR-061", "ADR-067", "ADR-073"]
 ---

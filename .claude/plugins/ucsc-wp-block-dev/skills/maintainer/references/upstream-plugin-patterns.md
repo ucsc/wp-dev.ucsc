@@ -67,7 +67,7 @@ An upstream example does not override local requirements. In particular:
 
 - Preserve this repository's no-push rule and explicit external-write
   authorization even when another plugin automates commits, pushes, or PRs.
-- Preserve ADR-064's opt-in agent checks and low-token defaults.
+- Preserve ADR-086's opt-in agent checks and low-token defaults.
 - Preserve WordPress, Gutenberg, Docker, macOS zsh, and Bash 3.2 constraints.
 - Do not add hooks, agents, MCP servers, dependencies, or telemetry merely
   because an example includes them.

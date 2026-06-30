@@ -1,6 +1,6 @@
 ---
 title: "ADR-053: Tag commits with ucsc-wp-block-dev skillset use"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 

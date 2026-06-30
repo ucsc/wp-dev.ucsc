@@ -8,7 +8,7 @@ date: 2026-06-09
 
 ## Status
 
-Accepted (consolidates ADR-058, 2026-06-24)
+Accepted (consolidates ADR-058 2026-06-24; ADR-064, ADR-075 2026-06-29)
 
 ## Context
 
@@ -51,6 +51,16 @@ preference.
    primary context, or a specialized capability unavailable inline.
 - Relay only the findings that matter; keep output terse.
 
+## Opt-in agent operations (absorbed from ADR-064)
+
+Two maintainer operations delegate to Anthropic `plugin-dev` agents:
+`validate` → `plugin-dev:plugin-validator` (~9.9k tokens) and `review-skills` →
+`plugin-dev:skill-reviewer` (~14.2k tokens). Both are opt-in only — they must
+never run automatically or as part of `all`. When presenting them, flag the
+approximate token cost so the choice is informed. `all` is the token-frugal
+deterministic suite: `self-test`, `check-references`, and the CLI structural
+validator.
+
 ## Consequences
 
 - Skills stay small and cheap to load; maintenance favors the validator and test
@@ -59,5 +69,7 @@ preference.
   behavior.
 - New skills must justify any subagent spawn or large reference file against this
   principle.
+- Agent-backed reviews (`validate`, `review-skills`) remain one keyword away but
+  never run on their own.
 - **Negative:** occasional tasks that could have been parallelized run
   sequentially — a deliberate, generally worthwhile tradeoff.

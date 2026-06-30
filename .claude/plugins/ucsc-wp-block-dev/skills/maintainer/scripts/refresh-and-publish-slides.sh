@@ -21,11 +21,10 @@ case "${1:-}" in
     ;;
 esac
 
-GDOC_URL="https://docs.google.com/document/d/1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw/edit"
-
 # scripts/ -> maintainer -> skills -> plugin root; project root is three more up.
 PLUGIN_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 PROJECT_ROOT="$(cd "$PLUGIN_ROOT/../../.." && pwd)"
+PUBLISH_ENV="$PLUGIN_ROOT/skills/maintainer/scripts/publish-env.sh"
 DECK="$PLUGIN_ROOT/skills/maintainer/assets/ucsc-wp-block-dev-presentation.md"
 PUBLISHER="$PROJECT_ROOT/.claude/scripts/publish_to_gdoc.py"
 TODAY="$(date +%Y-%m-%d)"
@@ -58,6 +57,12 @@ if [ "$NO_PUBLISH" -eq 1 ]; then
   echo "RESULT: PASS (refresh only)"
   exit 0
 fi
+[ -f "$PUBLISH_ENV" ] || { echo "  [FAIL] publish environment helper not found: $PUBLISH_ENV"; exit 2; }
+# shellcheck disable=SC1090
+. "$PUBLISH_ENV"
+load_publish_env "$PROJECT_ROOT"
+require_google_doc_url UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL "slides" || exit $?
+GDOC_URL="$UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL"
 [ -f "$PUBLISHER" ] || { echo "  [FAIL] publisher not found: $PUBLISHER"; exit 2; }
 PLOG="/tmp/ucsc-slides-publish-$(date +%H%M%S).log"
 echo "  ...  publishing to Google Doc"

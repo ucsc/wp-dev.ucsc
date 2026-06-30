@@ -9,7 +9,7 @@ related: ["ADR-046", "ADR-020", "ADR-070", "ADR-065", "ADR-081"]
 
 ## Status
 
-Accepted
+Accepted (consolidates ADR-065 2026-06-29)
 
 ## Context
 
@@ -50,6 +50,18 @@ The human-readable slug is `ADR-NNNN-SKILL-MODE` (uppercase, hyphenated); the
 checker keys only on the leading ADR number, so it resolves current four-digit
 ADR files and older three-digit references during migration.
 `check-adr-implements.py` enforces consistency in both directions (see Rollout).
+
+### E. ADR creation script — new-adr.sh (absorbed from ADR-065)
+
+Maintain `skills/maintainer/scripts/new-adr.sh` to automate ADR creation:
+1. Accepts skill + mode + title (preferred) or slug + title (legacy alias).
+2. Normalizes the slug into a lowercase, hyphen-separated string.
+3. Scans `docs/adr/` (and `retired/`) to resolve the next sequential number,
+   avoiding number-collision race conditions.
+4. Creates the file with standard ADR frontmatter and a skeleton body.
+5. Appends the entry to `docs/adr/index.md`.
+
+Always use `new-adr.sh` rather than creating ADR files by hand.
 
 ### D. Per-skill launcher + menu mode
 

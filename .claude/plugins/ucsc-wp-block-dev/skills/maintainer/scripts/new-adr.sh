@@ -1,5 +1,5 @@
 #!/bin/bash
-# implements: ADR-086-MAINTAINER-CONVENTIONS, ADR-065-MAINTAINER-NEW-ADR
+# implements: ADR-086-MAINTAINER-CONVENTIONS
 # new-adr.sh — automatically allocates the next ADR number, creates the ADR
 # markdown file with frontmatter, and updates docs/adr/index.md.
 #
@@ -24,13 +24,13 @@ case "${1:-}" in
 esac
 
 
-# Per ADR-065, new ADRs use
+# Per ADR-110, new ADRs use
 # ADR-NNN-<skill>-<mode>-mode-<detail>.md (hyphenated, lowercase).
 # Two call forms:
 #   new-adr.sh <skill> <mode> "<title>"   -> ADR-NNN-<skill>-<mode>-mode-<detail>.md
 #   new-adr.sh <slug> "<title>"           -> ADR-NNN-<slug>.md (legacy alias)
 if [ $# -lt 2 ]; then
-  echo "Usage: $0 <skill> <mode> \"<title>\"   (preferred, ADR-065)"
+  echo "Usage: $0 <skill> <mode> \"<title>\"   (preferred, ADR-110)"
   echo "       $0 <slug> \"<title>\"            (legacy)"
   exit 1
 fi

@@ -1,6 +1,6 @@
 ---
 title: "ADR-059: Offer a retrospective for skill and script enrichment"
-status: Accepted
+status: Superseded
 date: 2026-06-16
 ---
 

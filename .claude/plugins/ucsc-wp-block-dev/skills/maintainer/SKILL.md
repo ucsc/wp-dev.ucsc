@@ -1,6 +1,7 @@
 ---
 name: maintainer
 description: This skill should be used when the user asks to "maintain the plugin", "validate the plugin structure", "run the plugin self-tests", "review or promote a skill", "check ADR consistency", "study upstream plugin patterns", "publish the maintainer docs", or prepare ucsc-wp-block-dev for release.
+version: 0.1.0
 argument-hint: "[backlog|adr|skill|training|retro|self-test|validate|docs|all] [submode or target]"
 disable-model-invocation: true
 user-invocable: true
@@ -21,7 +22,7 @@ allowed-tools:
 
 ## Implements
 
-implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-027-MAINTAINER-MCP-TOKEN-COST, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-065-MAINTAINER-NEW-ADR, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-075-MAINTAINER-SINGLE-AGENT, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-079-MAINTAINER-PLUGIN-DEV, ADR-080-MAINTAINER-AGENTS-INVENTORY, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS, ADR-106-MAINTAINER-GENERATE-DOCS-MODE-MARKER-DRIVEN-DOCUMENTATION, ADR-107-MAINTAINER-DOCS-MODE-CONSOLIDATION
+implements: ADR-003-PLUGIN-LOW-TOKEN, ADR-004-MAINTAINER-VALIDATION, ADR-015-MAINTAINER-SLIDE-DATE, ADR-016-MAINTAINER-NO-BUNDLED-PYTHON, ADR-017-MAINTAINER-AGENTS-SYMLINKS, ADR-018-MAINTAINER-SLIDE-DECK, ADR-020-MAINTAINER-MENU, ADR-028-MAINTAINER-JIT-MCP, ADR-032-MAINTAINER-REFERENCE-CHECKS, ADR-033-MAINTAINER-WORKLIST, ADR-038-MAINTAINER-CONTRIB, ADR-045-MAINTAINER-GENERATE-DOCS, ADR-048-MAINTAINER-GENERATE-DOCS-ADRS, ADR-063-MAINTAINER-PUBLISH, ADR-067-MAINTAINER-SYNC-INVENTORY, ADR-070-MAINTAINER-FRONTMATTER, ADR-071-MAINTAINER-SKILL-DETAILS, ADR-072-MAINTAINER-SKILL-DISPLAY, ADR-076-MAINTAINER-TOKEN-LOG, ADR-078-MAINTAINER-CLI-VALIDATE, ADR-081-MAINTAINER-SUB-SKILLS, ADR-083-MAINTAINER-RETROSPECTIVE, ADR-085-MAINTAINER-TARGET, ADR-086-MAINTAINER-CONVENTIONS, ADR-089-MAINTAINER-PUBLIC-SLASH, ADR-099-MAINTAINER-RETRO-MODE-ORCHESTRATION-WRAPPER-SCRIPTS, ADR-106-MAINTAINER-GENERATE-DOCS-MODE-MARKER-DRIVEN-DOCUMENTATION, ADR-107-MAINTAINER-DOCS-MODE-CONSOLIDATION, ADR-109-MAINTAINER-CROSS-LINK-GUIDE-AND-SLIDES, ADR-110-MAINTAINER-ADR-MODE-STRICT-PREFIX-NAMING
 
 This body marker traces the skill to the ADRs it implements (ADR-086, decision C).
 `scripts/check-adr-implements.py` validates that every referenced ADR is active.
@@ -73,7 +74,7 @@ skills:
   the launcher before any operation runs.
 - [`retrospective/SKILL.md`](retrospective/SKILL.md) — capture lessons from a fix,
   feature, review, or run session into skill and reference files, and prompt for
-  script/skill/test improvements (ADR-077). Reached through `maintainer` or by
+  script/skill/test improvements (ADR-083). Reached through `maintainer` or by
   describing the goal at session end. See ADR-083. Past captured retrospectives
   are archived in the sub-skill dir, e.g.
   [`retrospective/archived-2026-06-18-gutenberg-hardening.md`](retrospective/archived-2026-06-18-gutenberg-hardening.md) and
@@ -101,13 +102,13 @@ skills:
 
 Resolve the plugin target, natural-language maintenance request, and optional Jira key/URL from the full input and session context.
 
-Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do. Present the durable modes first: `backlog`, `adr`, `skill`, `training`, and `retro`; then offer `self-test`, `validate`, `docs` (with `docs check` and `docs publish`), and `all`, with detailed compatibility modes available when needed. Per ADR-064, flag that `skill review`/`review-skills` and Tier 2 `validate` spawn token-heavy Anthropic `plugin-dev` agents; never run them automatically. Run the chosen mode only after selection. Treat `test` as a legacy alias for `self-test`, `new-adr` as a legacy alias for `adr`, and the older skill-specific modes as aliases under `skill`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
+Per ADR-020, when the user enters maintainer mode **without an explicit mode** (a bare `maintainer`), do **not** launch into `validate`, `review-skills`, or any plugin-dev agent. First prompt the user for what to do. Present the durable modes first: `backlog`, `adr`, `skill`, `training`, and `retro`; then offer `self-test`, `validate`, `docs` (with `docs check` and `docs publish`), and `all`, with detailed compatibility modes available when needed. Per ADR-086, flag that `skill review`/`review-skills` and Tier 2 `validate` spawn token-heavy Anthropic `plugin-dev` agents; never run them automatically. Run the chosen mode only after selection. Treat `test` as a legacy alias for `self-test`, `new-adr` as a legacy alias for `adr`, and the older skill-specific modes as aliases under `skill`. Once a mode is running, ask one concise question only when missing or conflicting information prevents useful work.
 
 When running token-heavy operations in CI, require a repository secret named `CLAUDE_AVAILABLE` set to `1` and restrict invocation to PRs from trusted collaborators. See `.github/workflows/ci.yml` for guarded execution.
 
 ## Anthropic plugin-dev tools
 
-`plugin-dev` is the optional Tier 2 companion (ADR-079). Before agent-backed
+`plugin-dev` is the optional Tier 2 companion (ADR-086). Before agent-backed
 validation or skill review, verify `claude plugin list` includes it. Installation,
 tool inventory, upstream links, and the deterministic local profile live in
 [`references/self-test.md`](references/self-test.md).
@@ -130,7 +131,7 @@ claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
 ```
 
 After Tier 1 passes, offer the opt-in Tier 2 semantic review only when deeper
-qualitative analysis is wanted (ADR-064):
+qualitative analysis is wanted (ADR-086):
 
 - `subagent_type`: `plugin-dev:plugin-validator`
 - `prompt`: "Validate the Claude Code plugin at `.claude/plugins/ucsc-wp-block-dev`. Report critical errors, warnings, and overall quality."
@@ -342,6 +343,9 @@ Use `--dry-run` to perform the complete local preflight without external writes.
 For the pre-publish reconciliation steps and the explicit `publish_to_gdoc.py`
 invocations and destination docs, read
 [`references/publish.md`](references/publish.md).
+The publishers source [`scripts/publish-env.sh`](scripts/publish-env.sh), which
+loads the gitignored project-root `.env` (or `$UCSC_WP_BLOCK_DEV_ENV_FILE`) and
+validates the configured Google Docs destination URLs.
 
 ## publish
 
@@ -359,13 +363,13 @@ reasonably hold the decision.
 
 When creating a new ADR, automatically allocate the next available ADR number,
 create a markdown file with standard frontmatter and skeleton, and update the ADR
-index file. Per ADR-065, new ADRs follow the hyphenated `ADR-NNN-<skill>-<mode>-mode-<detail>.md` form. The legacy slug form is still accepted as an alias. Number
+index file. Per ADR-086/ADR-110, new ADRs follow the hyphenated `ADR-NNN-<skill>-<mode>-mode-<detail>.md` form. The legacy slug form is still accepted as an alias. Number
 detection matches ADR files by their leading number regardless of separator. Per
 ADR-086 decision B, default to extending an existing ADR and create a new one
 only when the user says "add" or no existing ADR fits.
 
 ```bash
-# Preferred (ADR-065): ADR-NNN-<skill>-<mode>-mode-<detail>.md
+# Preferred (ADR-110): ADR-NNN-<skill>-<mode>-mode-<detail>.md
 bash "${CLAUDE_PLUGIN_ROOT}/skills/maintainer/scripts/new-adr.sh" <skill> <mode> "<title>"
 
 # Legacy alias: ADR-NNN-<slug>.md
@@ -393,7 +397,7 @@ repoint markers/prose → grep-verify zero dangling → gates — read
 ## sync-inventory
 
 Enforces skill inventory consistency across all documentation and testing assets
-by treating the directories in `skills/` as the source of truth. Per ADR-080,
+by treating the directories in `skills/` as the source of truth. Per ADR-086,
 this includes the root `AGENTS.md` routing table so Codex sees the live skill
 set before plugin work begins. Run the script:
 
@@ -440,7 +444,7 @@ structural check:
 claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
 ```
 
-Per ADR-064, `all` deliberately **excludes** the agent-backed checks
+Per ADR-086, `all` deliberately **excludes** the agent-backed checks
 (`plugin-dev:plugin-validator` and `plugin-dev:skill-reviewer`) — each spawns
 a token-heavy subagent, so they run only when explicitly requested. Offer them
 after `all` if a deeper semantic review is wanted.

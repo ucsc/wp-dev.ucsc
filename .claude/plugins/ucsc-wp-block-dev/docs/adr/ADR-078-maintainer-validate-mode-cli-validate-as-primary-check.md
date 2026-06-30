@@ -9,7 +9,7 @@ related: ["ADR-003", "ADR-064", "ADR-075"]
 
 ## Status
 
-Accepted
+Accepted (consolidates ADR-079 2026-06-29)
 
 ## Context
 
@@ -62,9 +62,32 @@ Or from the project root:
 claude plugin validate --strict .claude/plugins/ucsc-wp-block-dev
 ```
 
+## Tier 2 companion — plugin-dev (absorbed from ADR-079)
+
+Before running any Tier 2 operation (`validate` agent, `review-skills`,
+`skill-development`), verify that `plugin-dev` is installed:
+
+```bash
+claude plugin list | grep plugin-dev
+```
+
+If absent, prompt the user to install it:
+
+```text
+/plugin install plugin-dev@claude-code-marketplace
+```
+
+`plugin-dev` is a companion dependency maintained by Anthropic, not bundled with
+`ucsc-wp-block-dev`. Tier 1 operations (`claude plugin validate`, `self-test`,
+`check-references`) do not require it. The `maintainer training` mode uses
+`plugin-dev` source as an upstream reference for focused source-guided learning —
+it selects analogous upstream examples, records the source revision, and produces
+recommendations; it does not execute or vendor upstream code.
+
 ## Consequences
 
 - Structural regressions are caught cheaply on every `maintainer all` run.
 - The plugin-dev agent is reserved for qualitative review, not routine CI.
 - The distinction between structural and semantic validation is explicit.
-- `maintainer validate` now documents both tiers so the choice is informed.
+- Users who attempt Tier 2 operations without `plugin-dev` get a clear install prompt instead of a confusing failure.
+- `maintainer validate` documents both tiers so the choice is informed.

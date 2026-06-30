@@ -103,7 +103,7 @@ accepted local ADRs.
 - Accept the frontmatter fields allowed by ADR-070 instead of the smaller field
   set shown in older `plugin-dev` examples.
 - Preserve the plugin's accepted nested mode/sub-skill organization.
-- Keep agent-backed review opt-in under ADR-064; deterministic checks belong in
+- Keep agent-backed review opt-in under ADR-086; deterministic checks belong in
   `maintainer all`.
 - Prefer the official Claude Code docs and CLI validator when they disagree
   with prose or examples in `plugin-dev`.

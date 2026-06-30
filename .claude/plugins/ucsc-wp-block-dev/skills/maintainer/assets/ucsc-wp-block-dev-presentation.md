@@ -76,13 +76,13 @@ The plugin is built from a small set of repeating, test-enforced patterns:
 
 * **Low token use (ADR-003)** — lean `SKILL.md`, scanners over file reads,
   single-pass wrapper scripts.
-* **Single-agent default (ADR-075)** — inline tool calls; subagents only when a
+* **Single-agent default (ADR-003)** — inline tool calls; subagents only when a
   task genuinely needs parallelism.
 * **`implements:` traceability (ADR-086)** — full-slug markers tie skills and
   scripts to the decisions they realize; `check-adr-implements.py` harvests them.
 * **Marker-driven docs (ADR-106)** — the per-skill slides that follow are
   harvested from `doc-slide:` landmarks in each `SKILL.md`.
-* **Inventory as source of truth (ADR-067, ADR-080)** — `skill-tree.json` drives
+* **Inventory as source of truth (ADR-067, ADR-086)** — `skill-tree.json` drives
   the README, hub, deck, `AGENTS.md`, and tests via `sync-inventory.sh`.
 
 ---
@@ -176,6 +176,7 @@ Maintains the plugin itself — ADRs, skills, self-tests, docs, and release read
 Future direction lives as **Proposed** ADRs; each graduates to Accepted when it is built. Harvested live from `docs/adr/index.md` (ADR-048, ADR-106).
 
 * **ADR-105** — Support multiple WP local runtimes (wp-env, Local, WP Engine) beyond home-rolled wp-dev.ucsc
+* **ADR-108** — Plugin-scoped npm packages for test and lint tooling without polluting block package.json
 
 <!-- END AUTO:roadmap -->
 

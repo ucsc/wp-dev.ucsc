@@ -1,6 +1,6 @@
 ---
 title: "ADR-027: Study GitHub and Atlassian MCP token cost"
-status: Accepted
+status: Superseded
 date: 2026-06-10
 ---
 

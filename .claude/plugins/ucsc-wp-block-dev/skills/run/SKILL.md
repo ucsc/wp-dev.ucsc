@@ -1,6 +1,7 @@
 ---
 name: run
 description: This skill should be used when the user asks to "run the WordPress app", "start wp-dev.ucsc", "launch and drive the plugin", "open the editor", "interact with the block", or "demonstrate this change" in the ucsc-gutenberg-blocks Docker environment. Use verify for a specific acceptance criterion and validate for PHP, Jest, or e2e tests.
+version: 0.1.0
 argument-hint: "[block] [change to demonstrate or URL]"
 allowed-tools:
   - bash
@@ -158,7 +159,9 @@ docker compose exec wpcli wp plugin activate ucsc-gutenberg-blocks
 docker compose ps
 ```
 
-Use `https://wp-dev.ucsc/wp-admin/` as the canonical browser URL. The development credentials documented by the environment are `admin` / `password`.
+Use `https://wp-dev.ucsc/wp-admin/` as the canonical local-only browser URL.
+Obtain the throwaway local administrator credentials from the environment's
+private setup rather than recording them in this public plugin.
 
 ## Drive The App
 
@@ -217,3 +220,7 @@ races right after `up -d`, the `caching_sha2_password` mysql-client red herring,
 stale API caches, or Campus Directory VPN — see
 [`references/recovery.md`](references/recovery.md). Never delete containers,
 volumes, repositories, or user data without explicit approval.
+
+## Examples
+
+- [`examples/driver-invocations.md`](examples/driver-invocations.md) — copy-ready `driver.sh` commands for every phase and common scenarios

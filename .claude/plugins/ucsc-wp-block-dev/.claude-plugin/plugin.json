@@ -3,8 +3,7 @@
   "version": "0.2.0",
   "description": "Development toolkit for the ucsc-gutenberg-blocks WordPress plugin — block authoring, debugging, and local environment workflow",
   "author": {
-    "name": "UCSC ITS",
-    "email": "henryh@ucsc.edu"
+    "name": "UCSC ITS"
   },
   "keywords": ["wordpress", "gutenberg", "blocks", "ucsc", "php", "webpack", "jest", "wp-scripts", "campuspress"],
   "repository": "https://github.com/ucsc/ucsc-wp-block-dev",

@@ -21,9 +21,12 @@ Targets (rewritten in place, marker lines preserved):
   <!-- BEGIN AUTO:roadmap --> ... <!-- END AUTO:roadmap -->
 
 Usage:
-  build-slides.py            Rewrite the AUTO regions in the canonical deck.
-  build-slides.py --check    Write nothing; exit 0 if the regions are already
-                             current, 3 if a rebuild is needed, 2 on error.
+  build-slides.py                Rewrite the AUTO regions in the canonical deck.
+  build-slides.py --check        Write nothing; exit 0 if the regions are already
+                                 current, 3 if a rebuild is needed, 2 on error.
+  build-slides.py --guide-skills Write nothing; print the brief post-install skill
+                                 list (the `:hub` output) as Markdown to stdout,
+                                 for the guide's "After installing" section.
 """
 from __future__ import annotations
 
@@ -101,6 +104,31 @@ def render_skills_region() -> str:
     return "\n".join(parts)
 
 
+def render_guide_skills() -> str:
+    """Brief `:hub`-style skill list for the guide's post-install section."""
+    if not SKILL_TREE.is_file():
+        fail(f"missing skill tree: {SKILL_TREE}")
+    tree = json.loads(SKILL_TREE.read_text(encoding="utf-8"))
+    skills = tree.get("skills", [])
+    if not skills:
+        fail("skill tree has no skills")
+
+    lines = [
+        "## After installing — what you can do",
+        "",
+        "Type `hub` (`:hub`) in Claude Code to list the available skills, or invoke "
+        "one directly by name:",
+        "",
+    ]
+    for skill in skills:
+        name = skill["name"]
+        hint = skill.get("argument_hint", "").strip()
+        desc = skill.get("short_description", "").strip()
+        hint_str = f" `{hint}`" if hint else ""
+        lines.append(f"* **`{name}`**{hint_str} — {desc}")
+    return "\n".join(lines)
+
+
 def render_roadmap_region() -> str:
     if not ADR_INDEX.is_file():
         fail(f"missing ADR index: {ADR_INDEX}")
@@ -142,6 +170,9 @@ def main() -> int:
     args = sys.argv[1:]
     if "--help" in args or "-h" in args:
         print(__doc__)
+        return 0
+    if "--guide-skills" in args:
+        print(render_guide_skills())
         return 0
     check = "--check" in args
     if not DECK.is_file():

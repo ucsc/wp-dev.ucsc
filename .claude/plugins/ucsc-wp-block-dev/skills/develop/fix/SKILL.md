@@ -1,6 +1,7 @@
 ---
 name: fix
 description: This skill should be used when the user asks to "fix a block", "debug an issue", "something is broken", "block not showing", "wrong output", or reports any defect in a ucsc-gutenberg-blocks block, GUI, or app. Require the target and a plain-language problem description before investigating.
+version: 0.1.0
 argument-hint: "[block] [problem description] [Jira or GitHub URL/ID]"
 ---
 
@@ -8,7 +9,7 @@ argument-hint: "[block] [problem description] [Jira or GitHub URL/ID]"
 
 ## Implements
 
-implements: ADR-007-FIX-PROBLEM, ADR-008-FIX-JIRA, ADR-009-FIX-INTAKE, ADR-010-FIX-JIRA-REPEAT, ADR-026-FIX-TOKEN-STUDY, ADR-036-FIX-WORKFLOW, ADR-059-FIX-RETROSPECTIVE, ADR-093-FIX-BLOCK-TARGET
+implements: ADR-009-FIX-INTAKE, ADR-026-FIX-TOKEN-STUDY, ADR-036-FIX-WORKFLOW, ADR-083-FIX-RETROSPECTIVE, ADR-093-FIX-BLOCK-TARGET
 
 Systematic flow for diagnosing and fixing failures in `ucsc-gutenberg-blocks`.
 
@@ -66,9 +67,9 @@ the same clarification as the concrete-problem question. When Atlassian MCP
 tools are available and a Jira ID or URL is supplied, fetch the Jira record
 before reproducing. When Atlassian MCP tools are unavailable, ask the user to
 paste the ticket details or summarize the relevant requirements. The user may
-say there is no ticket or skip it; Jira is preferred, not required. See ADR-008.
+say there is no ticket or skip it; Jira is preferred, not required. See ADR-021.
 
-Do not inspect source files, logs, git history, browser or runtime state, builds, or tests until this gate is satisfied. See ADR-007 and ADR-009.
+Do not inspect source files, logs, git history, browser or runtime state, builds, or tests until this gate is satisfied. See ADR-009.
 
 ## 2. Reproduce First
 
@@ -166,9 +167,9 @@ skill. Use `run` only if the environment is not already up.
 
 ## 10. Complete the Fix Phase
 
-Summarize the completed fix and validation. If no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-010.
+Summarize the completed fix and validation. If no Jira ID was captured, the completion summary may ask for it again. Do not repeat the prompt when an ID is already known, and do not treat a missing ID as incomplete work. See ADR-021.
 
-Per ADR-051, offer to generate Conventional Commit syntax and automatically commit the completed
+Per ADR-023, offer to generate Conventional Commit syntax and automatically commit the completed
 fix. Generate message text only if the user accepts. Manual check-in is the
 default: do not run `git add`, `git commit`, or equivalent staging/commit
 operations unless the user explicitly asks. Never run `git push`,

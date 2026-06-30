@@ -1,6 +1,7 @@
 ---
 name: feedback
 description: This skill should be used when the user asks to "submit feedback", "send feedback", "give feedback about a skill", "report a bug in the plugin", "report a problem with run/validate/verify", "file a suggestion for ucsc-wp-block-dev", or invokes `:feedback`. It is the plugin analog of Claude Code's /bug — it collects a note plus session context and delivers it to a configured destination. Not for the WordPress ucscblocks/feedback block (that is product code; use develop).
+version: 0.1.0
 argument-hint: "[bug|idea|question] [note]"
 ---
 
@@ -64,13 +65,14 @@ order (endpoint → email → local-only):
 | `UCSC_FEEDBACK_FROM` | optional `From` address for the email channel |
 | `UCSC_WP_BLOCK_DEV_CACHE` | cache dir for saved copies (default `~/.cache/ucsc-wp-block-dev`) |
 
-To persist configuration across sessions, export these from the project settings
-file (the `.claude/ucsc-wp-block-dev.local.md` pattern) rather than hardcoding a
-URL in the skill.
+To persist configuration across sessions, add these variables to the gitignored
+project-root `.env`. The script loads that file automatically; set
+`UCSC_WP_BLOCK_DEV_ENV_FILE` to use another private env file. Never hardcode a
+real endpoint, address, or token in the skill.
 
 ## Privacy
 
 Only these fields are sent: the note, category, named skill/target, plugin
-version, timestamp, OS string, cwd, and git branch. **No file contents, diffs, or
-conversation transcripts are included.** State this if the user asks what leaves
-the machine.
+version, timestamp, and OS string. **No local paths, branch names, file contents,
+diffs, or conversation transcripts are included.** State this if the user asks
+what leaves the machine.

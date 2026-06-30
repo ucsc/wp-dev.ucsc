@@ -1,6 +1,6 @@
 ---
 title: "ADR-010: Jira prompt may repeat at phase completion"
-status: Accepted
+status: Superseded
 date: 2026-06-09
 ---
 

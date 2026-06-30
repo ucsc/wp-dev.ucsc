@@ -1,6 +1,6 @@
 ---
 title: "ADR-051: Offer to automatically commit in addition to providing message text"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 
@@ -8,7 +8,7 @@ date: 2026-06-15
 
 ## Context
 
-[ADR-029](retired/ADR-029-develop-fix-and-develop-offer-conventional-commit-message.md) stated that workflows should only offer commit message text and should default to manual check-ins without offering to automatically execute `git` operations unless explicitly requested. However, offering to automatically stage and commit the changes improves the developer experience and saves time.
+[ADR-029](ADR-029-develop-fix-and-develop-offer-conventional-commit-message.md) stated that workflows should only offer commit message text and should default to manual check-ins without offering to automatically execute `git` operations unless explicitly requested. However, offering to automatically stage and commit the changes improves the developer experience and saves time.
 
 ## Decision
 

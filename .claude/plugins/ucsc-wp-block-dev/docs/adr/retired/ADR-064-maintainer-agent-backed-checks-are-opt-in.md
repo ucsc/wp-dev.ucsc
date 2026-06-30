@@ -1,6 +1,6 @@
 ---
 title: "ADR-064: Agent-backed maintainer checks are opt-in, not default"
-status: Accepted
+status: Superseded
 date: 2026-06-16
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: review
 description: This skill should be used when the user asks to "review this diff", "review this branch", "check this PR", "review this file", "check this change for accessibility", "look for security issues", or review a Jira-scoped WordPress block change for bugs, regressions, and missing tests.
+version: 0.1.0
 argument-hint: "[block|PR|branch|file|diff] [bugs|security|a11y|tests|all]"
 ---
 
@@ -10,7 +11,7 @@ argument-hint: "[block|PR|branch|file|diff] [bugs|security|a11y|tests|all]"
 
 ## Implements
 
-implements: ADR-021-REVIEW-REFERENCES, ADR-022-REVIEW-PR-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-025-REVIEW-ATLASSIAN-MCP, ADR-034-REVIEW-DEFER-MCP-LOGIN, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-051-REVIEW-OFFER-COMMIT, ADR-052-REVIEW-AI-COAUTHOR, ADR-053-REVIEW-SKILLSET-TAG, ADR-054-REVIEW-OFFER-PR, ADR-055-REVIEW-NO-PUSH, ADR-056-REVIEW-GITHUB-ONLY, ADR-057-REVIEW-NO-PARENT-REPOS, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS, ADR-093-REVIEW-BLOCK-TARGET, ADR-104-REVIEW-WP-COMPANION
+implements: ADR-021-REVIEW-REFERENCES, ADR-023-REVIEW-COMMITS, ADR-028-REVIEW-MCP-STRATEGY, ADR-035-REVIEW-WORKTREE-WARNING, ADR-037-REVIEW-ANTHROPIC-GUARDRAILS, ADR-047-REVIEW-BRANCH-WARNING, ADR-055-REVIEW-NO-PUSH, ADR-062-REVIEW-GITHUB-FALLBACKS, ADR-069-REVIEW-FULL-PATHS, ADR-093-REVIEW-BLOCK-TARGET, ADR-104-REVIEW-WP-COMPANION
 
 ## Universal Command Intake
 
@@ -26,9 +27,9 @@ ARGUMENTS → persisted session value (`../develop/scripts/session-target.sh get
 newly resolved target with `session-target.sh set`. A PR/branch/diff review that
 spans multiple blocks or the whole plugin needs no single block target.
 
-Per ADR-022, the review target may be a pull-request reference: a **GitHub PR** — a full URL such as `https://github.com/ucsc/ucsc-gutenberg-blocks/pull/169` or a bare `#<n>` (GitHub is the canonical PR host for this plugin; fetch it with the `gh` CLI) — or a **Bitbucket PR** (`https://bitbucket.org/<workspace>/<repo>/pull-requests/<n>` for related UCSC webapps repos). A Jira reference (ADR-021) and a PR reference may both be supplied — Jira gives the issue/acceptance context, the PR gives the code under review.
+Per ADR-021, the review target may be a pull-request reference: a **GitHub PR** — a full URL such as `https://github.com/ucsc/ucsc-gutenberg-blocks/pull/169` or a bare `#<n>` (GitHub is the canonical PR host for this plugin; fetch it with the `gh` CLI) — or a **Bitbucket PR** (`https://bitbucket.org/<workspace>/<repo>/pull-requests/<n>` for related UCSC webapps repos). A Jira reference (ADR-021) and a PR reference may both be supplied — Jira gives the issue/acceptance context, the PR gives the code under review.
 
-Per ADR-025, when a Bitbucket PR, Jira reference, or Confluence URL is in use and Atlassian MCP tools are unavailable, mention once that the user can set up Atlassian MCP for direct access. Keep the reminder brief and non-blocking, continue with available context, and do not repeat it later in the task. Never install, configure, authenticate, or reload Atlassian MCP without explicit user approval.
+Per ADR-028, when a Bitbucket PR, Jira reference, or Confluence URL is in use and Atlassian MCP tools are unavailable, mention once that the user can set up Atlassian MCP for direct access. Keep the reminder brief and non-blocking, continue with available context, and do not repeat it later in the task. Never install, configure, authenticate, or reload Atlassian MCP without explicit user approval.
 
 When GitHub CLI tooling is needed for pull request creation or inspection, read
 [`../develop/references/github.md`](../develop/references/github.md) before
@@ -59,7 +60,7 @@ changes should normally happen on a feature branch named
 `dev/developer_name/ISSUE-1234_short_desc`. Do not create or switch branches
 unless the user explicitly asks.
 
-Per ADR-051, offer to generate Conventional Commit syntax for reviewed changes
+Per ADR-023, offer to generate Conventional Commit syntax for reviewed changes
 or review follow-up edits. Generate message text only if the user accepts.
 Manual check-in is the default: do not run `git add`, `git commit`, or
 equivalent staging/commit operations unless the user explicitly asks. Never run

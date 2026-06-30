@@ -1,6 +1,6 @@
 ---
 title: "ADR-056: Do not offer operations on non-GitHub repositories"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 

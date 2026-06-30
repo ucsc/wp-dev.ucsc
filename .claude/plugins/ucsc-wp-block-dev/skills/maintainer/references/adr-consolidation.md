@@ -60,7 +60,7 @@ files.
 ## History
 
 - **Sample 1 (2026-06-24):** merged the adr-mode naming-convention ADR into
-  ADR-065 (adr mode: creation script + naming convention). Proved the retire +
+  ADR-086 (adr mode: creation script + naming convention). Proved the retire +
   repoint + grep-verify loop; produced `retire-adr.sh`.
 - **Sample 2 (2026-06-24):** merged the low-token single-agent ADR into ADR-003
   (low token use and single-agent default); 7 prose refs repointed across

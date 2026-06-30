@@ -1,6 +1,6 @@
 ---
 title: "ADR-057: Do not inspect parent Git repos"
-status: Accepted
+status: Superseded
 date: 2026-06-15
 ---
 

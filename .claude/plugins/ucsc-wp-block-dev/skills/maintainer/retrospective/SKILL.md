@@ -1,6 +1,7 @@
 ---
 name: retrospective
 description: This skill should be used when the user asks to "capture lessons learned", "update the skills from this session", "record this gotcha", "preserve this pattern", or persist reusable domain knowledge at the end of a fix, feature, review, or run session. Use it to enrich ucsc-wp-block-dev skill references, not to produce a task summary.
+version: 0.1.0
 argument-hint: "[lesson or target skill]"
 ---
 
@@ -8,7 +9,7 @@ argument-hint: "[lesson or target skill]"
 
 ## Implements
 
-implements: ADR-059-RETROSPECTIVE-SKILL-ENRICHMENT, ADR-077-RETROSPECTIVE-LESSONS, ADR-083-MAINTAINER-RETROSPECTIVE
+implements: ADR-083-MAINTAINER-RETROSPECTIVE
 
 Run this at the end of any meaningful work session to persist what was learned
 before the context window closes. Keep it token-light: grep before reading,
@@ -17,7 +18,7 @@ write only what isn't already documented.
 ## When To Run
 
 - At the conclusion of every fix, feature, review, or run session when there
-  are reusable lessons to preserve (per ADR-059).
+  are reusable lessons to preserve (per ADR-083).
 - When a new pattern, gotcha, or domain boundary was discovered.
 - When an existing skill reference was found to be missing, wrong, or misleading.
 
@@ -76,7 +77,7 @@ ADR-NNN_skill_mode_detail.md
 With proper frontmatter (`title`, `status: Accepted`, `date`), then add it to
 `docs/adr/index.md`. See existing ADRs for the format.
 
-### 5. Consider Scripts and Skill Improvements (ADR-077)
+### 5. Consider Scripts and Skill Improvements (ADR-083)
 
 Ask three questions before closing (answer in one sentence each; skip if
 nothing applies):

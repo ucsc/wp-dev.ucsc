@@ -92,11 +92,7 @@ REFRESH_SLIDES="$SCRIPT_DIR/refresh-and-publish-slides.sh"
 REFRESH_GUIDE="$SCRIPT_DIR/refresh-and-publish-docs.sh"
 CHECK_REFS="$SCRIPT_DIR/check-skill-references.sh"
 REGENERATE="$SCRIPT_DIR/regenerate-docs.sh"
-
-SLIDES_DOC_ID="1Qj8bnNorBnD_ChbKD4BDLzBNFmTeqOArbrepNQh2Elw"
-GUIDE_DOC_ID="18Ozi1BJ60eH2_-mX5rpA08YsLtFwUAHC0nMErhsCxwo"
-SLIDES_DOC_URL="https://docs.google.com/document/d/${SLIDES_DOC_ID}/edit"
-GUIDE_DOC_URL="https://docs.google.com/document/d/${GUIDE_DOC_ID}/edit"
+PUBLISH_ENV="$SCRIPT_DIR/publish-env.sh"
 
 PYTHON="$PROJECT_ROOT/.claude/scripts/.venv/bin/python"
 [ -x "$PYTHON" ] || PYTHON="python3"
@@ -119,15 +115,19 @@ require_file() {
   [ -f "$1" ] || fail "missing file: $1"
 }
 
-validate_doc_url() {
-  case "$1" in
-    "https://docs.google.com/document/d/$2/edit")
-      ;;
-    *)
-      fail "destination URL does not match expected document ID: $1"
-      ;;
-  esac
-}
+require_file "$PUBLISH_ENV"
+# shellcheck disable=SC1090
+. "$PUBLISH_ENV"
+load_publish_env "$PROJECT_ROOT"
+
+if [ "$TARGET" = "both" ] || [ "$TARGET" = "slides" ]; then
+  require_google_doc_url UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL "slides" || fail "slides destination is not configured"
+fi
+if [ "$TARGET" = "both" ] || [ "$TARGET" = "guide" ]; then
+  require_google_doc_url UCSC_WP_BLOCK_DEV_GUIDE_DOC_URL "guide" || fail "guide destination is not configured"
+fi
+SLIDES_DOC_URL="${UCSC_WP_BLOCK_DEV_SLIDES_DOC_URL:-not requested}"
+GUIDE_DOC_URL="${UCSC_WP_BLOCK_DEV_GUIDE_DOC_URL:-not requested}"
 
 echo "=== docs publish preflight ==="
 status_line "[INFO]" "target: $TARGET"
@@ -141,8 +141,6 @@ require_file "$REFRESH_GUIDE"
 require_file "$CHECK_REFS"
 require_file "$REGENERATE"
 require_file "$PLUGIN_ROOT/.claude-plugin/plugin.json"
-validate_doc_url "$SLIDES_DOC_URL" "$SLIDES_DOC_ID"
-validate_doc_url "$GUIDE_DOC_URL" "$GUIDE_DOC_ID"
 
 if [ ! -f "$PROJECT_ROOT/.claude/scripts/service_account.json" ] \
   && [ ! -f "$PROJECT_ROOT/.claude/scripts/credentials.json" ] \

@@ -1,6 +1,6 @@
 ---
 title: "ADR-077: always consider lessons learned and token-reduction opportunities via scripts and skill improvements"
-status: Accepted
+status: Superseded
 date: 2026-06-17
 related: ["ADR-003", "ADR-059", "ADR-075", "ADR-076"]
 ---

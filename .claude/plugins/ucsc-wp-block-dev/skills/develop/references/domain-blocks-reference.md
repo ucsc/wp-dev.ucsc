@@ -73,7 +73,7 @@ The Class Schedule block embeds UCSC's Class Schedule application (WCSI) inside 
 - Under `ClassSchedule.js`, the block checks if it is running in a local or development environment:
   ```js
   const isDevEnvironment = () => {
-    return window.location.href.includes('https://wordpress-dev.ucsc.edu/')
+    return window.location.href.includes('https://wordpress-dev.example.edu/')
            || window.location.href.includes('wp-dev.ucsc');
   }
   ```

@@ -1,6 +1,6 @@
 ---
 title: "ADR-079: Anthropic plugin-dev is the upstream reference and optional Tier 2 companion"
-status: Accepted
+status: Superseded
 date: 2026-06-17
 related: ["ADR-064", "ADR-075", "ADR-078"]
 ---

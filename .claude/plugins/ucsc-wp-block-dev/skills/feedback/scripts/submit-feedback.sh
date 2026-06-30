@@ -18,7 +18,7 @@
 #
 # Privacy: only the fields shown in the payload below are sent — the note, an
 # optional category, the named skill/target, plugin version, timestamp, OS
-# string, cwd, and git branch. No file contents or transcripts.
+# string and timestamp. No local paths, branch names, file contents, or transcripts.
 set -uo pipefail
 
 usage() {
@@ -81,6 +81,14 @@ command -v python3 >/dev/null 2>&1 || {
 
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_ROOT="$(cd -- "$HERE/../../.." && pwd)"
+PROJECT_ROOT="$(cd -- "$PLUGIN_ROOT/../../.." && pwd)"
+env_file="${UCSC_WP_BLOCK_DEV_ENV_FILE:-$PROJECT_ROOT/.env}"
+if [ -f "$env_file" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  . "$env_file"
+  set +a
+fi
 
 # --- gather context ---
 version="$(python3 -c 'import json,sys
@@ -88,8 +96,6 @@ try: print(json.load(open(sys.argv[1])).get("version",""))
 except Exception: print("")' "$PLUGIN_ROOT/.claude-plugin/plugin.json" 2>/dev/null)"
 ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 platform="$(uname -sr 2>/dev/null || echo unknown)"
-cwd="$PWD"
-branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
 
 cache="${UCSC_WP_BLOCK_DEV_CACHE:-$HOME/.cache/ucsc-wp-block-dev}/feedback"
 mkdir -p "$cache"
@@ -97,7 +103,7 @@ saved="$cache/feedback-$(date -u +%Y%m%dT%H%M%SZ)-$$.json"
 
 # --- build the JSON payload (python3 handles escaping; values via env) ---
 FB_MESSAGE="$message" FB_CATEGORY="$category" FB_SKILL="$skill" FB_TARGET="$target" \
-FB_VERSION="$version" FB_TS="$ts" FB_PLATFORM="$platform" FB_CWD="$cwd" FB_BRANCH="$branch" \
+FB_VERSION="$version" FB_TS="$ts" FB_PLATFORM="$platform" \
 python3 - > "$saved" <<'PY'
 import json, os
 def opt(v): return v if v else None
@@ -111,8 +117,6 @@ doc = {
     "submitted_at": os.environ.get("FB_TS", ""),
     "context": {
         "platform": opt(os.environ.get("FB_PLATFORM", "")),
-        "cwd": opt(os.environ.get("FB_CWD", "")),
-        "git_branch": opt(os.environ.get("FB_BRANCH", "")),
     },
 }
 print(json.dumps(doc, indent=2))

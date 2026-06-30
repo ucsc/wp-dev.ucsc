@@ -8,7 +8,7 @@ date: 2026-06-16
 
 ## Status
 
-Accepted
+Accepted (consolidates ADR-080 2026-06-29)
 
 ## Context
 
@@ -33,8 +33,19 @@ We will introduce a script at `skills/maintainer/scripts/sync-inventory.sh` (wra
    - The `EXPECTED_LIVE_SKILLS` set in `tests/test_plugin_structure.py`.
 4. It contains a static mapping of descriptions and triggers to preserve desired table content formatting, but falls back to the skill's YAML frontmatter description for any new, unrecognized skill.
 
+## AGENTS.md sync (absorbed from ADR-080)
+
+The root `AGENTS.md` routing table is also part of the sync set. Whenever a skill
+is added, removed, renamed, or has its routing summary changed, update `AGENTS.md`
+in the same inventory sync pass. `sync-inventory.sh --check` reports drift in
+`AGENTS.md`; `--write` regenerates its routing table. `AGENTS.md` must list only
+live skills and no retired skill names. Do not duplicate full skill content into
+`AGENTS.md` — it points agents at the canonical skill source and requires reading
+the relevant `SKILL.md` before acting.
+
 ## Consequences
 
 - **Positive:** Retires the inventory-sync gotcha.
-- **Positive:** Automates updates to documentation and tests, reducing development friction when skills are added/removed.
-- **Negative:** None.
+- **Positive:** Automates updates to documentation, `AGENTS.md`, and tests, reducing development friction when skills are added/removed.
+- **Positive:** Stale skill names in `AGENTS.md` are caught by `sync-inventory.sh --check` and the existing pytest tests.
+- **Negative:** `sync-inventory.sh --write` now edits a repository-root file outside the plugin directory; review that diff alongside plugin-owned documentation changes.

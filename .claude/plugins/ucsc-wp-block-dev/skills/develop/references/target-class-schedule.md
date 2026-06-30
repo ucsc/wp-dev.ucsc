@@ -34,7 +34,6 @@ Previous versions used `id="wcsi"` — that ID is no longer current.
 ## Testing Toggle
 
 `src/blocks/ClassSchedule.js` recognizes
-`https://wordpress-dev.ucsc.edu/` and `wp-dev.ucsc` as development
+an organization-specific development hostname and the local-only `wp-dev.ucsc` hostname as development
 environments. There it exposes the `Use New Server for Testing` control backed
 by `useNewServer`.
-

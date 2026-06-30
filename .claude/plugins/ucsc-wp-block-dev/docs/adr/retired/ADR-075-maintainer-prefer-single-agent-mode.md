@@ -1,6 +1,6 @@
 ---
 title: "ADR-075: prefer single-agent mode — avoid multi-agent pipelines unless the task requires parallelism"
-status: Accepted
+status: Superseded
 date: 2026-06-17
 supersedes: []
 related: ["ADR-003", "ADR-064"]

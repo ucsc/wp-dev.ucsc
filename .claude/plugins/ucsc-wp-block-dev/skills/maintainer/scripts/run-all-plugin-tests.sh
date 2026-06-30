@@ -1,5 +1,5 @@
 #!/bin/bash
-# implements: ADR-064-MAINTAINER-OPT-IN-AGENTS, ADR-078-MAINTAINER-CLI-VALIDATE
+# implements: ADR-003-MAINTAINER-LOW-TOKEN, ADR-078-MAINTAINER-CLI-VALIDATE
 # run-all-plugin-tests.sh — run the `maintainer all` deterministic battery in one command.
 #
 # Battery (token-frugal, no agents):
@@ -8,7 +8,7 @@
 #   3. validate          — `claude plugin validate --strict` structural check
 #
 # Agent-backed checks (plugin-dev:plugin-validator / skill-reviewer) are
-# deliberately excluded per ADR-064; request those explicitly.
+# deliberately excluded per ADR-086; request those explicitly.
 #
 # Runs from any cwd: paths resolve relative to this script. Prints a compact
 # per-step PASS/FAIL and a final summary. Exit 0 only if every step passes.

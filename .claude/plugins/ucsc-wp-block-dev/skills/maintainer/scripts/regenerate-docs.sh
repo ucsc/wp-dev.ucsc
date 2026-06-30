@@ -57,12 +57,15 @@ guide_source_text() {
 main_source="$plugin_root/README.md"
 manifest_source="$plugin_root/.claude-plugin/plugin.json"
 deck_source="$maintainer_dir/assets/ucsc-wp-block-dev-presentation.md"
+# The guide appends a harvested `:hub` skill list (ADR-107), so the skill tree is
+# a guide source and belongs in the staleness hash.
+skill_tree_source="$plugin_root/skills/hub/references/skill-tree.json"
 main_out="$out_dir/generate-docs-main.md"
 deck_out="$out_dir/generate-docs-presentation.md"
 generated_date="$(date +%Y-%m-%d)"
 
 # A content hash of exactly the bytes the script copies into the artifacts
-# (README + manifest version + canonical deck). It is independent of git
+# (README + manifest version + canonical deck + skill tree). It is independent of git
 # working-tree state, so a committed-but-unregenerated source change is still
 # detected. `git hash-object` is preferred; shasum is the portable fallback
 # when git is unavailable.
@@ -78,7 +81,7 @@ file_hash() {
 compute_source_hash() {
   local acc=""
   local f
-  for f in "$main_source" "$manifest_source" "$deck_source"; do
+  for f in "$main_source" "$manifest_source" "$deck_source" "$skill_tree_source"; do
     [[ -f "$f" ]] || { echo ""; return 1; }
     acc+="$(file_hash "$f")"
   done
@@ -164,6 +167,10 @@ mkdir -p "$out_dir"  # references/ should already exist; guard for safety
       inserted = 1
     }
   '
+  # Close the guide with the harvested post-install `:hub` skill list (ADR-107)
+  # so a reader knows what to do after installing.
+  printf "\n"
+  python3 "$scripts_dir/build-slides.py" --guide-skills
 } > "$main_out"
 
 {

@@ -1,5 +1,5 @@
-<!-- Generated: 2026-06-25 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
-<!-- source-hash: 604e2e6f18ca103c822484af4d253e02d0aed14eb13e73b497800311d7f7a050 -->
+<!-- Generated: 2026-06-30 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
+<!-- source-hash: 0a804f1eaa2f68eac1dfed597547a275e470fb1c1624f8e69eaea2aff5f55b37 -->
 
 ---
 marp: true
@@ -48,7 +48,7 @@ AUTO markers — your edits will be overwritten on the next `docs` run.
 ### *A guided tour of the `ucsc-wp-block-dev` Claude Code plugin*
 
 **Slides** · **Presented by:** UCSC ITS<br />
-**Generated:** 2026-06-25<br />
+**Generated:** 2026-06-30<br />
 **Target Product:** `ucsc-gutenberg-blocks` · **Local Environment:** `wp-dev.ucsc`
 
 > Built for Claude Code; the same skills also run via natural-language invocation
@@ -79,13 +79,13 @@ The plugin is built from a small set of repeating, test-enforced patterns:
 
 * **Low token use (ADR-003)** — lean `SKILL.md`, scanners over file reads,
   single-pass wrapper scripts.
-* **Single-agent default (ADR-075)** — inline tool calls; subagents only when a
+* **Single-agent default (ADR-003)** — inline tool calls; subagents only when a
   task genuinely needs parallelism.
 * **`implements:` traceability (ADR-086)** — full-slug markers tie skills and
   scripts to the decisions they realize; `check-adr-implements.py` harvests them.
 * **Marker-driven docs (ADR-106)** — the per-skill slides that follow are
   harvested from `doc-slide:` landmarks in each `SKILL.md`.
-* **Inventory as source of truth (ADR-067, ADR-080)** — `skill-tree.json` drives
+* **Inventory as source of truth (ADR-067, ADR-086)** — `skill-tree.json` drives
   the README, hub, deck, `AGENTS.md`, and tests via `sync-inventory.sh`.
 
 ---
@@ -179,6 +179,7 @@ Maintains the plugin itself — ADRs, skills, self-tests, docs, and release read
 Future direction lives as **Proposed** ADRs; each graduates to Accepted when it is built. Harvested live from `docs/adr/index.md` (ADR-048, ADR-106).
 
 * **ADR-105** — Support multiple WP local runtimes (wp-env, Local, WP Engine) beyond home-rolled wp-dev.ucsc
+* **ADR-108** — Plugin-scoped npm packages for test and lint tooling without polluting block package.json
 
 <!-- END AUTO:roadmap -->
 
