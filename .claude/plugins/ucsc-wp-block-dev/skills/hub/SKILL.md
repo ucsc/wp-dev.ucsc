@@ -48,7 +48,7 @@ skills
 │  └─ fix      [block] [problem]  — diagnose and repair a block defect
 ├─ feedback  [bug|idea|question] [note]                — report a bug or idea about the plugin skills
 ├─ review    [target] [focus]                          — review code for bugs, security, a11y, and tests
-├─ run       [block] [change|URL]                      — launch and drive wp-dev.ucsc
+├─ run       [block] [change|URL]                      — launch and drive (multi-env / BYO)
 ├─ validate  [php|jest|e2e|all] [create|run] [target]  — create or run automated test suites
 │  ├─ php   [create|run] [target]  — create or run PHP tests
 │  ├─ jest  [create|run] [target]  — create or run Jest tests

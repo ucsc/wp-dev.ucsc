@@ -28,16 +28,19 @@ Build and launch the app, then use the recorded driver/browser path to interact
 with the requested surface and observe it working. `run` demonstrates the app;
 `verify` applies a specific acceptance criterion without falling back to tests.
 
-## Environment — home-rolled Docker Compose (ADR-002)
+## Environment — multi-environment support
 
-`wp-dev.ucsc` is a **home-rolled Docker Compose** stack — **not** wp-env, Local,
-ddev, or WP Engine. There is no framework CLI: a custom `Dockerfile`
-(WordPress 6.5.5 + PHP 8.1 + **LDAP** + Xdebug) plus three layered compose files
-(`docker-compose.yml` base, `docker-compose-start.yml` dev/watch overlay,
-`docker-compose-install.yml` bootstrap jobs), driven by plain `docker compose`
-and WP-CLI inside the `wpcli` container. It is **dev-only**; the real site is
-production. Do not assume any environment-manager conventions. Full details:
-[`references/environment.md`](references/environment.md).
+This skill supports multiple development environments: the original `wp-dev.ucsc`
+home-rolled Docker Compose stack, `wp-env`, Local (LocalWP), WP Engine, and
+"Bring Your Own" (BYO) environments. The run skill includes an environment
+router that auto-detects the runtime using
+`skills/run/lib/detect-environment.sh` and dispatches to environment-specific
+drivers under `skills/run/drivers/` (e.g. `wp-dev-ucsc`, `wp-env`, `local`,
+`generic-byo`). When a full driver is not present the BYO driver provides
+clear guidance to bring up your site and run the requested commands.
+
+See [`references/environments.md`](references/environments.md) for detection
+rules, supported probes, troubleshooting, and how to add a new driver.
 
 ## Launcher
 

@@ -40,44 +40,38 @@ resolved target with `session-target.sh" set`.
 
 ## Test Driver
 
-Prefer a single-call driver over ad-hoc Docker commands. Two driver families
-exist; pick by the resolved target repo.
+Prefer a single-call driver over ad-hoc Docker commands. The validate skill is
+now multi-environment aware: when invoked it uses the environment detection
+router (via `skills/run/lib/detect-environment.sh`) and routes to the
+appropriate validation flow for the detected environment (dockerized
+`wp-dev.ucsc`, `wp-env`, LocalWP, WP Engine, or BYO). When a repo-local
+`bin/validate*.sh` exists prefer it; otherwise the plugin-level validators
+(`skills/validate/validate-*.sh`) handle routing and provide BYO guidance.
 
 **Repo-local battery (`ucsc-gutenberg-blocks`).** When the target repo ships
 `bin/validate*.sh`, use them — they realize the full per-type + battery design
-ADR-066 envisioned, with **distinct per-suite logs**. All run in Docker; none
-require host PHP or Node.
+ADR-066 envisioned, with distinct per-suite logs. All run in Docker when the
+environment supports it; non-docker environments will be given BYO instructions.
 
-| Command | Runs | Log |
-|---|---|---|
-| `bash bin/validate-php.sh` | standalone `tests/php/*.php` **+** `tests/phpunit` (PHPUnit) in `php:8.1-cli` | `ucsc-validate-php.log` |
-| `bash bin/validate-jest.sh` | `npm test` (wp-scripts) in a Node container | `ucsc-validate-jest.log` |
-| `bash bin/validate-e2e.sh` | wraps `tests/e2e/run-e2e.sh` | `ucsc-validate-e2e.log` |
-| `bash bin/validate.sh [php] [jest] [e2e]` | battery — all suites (run with no args) or a named subset, with a per-suite PASS/FAIL summary. Do not pass 'all' as an argument. | — |
-
-Logs land in `$UCSC_LOG_DIR` (default `/tmp`). The e2e suite needs the stack up; if the docker container is not running, you must invoke the `run` skill first before running e2e or all tests (ADR-103). PHP and Jest run fully offline.
+Logs land in `$UCSC_LOG_DIR` (default `/tmp`). The e2e suite requires the site
+be up; if the environment is not running the validator will prompt to bring it
+up (or use the `run` skill's driver to launch it when supported). PHP and Jest
+can run offline when the environment provides the necessary runtimes.
 
 **Output isolation (ADR-102).** Test logs and artifacts must be session- and
 block-target-specific — never static global paths — to avoid concurrent runs
 stomping each other, stale-log false results, or cross-target contamination.
-Include a session id / PID and the block slug in artifact names (e.g.
-`ucsc-validate-php-<block>-$$.log`), and never parse a pre-existing static log as
-this run's result. (The current `bin/validate*.sh` still use static
-`ucsc-validate-<type>.log` names — making them unique per session+target is a
-tracked follow-up.)
 
 **Plugin driver (`ucsc-blocks`).** For the `ucsc-blocks` plugin, which ships no
-`bin/` runners, use the plugin-side driver (PHP/PHPUnit only, no subcommands):
+`bin/` runners, use the plugin-side driver; it detects and routes automatically:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/validate/validate-php.sh"
 ```
 
-Environment overrides: `WP_CONTAINER`, `PLUGIN_SLUG` (default `ucsc-blocks`),
-`PHPUNIT_PHAR_URL`.
-
-See [`references/run.md`](references/run.md) for per-type Docker commands, the
-repo-local runner details, and stack gotchas.
+See [`references/environments.md`](references/environments.md) for detection
+rules and per-environment guidance, and [`references/run.md`](references/run.md)
+for per-type Docker commands and stack gotchas.
 
 ## Modes
 

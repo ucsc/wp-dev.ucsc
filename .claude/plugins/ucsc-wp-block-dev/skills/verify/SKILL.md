@@ -20,8 +20,7 @@ allowed-tools:
 
 implements: ADR-030-VERIFY-SEPARATION, ADR-068-VERIFY-SHARED-SCRIPTS, ADR-074-VERIFY-BLOCK-COVERAGE, ADR-093-VERIFY-BLOCK-TARGET, ADR-103-VALIDATE-VERIFY-STACK-DEPENDENCY
 
-Verify behavior against the live `wp-dev.ucsc` application, following the
-recorded launch recipe in the `run` skill.
+Verify behavior against a running development WordPress instance (auto-detected environment), following the recorded launch recipe for the detected environment in the `run` skill.
 
 ## What `verify` proves — DOM vitals, the "is it alive?" check
 
