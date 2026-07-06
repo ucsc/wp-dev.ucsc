@@ -99,5 +99,18 @@ detect_environment() {
 
 # Allow calling as a script or sourcing as a function
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
+  case "${1:-}" in
+    --help|-h)
+      cat <<'EOF'
+Usage: detect-environment.sh [dir]
+
+Prints the detected WordPress development environment for dir (default: .):
+wp-dev-ucsc, wp-env, local, bare-wp-cli, running-generic, or unknown.
+Exits 0 when detected, 1 for unknown. May also be sourced to use the
+detect_environment() function directly.
+EOF
+      exit 0
+      ;;
+  esac
   detect_environment "$@"
 fi

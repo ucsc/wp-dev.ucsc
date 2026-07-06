@@ -7,6 +7,23 @@
 
 set -uo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: wp-env.sh [phase ...]
+
+WordPress.org wp-env driver — Phase 1 stub. All invocations print BYO guidance
+and exit 1; full lifecycle support arrives in Phase 4a. Start wp-env manually
+(wp-env start), then use: bash driver.sh byo drive http://localhost:8888/
+EOF
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 echo "→ wp-env driver detected (Phase 1 stub)"
 echo ""
 echo "Phase 1 supports BYO approach: start wp-env manually, then use:"

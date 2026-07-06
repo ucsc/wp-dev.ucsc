@@ -1,15 +1,15 @@
 ---
 name: verify
-description: This skill should be used when the user asks to "verify this change", "confirm this works", "prove this acceptance criterion", "check the rendered block", or demonstrate that a ucsc-gutenberg-blocks change behaves correctly in the running WordPress editor or frontend without substituting automated tests or type checks.
+description: This skill should be used when the user asks to "verify this change", "confirm this works", "prove this acceptance criterion", "check the rendered block", or demonstrate that a UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks) change behaves correctly in the running WordPress editor or frontend without substituting automated tests or type checks.
 version: 0.1.0
 argument-hint: "[block] [change or acceptance criterion]"
 allowed-tools:
-  - bash
-  - curl
-  - docker
-  - docker-compose
-  - wp
-  - jq
+  - Read
+  - Grep
+  - Bash(bash:*)
+  - Bash(docker:*)
+  - Bash(curl:*)
+  - Bash(jq:*)
 ---
 
 # Verify In The Running App

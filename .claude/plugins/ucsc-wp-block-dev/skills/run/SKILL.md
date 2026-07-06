@@ -1,15 +1,15 @@
 ---
 name: run
-description: This skill should be used when the user asks to "run the WordPress app", "start wp-dev.ucsc", "launch and drive the plugin", "open the editor", "interact with the block", or "demonstrate this change" in the ucsc-gutenberg-blocks Docker environment. Use verify for a specific acceptance criterion and validate for PHP, Jest, or e2e tests.
+description: This skill should be used when the user asks to "run the WordPress app", "start wp-dev.ucsc", "launch and drive the plugin", "open the editor", "interact with the block", or "demonstrate this change" in the UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks) Docker environment. Use verify for a specific acceptance criterion and validate for PHP, Jest, or e2e tests.
 version: 0.1.0
 argument-hint: "[block] [change to demonstrate or URL]"
 allowed-tools:
-  - bash
-  - docker
-  - docker-compose
-  - wp
-  - curl
-  - jq
+  - Read
+  - Grep
+  - Bash(bash:*)
+  - Bash(docker:*)
+  - Bash(curl:*)
+  - Bash(jq:*)
 ---
 
 # Run wp-dev.ucsc
@@ -34,13 +34,25 @@ This skill supports multiple development environments: the original `wp-dev.ucsc
 home-rolled Docker Compose stack, `wp-env`, Local (LocalWP), WP Engine, and
 "Bring Your Own" (BYO) environments. The run skill includes an environment
 router that auto-detects the runtime using
-`skills/run/lib/detect-environment.sh` and dispatches to environment-specific
-drivers under `skills/run/drivers/` (e.g. `wp-dev-ucsc`, `wp-env`, `local`,
-`generic-byo`). When a full driver is not present the BYO driver provides
-clear guidance to bring up your site and run the requested commands.
+[`lib/detect-environment.sh`](lib/detect-environment.sh) and dispatches to an
+environment-specific driver:
+
+- [`drivers/wp-dev-ucsc.sh`](drivers/wp-dev-ucsc.sh) — full driver for the
+  home-rolled Docker stack
+- [`drivers/generic-byo.sh`](drivers/generic-byo.sh) — BYO: validates a
+  reachable site and drives it
+- [`drivers/wp-env.sh`](drivers/wp-env.sh) / [`drivers/local.sh`](drivers/local.sh)
+  — Phase 1 stubs that route to BYO guidance
+
+When a full driver is not present the BYO driver provides clear guidance to
+bring up your site and run the requested commands.
 
 See [`references/environments.md`](references/environments.md) for detection
-rules, supported probes, troubleshooting, and how to add a new driver.
+rules, supported probes, troubleshooting, and how to add a new driver. The
+router and driver behavior are covered by
+[`lib/test-detect-environment.sh`](lib/test-detect-environment.sh) and the
+[`test-regression-wp-dev-ucsc.sh`](test-regression-wp-dev-ucsc.sh) regression
+suite (maintainer-run; not part of a normal launch).
 
 ## Launcher
 
@@ -227,3 +239,4 @@ volumes, repositories, or user data without explicit approval.
 ## Examples
 
 - [`examples/driver-invocations.md`](examples/driver-invocations.md) — copy-ready `driver.sh` commands for every phase and common scenarios
+- [`examples/env-invocations.md`](examples/env-invocations.md) — environment detection/router invocations across wp-dev.ucsc, wp-env, LocalWP, and BYO

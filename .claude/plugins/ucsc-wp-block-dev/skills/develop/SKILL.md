@@ -1,6 +1,6 @@
 ---
 name: develop
-description: This skill should be used when the user asks to "add a block", "create a Gutenberg block", "implement a feature", "modify block code", "extend a block", or when feature/fix scope is already defined and implementation is ready to begin on ucsc-gutenberg-blocks.
+description: This skill should be used when the user asks to "add a block", "create a Gutenberg block", "implement a feature", "modify block code", "extend a block", or when feature/fix scope is already defined and implementation is ready to begin on UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks).
 version: 0.1.0
 argument-hint: "[feature|fix] [block] [description or Jira/GitHub URL or ID]"
 ---
@@ -34,116 +34,41 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/`.
 
 ## Universal Command Intake
 
-Resolve the target, natural-language feature request, and an optional issue
-reference — a **Jira key/URL or a GitHub issue/PR URL or ID** — from the full
-input and session context, regardless of order. Preserve explicit user
-instructions and ask one concise question only when missing or conflicting
-information blocks the workflow.
+Resolve the target block/app, natural-language request, and optional Jira/GitHub issue from the context. Always ask one concise question only and wait for the answer before using tools if information is missing.
+- For Jira/pasted details, see [references/issue-context.md](references/issue-context.md). Prompt for a jira id up front; it is preferred, not required. When atlassian mcp tools are available, fetch the jira record; when atlassian mcp tools are unavailable, paste the ticket details.
+- For GitHub CLI/issues, see [references/github.md](references/github.md).
+- For the block target session persistence contract, see [references/block-target-session.md](references/block-target-session.md).
 
-When Jira, Confluence, pasted ticket details, or issue normalization applies,
-read [`references/issue-context.md`](references/issue-context.md) and merge its
-compact implementation brief into this workflow.
+Determine the block target in this order:
+1. **Explicit ARGUMENTS** — named target wins.
+2. **Persisted session value** — run `bash scripts/session-target.sh get`.
+3. **CWD inference** — run `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh"`.
+4. **Prompt** — require the user to choose a target from [references/targets.md](references/targets.md) (do not load all target references). Dynamic blocks render templates using [references/domain-blocks.md](references/domain-blocks.md).
 
-When a **GitHub issue or PR is supplied as the work scope**, fetch it for
-context (GitHub MCP → `gh` → REST), and when GitHub CLI tooling is needed for
-pull request creation or inspection, read
-[`references/github.md`](references/github.md) before proceeding.
-
-Before using tools, determine the target. The block target is a **persistent
-session value** shared across skills (ADR-093) — see
-[`references/block-target-session.md`](references/block-target-session.md) for the
-full contract. Resolve it in this order:
-
-1. **Explicit ARGUMENTS** — a target named in the arguments always wins and
-   replaces any persisted value.
-2. **Persisted session value** — else reuse the stored target without re-asking
-   (`bash scripts/session-target.sh get`).
-3. **CWD inference** — else infer from the working directory with
-   `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh` (a
-   `.../src/blocks/<slug>` segment, or a directory matching a slug in
-   [`references/targets.md`](references/targets.md)); it resolves
-   `<slug> <repo> <path>` deterministically with no token cost. State the inferred
-   target so the user can correct it.
-4. **Prompt** — only when ambiguous or empty, require the user to choose a target.
-
-When a target is newly resolved or changed (steps 1, 3, 4), persist it with
-`bash scripts/session-target.sh set <slug> <repo> <abs-path>` — specify the
-repository and the target both, and record the filesystem path (ADR-093). Resolve known slugs and
-aliases through [`references/targets.md`](references/targets.md), then read only
-the selected target reference. Do not load all target references.
-(ADR-084 selection contract, refined by ADR-090 CWD inference and ADR-093 session
-persistence.)
-
-**Stack sanity check (ADR-096).** This plugin was forked from the Laravel+Vue
-sibling `ucsc-laravel-vue-dev` and shares the same skill names, so the wrong
-plugin can load against a repo silently. Once per session — when the target is
-first resolved or changes — confirm the codebase is WordPress/Gutenberg before
-acting:
-
+Once resolved, persist it:
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" set <slug> <repo> <abs-path>
+```
+Verify the WordPress/Gutenberg stack (ADR-096):
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/stack-check.sh" <target-path>
 ```
 
-It exits 0 on a WordPress match or an ambiguous/undetectable stack (printing a
-warning), and exits 3 only on a clear mismatch (Laravel/Vue signals, no
-WordPress). On a mismatch, surface it and recommend switching to
-`ucsc-laravel-vue-dev` rather than proceeding; on ambiguity, confirm the target
-with the user. Do not hard-block an ambiguous stack.
-
-Target references (ucsc-gutenberg-blocks):
-
-- [`references/target-accordion.md`](references/target-accordion.md)
-- [`references/target-campus-directory.md`](references/target-campus-directory.md)
-- [`references/target-class-schedule.md`](references/target-class-schedule.md)
-- [`references/target-content-sharer.md`](references/target-content-sharer.md)
-- [`references/target-course-catalog.md`](references/target-course-catalog.md)
-- [`references/target-events.md`](references/target-events.md)
-- [`references/target-feedback.md`](references/target-feedback.md)
-- [`references/target-news.md`](references/target-news.md)
-
-Target references (ucsc-blocks):
-
-- [`references/target-calendar-feed.md`](references/target-calendar-feed.md)
-- [`references/target-ucsc-events.md`](references/target-ucsc-events.md)
-
-Target resolution (ADR-093):
-
-- [`references/block-target-session.md`](references/block-target-session.md) — persistent session-target contract (shared by feature/fix/run/validate/verify/review)
-- [`scripts/session-target.sh`](scripts/session-target.sh) — get/set/clear the session target cache
-- [`scripts/block-target-check.sh`](scripts/block-target-check.sh) — cheap check that a path is a real block code set, not just a folder
-- [`scripts/resolve-target.sh`](scripts/resolve-target.sh) — zero-token CWD inference: derive `<slug> <repo> <path>` from a path string, validate, optional `--persist` (the ADR-093 step 3)
-- [`scripts/check-session-target.sh`](scripts/check-session-target.sh) — one-call wrapper that reports the session target (ADR-094)
-- [`scripts/stack-check.sh`](scripts/stack-check.sh) — once-per-session WordPress-vs-Laravel stack sanity check; warns on mismatch (ADR-096)
-
-**Script execution (ADR-094).** Issue script commands with the harness-expanded
-`${CLAUDE_PLUGIN_ROOT}` absolute path — do not assign script paths to temporary
-shell variables (shell state does not persist between calls) or rely on the cwd.
-For the session-target checks, run the single wrapper rather than a sequence of
-ad-hoc commands:
-
+### Script Execution & Layout (ADR-094, ADR-095)
+Use harness-expanded `${CLAUDE_PLUGIN_ROOT}`:
 ```bash
+# Check session target
 bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/check-session-target.sh"
-```
-
-**Source base (ADR-095).** Never hardcode an absolute base path like
-`/Users/.../wp-dev.ucsc/...` and never hand-roll `find`/`ls` exploration in a
-command. Resolve locations through the source-base resolver, and inspect a
-plugin's block layout with the reusable inspector (quoted, `node_modules` pruned):
-
-```bash
+# Resolve source base path
 bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/source-base.sh" plugin-dir ucsc-blocks
+# Inspect layout
 bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/inspect-block-layout.sh" ucsc-gutenberg-blocks
 ```
 
-- [`scripts/source-base.sh`](scripts/source-base.sh) — resolve repo-root / plugin-root / wp-plugins / plugin-dir (ADR-095)
-- [`scripts/inspect-block-layout.sh`](scripts/inspect-block-layout.sh) — safe block-layout inspection for either repo (ADR-095)
-
-Domain references:
-
-- [`references/domain-blocks.md`](references/domain-blocks.md)
-- [`references/domain-blocks-reference.md`](references/domain-blocks-reference.md)
-- [`references/domain-detection.md`](references/domain-detection.md)
-- [`references/domain-stack-profile.md`](references/domain-stack-profile.md)
+### Target references:
+- **ucsc-gutenberg-blocks**: [accordion](references/target-accordion.md) | [campus-directory](references/target-campus-directory.md) | [class-schedule](references/target-class-schedule.md) | [content-sharer](references/target-content-sharer.md) | [course-catalog](references/target-course-catalog.md) | [events](references/target-events.md) | [feedback](references/target-feedback.md) | [news](references/target-news.md)
+- **ucsc-blocks**: [calendar-feed](references/target-calendar-feed.md) | [ucsc-events](references/target-ucsc-events.md)
+- **Domain refs**: [domain-blocks](references/domain-blocks.md) | [domain-blocks-reference](references/domain-blocks-reference.md) | [domain-detection](references/domain-detection.md) | [domain-stack-profile](references/domain-stack-profile.md)
 
 ## 1. Secure the Target and Feature Description
 
@@ -237,3 +162,6 @@ When this workflow creates or modifies plugin components (skills, manifest, hook
 - **`plugin-dev:plugin-validator`** — validate plugin structure, manifest, and naming via `Agent` with `subagent_type: "plugin-dev:plugin-validator"`.
 - **`plugin-dev:skill-reviewer`** — review skill quality and description effectiveness via `Agent` with `subagent_type: "plugin-dev:skill-reviewer"`.
 - **`plugin-dev:skill-development`** — guidance on skill structure and frontmatter via `Skill` with `skill: "plugin-dev:skill-development"`.
+
+## Supporting Files
+- [scripts/block-target-check.sh](scripts/block-target-check.sh)

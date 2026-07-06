@@ -1,7 +1,7 @@
 {
   "name": "ucsc-wp-block-dev",
   "version": "0.2.0",
-  "description": "Development toolkit for the ucsc-gutenberg-blocks WordPress plugin — block authoring, debugging, and local environment workflow",
+  "description": "Development toolkit for UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks) — block authoring, debugging, and local environment workflow",
   "author": {
     "name": "UCSC ITS"
   },

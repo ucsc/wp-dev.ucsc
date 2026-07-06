@@ -1,15 +1,15 @@
 ---
 title: UCSC WordPress Block Development Plugin Guide
-generated: 2026-06-30
+generated: 2026-07-05
 version: 0.2.0
-git-commit: 27fe42283ad0642d4abea145c8c333f102dacfab
+git-commit: e7294b3991eb4632759ff3bebdc2ab97456f4f04
 source: README.md
-source-hash: 0a804f1eaa2f68eac1dfed597547a275e470fb1c1624f8e69eaea2aff5f55b37
+source-hash: b7a54239a48468e2aebab355b5cb394de83a87cd466ff113e920470d83b259b7
 ---
 
 # ucsc-wp-block-dev
 
-**Generated:** 2026-06-30 · **Plugin version:** 0.2.0 · **Git commit:** `27fe42283ad0`
+**Generated:** 2026-07-05 · **Plugin version:** 0.2.0 · **Git commit:** `e7294b3991eb`
 
 Claude Code plugin for developing the `ucsc-gutenberg-blocks` WordPress plugin at UCSC ITS.
 

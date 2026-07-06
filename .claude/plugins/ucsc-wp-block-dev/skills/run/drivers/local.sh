@@ -7,6 +7,23 @@
 
 set -uo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: local.sh [phase ...]
+
+LocalWP / Local by Flywheel driver — Phase 1 stub. All invocations print BYO
+guidance and exit 1; full lifecycle support arrives in Phase 4b. Start the site
+in the LocalWP app, then use: bash driver.sh byo drive https://yoursite.local/
+EOF
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+esac
+
 echo "→ LocalWP driver detected (Phase 1 stub)"
 echo ""
 echo "Phase 1 supports BYO approach: start your WordPress manually, then use:"

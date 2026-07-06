@@ -1,6 +1,6 @@
 ---
 name: hub
-description: This skill should be used when the user asks to "list skills", "what can you do", "show available commands", "what WordPress block skills are available", or invokes `:hub`. Lists the plugin inventory and can resolve, validate, and set the session block target (from a passed target or the current repo) so later skills reuse it; it does not route — to act, invoke the relevant skill directly.
+description: This skill should be used when the user asks to "list skills", "what can you do", "show available commands", "what WordPress block skills are available", or invokes `:hub` (lists plugin inventory and handles session block target resolution).
 version: 0.1.0
 argument-hint: "[block]"
 ---
@@ -48,7 +48,7 @@ skills
 │  └─ fix      [block] [problem]  — diagnose and repair a block defect
 ├─ feedback  [bug|idea|question] [note]                — report a bug or idea about the plugin skills
 ├─ review    [target] [focus]                          — review code for bugs, security, a11y, and tests
-├─ run       [block] [change|URL]                      — launch and drive (multi-env / BYO)
+├─ run       [block] [change|URL]                      — launch and drive wp-dev.ucsc
 ├─ validate  [php|jest|e2e|all] [create|run] [target]  — create or run automated test suites
 │  ├─ php   [create|run] [target]  — create or run PHP tests
 │  ├─ jest  [create|run] [target]  — create or run Jest tests

@@ -1,5 +1,5 @@
-<!-- Generated: 2026-06-30 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
-<!-- source-hash: 0a804f1eaa2f68eac1dfed597547a275e470fb1c1624f8e69eaea2aff5f55b37 -->
+<!-- Generated: 2026-07-05 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
+<!-- source-hash: b7a54239a48468e2aebab355b5cb394de83a87cd466ff113e920470d83b259b7 -->
 
 ---
 marp: true
@@ -48,7 +48,7 @@ AUTO markers — your edits will be overwritten on the next `docs` run.
 ### *A guided tour of the `ucsc-wp-block-dev` Claude Code plugin*
 
 **Slides** · **Presented by:** UCSC ITS<br />
-**Generated:** 2026-06-30<br />
+**Generated:** 2026-07-05<br />
 **Target Product:** `ucsc-gutenberg-blocks` · **Local Environment:** `wp-dev.ucsc`
 
 > Built for Claude Code; the same skills also run via natural-language invocation

@@ -7,6 +7,14 @@
 
 set -uo pipefail
 
+case "${1:-}" in
+  --help|-h)
+    echo "Usage: test-regression-wp-dev-ucsc.sh"
+    echo "Runs the wp-dev-ucsc driver regression suite; takes no arguments."
+    exit 0
+    ;;
+esac
+
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'

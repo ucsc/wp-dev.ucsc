@@ -1,6 +1,6 @@
 ---
 name: feature
-description: This skill should be used when the user asks to "add new behavior", "create a new block", "add a feature", "implement editor controls", "add frontend output", or describes new functionality for ucsc-gutenberg-blocks that is not a defect fix.
+description: This skill should be used when the user asks to "add new behavior", "create a new block", "add a feature", "implement editor controls", "add frontend output", or describes new functionality for UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks) that is not a defect fix.
 version: 0.1.0
 argument-hint: "[block] [feature description] [Jira or GitHub URL/ID]"
 ---
@@ -16,45 +16,21 @@ behavior is incorrect.
 
 ## Universal Command Intake
 
-Resolve the target block, GUI, or app; the natural-language feature request;
-and an optional issue reference — a **Jira key/URL or a GitHub issue/PR URL or
-ID** — from the full input. Ask one concise question only when missing or
-conflicting information prevents useful work.
+Resolve the target block/app, natural-language request, and optional Jira/GitHub issue from the context. Always ask one concise question only and wait for the answer before using tools if information is missing.
+- For Jira/pasted details, see [../references/issue-context.md](../references/issue-context.md). Prompt for a jira id up front; it is preferred, not required. When atlassian mcp tools are available, fetch the jira record; when atlassian mcp tools are unavailable, paste the ticket details.
+- For GitHub CLI/issues, see [../references/github.md](../references/github.md).
+- For the block target session persistence contract, see [../references/block-target-session.md](../references/block-target-session.md).
 
-When Jira, Confluence, pasted ticket details, or issue normalization applies,
-read
-[`../references/issue-context.md`](../references/issue-context.md)
-before defining the feature. When a **GitHub issue or PR** is supplied as the
-scope, fetch it for context (GitHub MCP → `gh` → REST, per
-[`../references/github.md`](../references/github.md)) the same way a Jira ticket
-is fetched before defining the feature.
+Determine the block target in this order:
+1. **Explicit ARGUMENTS** — named target wins.
+2. **Persisted session value** — run `bash scripts/session-target.sh get`.
+3. **CWD inference** — run `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh"`.
+4. **Prompt** — choose from [../references/targets.md](../references/targets.md).
 
-# Note on relative references
-The references above use a relative path into `develop/references/`. This is an
-intentional dependency but fragile to directory moves/renames. Consider
-promoting shared references (issue-context.md, targets.md) to a plugin-level
-`skills/shared/references/` to avoid breakage. Maintain awareness when
-renaming directories.
-
-Before using tools, require:
-
-- **Target:** the block, GUI, or app that will change.
-- **Desired outcome:** a plain-language description of the new behavior.
-
-**Block target (ADR-093).** The target is a persistent session value shared
-across skills. Resolve it with the shared contract in
-[`../references/block-target-session.md`](../references/block-target-session.md):
-ARGUMENTS → persisted session value (`../scripts/session-target.sh get`) → cwd
-inference → prompt. Validate an inferred directory with
-`../scripts/block-target-check.sh` before adopting it, and persist a newly
-resolved target with `session-target.sh set` so `develop` and later skills reuse
-it without re-asking.
-
-Prompt for a Jira ID up front in the initial clarification when none was
-supplied. When Atlassian MCP tools are available and a Jira ID or URL is
-supplied, fetch the Jira record before defining the feature. When Atlassian MCP
-tools are unavailable, ask the user to paste the ticket details or summarize
-the relevant requirements. Jira is preferred, not required.
+Once resolved, persist it:
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" set <slug> <repo> <abs-path>
+```
 
 ## Define The Feature
 

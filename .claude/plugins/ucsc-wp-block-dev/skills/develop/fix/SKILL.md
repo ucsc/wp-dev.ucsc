@@ -1,6 +1,6 @@
 ---
 name: fix
-description: This skill should be used when the user asks to "fix a block", "debug an issue", "something is broken", "block not showing", "wrong output", or reports any defect in a ucsc-gutenberg-blocks block, GUI, or app. Require the target and a plain-language problem description before investigating.
+description: This skill should be used when the user asks to "fix a block", "debug an issue", "something is broken", "block not showing", "wrong output", or reports any defect in a block, GUI, or app under UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks). Require the target and a plain-language problem description before investigating.
 version: 0.1.0
 argument-hint: "[block] [problem description] [Jira or GitHub URL/ID]"
 ---
@@ -19,30 +19,21 @@ All paths relative to `public/wp-content/plugins/ucsc-gutenberg-blocks/` unless 
 
 ## Universal Command Intake
 
-Resolve the target, natural-language problem description, and an optional issue
-reference — a **Jira key/URL or a GitHub issue/PR URL or ID** — from the full
-input and session context, regardless of order. Preserve explicit user
-instructions and ask one concise question only when missing or conflicting
-information blocks the fix workflow.
+Resolve the target block/app, natural-language request, and optional Jira/GitHub issue from the context. Always ask one concise question only and wait for the answer before using tools if information is missing.
+- For Jira/pasted details, see [../references/issue-context.md](../references/issue-context.md). Prompt for a jira id up front; it is preferred, not required. When atlassian mcp tools are available, fetch the jira record; when atlassian mcp tools are unavailable, paste the ticket details.
+- For GitHub CLI/issues, see [../references/github.md](../references/github.md).
+- For the block target session persistence contract, see [../references/block-target-session.md](../references/block-target-session.md).
 
-When Jira, Confluence, pasted ticket details, or issue normalization applies,
-read
-[`../references/issue-context.md`](../references/issue-context.md)
-before investigating. When a **GitHub issue or PR** is supplied as the scope,
-fetch it for context (GitHub MCP → `gh` → REST, per
-[`../references/github.md`](../references/github.md)) the same way a Jira ticket
-is fetched before investigating.
+Determine the block target in this order:
+1. **Explicit ARGUMENTS** — named target wins.
+2. **Persisted session value** — run `bash scripts/session-target.sh get`.
+3. **CWD inference** — run `bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/resolve-target.sh"`.
+4. **Prompt** — choose from [../references/targets.md](../references/targets.md).
 
-# Note on relative references
-The references above use a relative path into `develop/references/`. This is an
-intentional dependency but fragile to directory moves/renames. Consider
-promoting shared references (issue-context.md, targets.md) to a plugin-level
-`skills/shared/references/` to avoid breakage. Maintain awareness when
-renaming directories.
-
-Resolve known block targets through
-[`../references/targets.md`](../references/targets.md)
-and read only the selected target reference.
+Once resolved, persist it:
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/develop/scripts/session-target.sh" set <slug> <repo> <abs-path>
+```
 
 ## 1. Secure the Target and Fix Description
 
@@ -51,23 +42,7 @@ Before using tools or investigating, obtain both required inputs from the user:
 1. **Target** — the block, GUI, or app being worked on.
 2. **Fix description** — what needs to be fixed. A plain-language description is sufficient.
 
-A target alone is not sufficient, and a description without a target is not sufficient. A Jira ID alone is also insufficient unless its available details clearly supply both. If either required input is missing, ask one concise question for all missing inputs and wait for the answer.
-
-**Block target (ADR-093).** The target is a persistent session value shared
-across skills. Resolve it with the shared contract in
-[`../references/block-target-session.md`](../references/block-target-session.md):
-ARGUMENTS → persisted session value (`../scripts/session-target.sh get`) → cwd
-inference → prompt. Validate an inferred directory with
-`../scripts/block-target-check.sh` before adopting it, and persist a newly
-resolved target with `session-target.sh set` so later skills reuse it without
-re-asking.
-
-Prompt for a Jira ID up front. If none was supplied, include the Jira request in
-the same clarification as the concrete-problem question. When Atlassian MCP
-tools are available and a Jira ID or URL is supplied, fetch the Jira record
-before reproducing. When Atlassian MCP tools are unavailable, ask the user to
-paste the ticket details or summarize the relevant requirements. The user may
-say there is no ticket or skip it; Jira is preferred, not required. See ADR-021.
+If either required input is missing, ask one concise question for all missing inputs and wait for the answer. Prompt for a Jira ID up front in the same clarification as the concrete-problem question. When Atlassian MCP tools are available and a Jira ID or URL is supplied, fetch the jira record before reproducing. When Atlassian MCP tools are unavailable, ask the user to paste the ticket details or summarize the relevant requirements. Jira is preferred, not required. See ADR-021.
 
 Do not inspect source files, logs, git history, browser or runtime state, builds, or tests until this gate is satisfied. See ADR-009.
 

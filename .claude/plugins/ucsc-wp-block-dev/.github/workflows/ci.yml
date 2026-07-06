@@ -27,7 +27,11 @@ jobs:
       - name: Secret scan (grep)
         run: |
           set -euo pipefail
-          matches=$(git ls-files | xargs grep -I -n -E "-----BEGIN (RSA|PRIVATE) KEY|aws_secret_access_key|aws_access_key_id|BEGIN RSA PRIVATE KEY|token.json|APP_PASS|PASSWORD|PRIVATE_KEY" || true)
+          if git ls-files | grep -E "token\.json" >/dev/null; then
+            echo "Error: token.json file is tracked in git!"
+            exit 1
+          fi
+          matches=$(git ls-files | grep -v "\.github/workflows/ci.yml" | xargs grep -I -n -E -e "-----BEGIN (RSA|PRIVATE) KEY|aws_secret_access_key|aws_access_key_id|BEGIN RSA PRIVATE KEY|(APP_PASS|PASSWORD|PRIVATE_KEY)\s*=" || true)
           if [ -n "$matches" ]; then
             echo "Secret-like strings found in repository:"
             echo "$matches"

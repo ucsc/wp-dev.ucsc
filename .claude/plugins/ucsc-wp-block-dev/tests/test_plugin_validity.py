@@ -167,7 +167,7 @@ class TestSkillRouting:
             return {}
         fm = {}
         for line in fm_match.group(1).splitlines():
-            if ":" in line:
+            if ":" in line and not line.strip().startswith("-"):
                 key, _, val = line.partition(":")
                 fm[key.strip()] = val.strip().strip('"').strip("'")
         return fm

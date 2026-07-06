@@ -1,16 +1,17 @@
 ---
 name: validate
-description: This skill should be used when the user asks to "create a PHP test", "run the PHP tests", "create a Jest test", "run the Jest tests", "create an e2e test", "run the e2e tests", or validate a ucsc-gutenberg-blocks feature, fix, or Jira acceptance criterion with an automated test suite. Use verify instead for live editor or frontend behavior.
+description: This skill should be used when the user asks to "create a PHP test", "run the PHP tests", "create a Jest test", "run the Jest tests", "create an e2e test", "run the e2e tests", or validate a UCSC block plugins (ucsc-blocks, ucsc-gutenberg-blocks) feature, fix, or Jira acceptance criterion with an automated test suite. Use verify instead for live editor or frontend behavior.
 version: 0.1.0
 argument-hint: "[php|jest|e2e|all] [create|run] [block|feature|Jira]"
 allowed-tools:
-  - bash
-  - python
-  - docker
-  - docker-compose
-  - npm
-  - yarn
-  - wp
+  - Read
+  - Grep
+  - Bash(bash:*)
+  - Bash(docker:*)
+  - Bash(npm:*)
+  - Bash(yarn:*)
+  - Bash(wp:*)
+  - Bash(python3:*)
 ---
 
 # Validate
@@ -67,11 +68,14 @@ stomping each other, stale-log false results, or cross-target contamination.
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/validate/validate-php.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/skills/validate/validate-jest.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/skills/validate/validate-e2e.sh"
 ```
 
-See [`references/environments.md`](references/environments.md) for detection
-rules and per-environment guidance, and [`references/run.md`](references/run.md)
-for per-type Docker commands and stack gotchas.
+See [`../run/references/environments.md`](../run/references/environments.md)
+for detection rules and per-environment guidance, and
+[`references/run.md`](references/run.md) for per-type Docker commands and stack
+gotchas.
 
 ## Modes
 

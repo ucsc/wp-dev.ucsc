@@ -55,7 +55,7 @@ def read_frontmatter(skill_dir: Path) -> dict:
         return {}
     fm = {}
     for line in m.group(1).splitlines():
-        if ":" in line:
+        if ":" in line and not line.strip().startswith("-"):
             k, _, v = line.partition(":")
             fm[k.strip()] = v.strip().strip('"').strip("'")
     return fm
@@ -406,7 +406,7 @@ class TestSkillFrontmatter:
                 continue
             fm = {}
             for line in fm_match.group(1).splitlines():
-                if ":" in line:
+                if ":" in line and not line.strip().startswith("-"):
                     k, _, v = line.partition(":")
                     fm[k.strip()] = v.strip().strip('"').strip("'")
             combined = len(fm.get("description", "")) + len(fm.get("when_to_use", ""))
@@ -429,7 +429,7 @@ class TestSkillFrontmatter:
             if fm_match:
                 keys = []
                 for line in fm_match.group(1).splitlines():
-                    if ":" in line:
+                    if ":" in line and not line.strip().startswith("-"):
                         k, _, _ = line.partition(":")
                         keys.append(k.strip())
                 extra_keys = set(keys) - allowed

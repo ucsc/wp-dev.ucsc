@@ -241,6 +241,8 @@ docker run --rm -v "$PWD/public/wp-content/plugins/ucsc-gutenberg-blocks:/plugin
   -w /plugin php:8.1-cli php tests/php/ClassScheduleTest.php
 ```
 
+For developer quick-start and environment setup instructions, see [INSTALL.md](INSTALL.md).
+
 <!-- BEGIN GUIDE -->
 ## Plugin management
 

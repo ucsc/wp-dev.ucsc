@@ -9,11 +9,9 @@ related: ["ADR-002", "ADR-091", "ADR-095"]
 
 ## Status
 
-Proposed
+Accepted
 
-> This is a forward-looking idea, not an accepted change. Nothing in the plugin
-> behaves differently because of it yet. It records a direction and the
-> constraint (LDAP) that must be solved first.
+Date: 2026-06-30
 
 ## Context
 
@@ -23,7 +21,7 @@ The `run`, `validate`, and `verify` skills are **hardwired to the home-rolled
 `docker compose ...` and `docker compose exec wpcli wp ...`, and the canonical
 URL/host (`https://wp-dev.ucsc/`), credentials, and container/service names are
 baked into the skills (see
-[`skills/run/references/environment.md`](../../skills/run/references/environment.md)).
+[`skills/run/references/environments.md`](../../skills/run/references/environments.md)).
 
 This environment is **not** `@wordpress/env` (wp-env), Local (LocalWP), ddev, or
 WP Engine — it is bespoke. The main reason it was home-rolled: the *Campus

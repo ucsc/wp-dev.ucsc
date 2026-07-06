@@ -7,6 +7,14 @@
 
 set -uo pipefail
 
+case "${1:-}" in
+  --help|-h)
+    echo "Usage: test-detect-environment.sh"
+    echo "Runs the environment-detection test suite; takes no arguments."
+    exit 0
+    ;;
+esac
+
 # Source the detection script
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/detect-environment.sh"
