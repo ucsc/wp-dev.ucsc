@@ -139,11 +139,11 @@ assert_exit_0 "wp-dev-ucsc driver exists" "[ -x '$WP_DEV_ROOT/.claude/plugins/uc
 # Test 10: BYO driver exists and is executable
 assert_exit_0 "BYO driver exists" "[ -x '$WP_DEV_ROOT/.claude/plugins/ucsc-wp-block-dev/skills/run/drivers/generic-byo.sh' ]"
 
-# Test 11: Local stub driver exists
-assert_exit_0 "Local stub driver exists" "[ -x '$WP_DEV_ROOT/.claude/plugins/ucsc-wp-block-dev/skills/run/drivers/local.sh' ]"
+# Test 11: local driver exists (full Phase 4b driver as of ADR-105)
+assert_exit_0 "local driver exists" "[ -x '$WP_DEV_ROOT/.claude/plugins/ucsc-wp-block-dev/skills/run/drivers/local.sh' ]"
 
-# Test 12: wp-env stub driver exists
-assert_exit_0 "wp-env stub driver exists" "[ -x '$WP_DEV_ROOT/.claude/plugins/ucsc-wp-block-dev/skills/run/drivers/wp-env.sh' ]"
+# Test 12: wp-env driver exists (full Phase 4a driver as of ADR-105)
+assert_exit_0 "wp-env driver exists" "[ -x '$WP_DEV_ROOT/.claude/plugins/ucsc-wp-block-dev/skills/run/drivers/wp-env.sh' ]"
 
 # Summary
 echo ""

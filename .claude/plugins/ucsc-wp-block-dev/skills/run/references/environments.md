@@ -15,11 +15,42 @@ Supported environments (detection precedence):
 
 2. wp-env
    - Detected by `wp-env` markers in `package.json` or `wp-env.json`
-   - Driver: `skills/run/drivers/wp-env.sh` (stub until implemented)
+   - Full driver: `skills/run/drivers/wp-env.sh` (inspect/build/launch/smoke/drive/down)
+   - Requires `.wp-env.json` at the repo root — copy `skills/run/wp-env-example.json`
+     (same pattern as `.env.example.txt`). Not auto-created, so opting in is explicit
+     and the default wp-dev-ucsc detection is unaffected (this repo's
+     `docker-compose.yml` + `Dockerfile` markers still win auto-detection — see
+     "Auto-detect and wp-env" below).
+   - LDAP-dependent blocks (Campus Directory) are **not supported**: the default
+     wp-env WordPress image has no PHP LDAP extension or UCSC VPN reachability.
+     Non-LDAP blocks work fine.
+   - Unlike wp-dev-ucsc.sh, the `build` phase runs `npm` on the host — wp-env has
+     no equivalent in-repo build container, and the "never run host Node" guardrail
+     targets the wp-dev-ucsc stack specifically, not a developer who has opted into
+     wp-env.
 
 3. Local (LocalWP)
    - Detected by common Local.app paths or known Local directories
-   - Driver: `skills/run/drivers/local.sh` (stub until implemented)
+   - Full driver: `skills/run/drivers/local.sh` (Phase 4b:
+     inspect/build/launch/smoke/drive/down)
+   - Local has no first-party scriptable CLI (the official `getflywheel/local-cli`
+     is archived), so this driver shells out to the third-party `lwp`
+     (cartpauj/localwp-cli), which talks to Local's own local GraphQL API. The
+     Local GUI app must be installed and running at least once. Install `lwp`:
+     `curl -fsSL https://raw.githubusercontent.com/cartpauj/localwp-cli/main/scripts/install.sh | bash`
+   - Requires `UCSC_LOCAL_SITE=<name-or-id>` (see `lwp list` for the site's
+     name/ID) — Local site names are per-developer, not part of this repo, so
+     there is no default. The site's public URL is resolved from `lwp status
+     <site>`; override with `UCSC_LOCAL_URL=<url>` if that parsing ever drifts
+     from lwp's output format.
+   - LDAP-dependent blocks (Campus Directory) are **not supported**: stock
+     Local sites have no PHP LDAP extension or UCSC VPN reachability — same
+     gating constraint as wp-env.
+   - Like wp-env.sh, the `build` phase runs `npm` on the host — Local has no
+     in-repo build container either. This assumes the standard Local workflow
+     of symlinking the Local site's plugin directory to this repo's own
+     checkout (`public/wp-content/plugins/<plugin>`) rather than maintaining a
+     second, disconnected copy of the plugin inside the Local site.
 
 4. WP Engine (wpe)
    - Detected by `WPE_*` environment variables or `.wpe` marker
@@ -45,10 +76,21 @@ Adding a new driver
 2. Add a detection probe to `skills/run/lib/detect-environment.sh` with tests.
 3. Add documentation to this file and examples in `skills/run/examples/env-invocations.md`.
 
+Auto-detect and wp-env
+
+This repository ships `docker-compose.yml` + the LDAP-marked `Dockerfile`
+unconditionally, and `detect-environment.sh` checks for those wp-dev-ucsc
+markers first. That means `driver.sh auto <phase>` always resolves to
+`wp-dev-ucsc` in this repo, even after adding `.wp-env.json` — auto-detection
+picks the packaged default, not per-developer intent. A developer who wants
+wp-env instead must say so explicitly: `driver.sh wp-env <phase>`. This is
+deliberate (ADR-105 decision 4: additive, default-unchanged), not a bug.
+
 Troubleshooting
 
-- If detection chooses the wrong environment, run `skills/run/driver.sh detect` to
-  print probe outputs and adjust your working directory or set the explicit
+- If detection chooses the wrong environment, run
+  `bash skills/run/lib/detect-environment.sh` to print the detected environment
+  and adjust your working directory, or bypass detection with the explicit
   environment: `driver.sh wp-env build`.
 - If BYO reports WordPress unreachable, confirm the site is up and reachable on
   localhost or the provided URL, and that host ports are not blocked by a local

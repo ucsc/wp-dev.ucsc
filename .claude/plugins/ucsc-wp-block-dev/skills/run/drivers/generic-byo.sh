@@ -2,8 +2,10 @@
 # implements: ADR-105-RUN-RUNTIME-MODE-SUPPORT-MULTIPLE-WP-LOCAL-RUNTIMES
 # generic-byo.sh — "Bring Your Own" driver for manually-managed WordPress.
 #
-# Assumes WordPress is already running (user brings it up).
-# Only supports `drive` command to interact with blocks in the browser.
+# Assumes WordPress is already running (user brings it up). Only supports
+# `drive` — verify the URL responds, then drive it with headless Chrome
+# (post-JS DOM + console capture, shared with every other environment driver
+# via lib/drive.sh).
 
 set -uo pipefail
 
@@ -35,6 +37,14 @@ esac
 COMMAND="${1:-}"
 URL="${2:-}"
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd)"
+LOG="${UCSC_RUN_LOG:-/tmp/ucsc-run-byo-$(date +%Y%m%d-%H%M%S).log}"
+FAILED=0
+pass() { printf '  [ OK ] %s\n' "$1"; }
+fail() { printf '  [FAIL] %s\n' "$1"; FAILED=1; }
+# shellcheck source=../lib/drive.sh
+source "$SCRIPT_DIR/../lib/drive.sh"
+
 case "$COMMAND" in
   drive)
     if [ -z "$URL" ]; then
@@ -42,23 +52,15 @@ case "$COMMAND" in
       usage
       exit 1
     fi
-    
-    # Verify WordPress is running (HTTP probe)
+
     echo "→ Checking WordPress at $URL..."
-    
-    # Probe for WordPress login page or wp-admin
-    local response
     response=$(curl -s --max-time 2 "$URL/wp-admin/" 2>/dev/null || echo "")
-    
+
     if echo "$response" | grep -q "wp-login\|wp-admin\|WordPress\|function wp_" 2>/dev/null; then
-      echo "✓ WordPress running at $URL"
-      
-      # TODO: Call existing drive logic (Playwright, screenshot, console capture)
-      # For now, stub it with a message
-      echo "✓ Would now open browser and capture block in action"
-      echo "  (Full Playwright integration: Phase 1b coming soon)"
+      pass "WordPress running at $URL"
+      drive_url "$URL" "$LOG"
     else
-      echo "ERROR: WordPress not responding at $URL"
+      fail "WordPress not responding at $URL"
       echo ""
       echo "Make sure your development environment is running:"
       echo "  - wp-dev-ucsc: docker compose up -d"
@@ -79,3 +81,7 @@ case "$COMMAND" in
     exit 1
     ;;
 esac
+
+echo "----"
+[ "$FAILED" -eq 0 ] && echo "RESULT: PASS" || echo "RESULT: FAIL  (log: $LOG)"
+exit "$FAILED"

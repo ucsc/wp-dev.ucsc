@@ -23,12 +23,60 @@ bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-dev-ucsc all
 bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-dev-ucsc inspect
 ```
 
-## Explicit: wp-env (when implemented)
+## Explicit: wp-env
+
+Requires `.wp-env.json` at the repo root first — copy the example:
 
 ```bash
-# Placeholder: the wp-env driver is a stub until fully implemented
-bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-env all
+cp .claude/plugins/ucsc-wp-block-dev/skills/run/wp-env-example.json .wp-env.json
 ```
+
+```bash
+# Full lifecycle: inspect -> build -> launch -> smoke
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-env all
+
+# Inspect the environment (non-destructive)
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-env inspect
+
+# Drive the frontend (headless Chrome captures post-JS DOM + console)
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-env drive http://localhost:8888/
+
+# Stop
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh wp-env down
+```
+
+Note: LDAP-dependent blocks (Campus Directory) do not work under wp-env — the
+default image has no PHP LDAP extension. Non-LDAP blocks work fine.
+
+## Explicit: local (LocalWP)
+
+Requires the `lwp` CLI (Local has no first-party one) and the Local GUI app
+running with the site already created:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/cartpauj/localwp-cli/main/scripts/install.sh | bash
+lwp list   # find your site's name or ID
+export UCSC_LOCAL_SITE=my-site
+```
+
+```bash
+# Full lifecycle: inspect -> build -> launch -> smoke
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh local all
+
+# Inspect the environment (non-destructive)
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh local inspect
+
+# Drive the frontend (headless Chrome captures post-JS DOM + console); URL
+# defaults to the resolved site URL if omitted
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh local drive
+
+# Stop
+bash .claude/plugins/ucsc-wp-block-dev/skills/run/driver.sh local down
+```
+
+Note: LDAP-dependent blocks (Campus Directory) do not work under Local — same
+constraint as wp-env. If `lwp status` output ever fails to parse a URL, set
+`UCSC_LOCAL_URL=<url>` to bypass resolution.
 
 ## BYO (Bring Your Own) — generic guidance
 

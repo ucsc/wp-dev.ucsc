@@ -1,0 +1,8 @@
+{
+	"core": "WordPress/WordPress#6.5.5",
+	"plugins": [
+		"./public/wp-content/plugins/ucsc-blocks",
+		"./public/wp-content/plugins/ucsc-gutenberg-blocks"
+	],
+	"port": 8888
+}

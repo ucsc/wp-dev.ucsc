@@ -52,7 +52,7 @@ FAILED=0
 # Prefer the shared source-base resolver so every driver agrees on the repo root
 # (ADR-095). Self-locate it relative to this driver; fall back to inline walk-up.
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd)"
-SOURCE_BASE="$SCRIPT_DIR/../develop/scripts/source-base.sh"
+SOURCE_BASE="$SCRIPT_DIR/../../develop/scripts/source-base.sh"
 
 find_root() {
   local d
@@ -188,7 +188,7 @@ do_smoke() {
   # 4. blocks registered — runtime registry via list-blocks.sh (reviewed PHP in
   #    a file, piped to wp-cli; spans ALL activated plugins, reads no repo source)
   local blocks nblocks
-  blocks=$(bash "$SCRIPT_DIR/list-blocks.sh" 2>>"$LOG" || true)
+  blocks=$(bash "$SCRIPT_DIR/../list-blocks.sh" 2>>"$LOG" || true)
   nblocks=$(printf '%s\n' "$blocks" | grep -c . || true)
   if [ "$nblocks" -gt 0 ]; then
     pass "$nblocks ucsc* block(s) registered"
@@ -199,81 +199,17 @@ do_smoke() {
 }
 
 # Drive a frontend URL with a real headless browser to prove client JS runs.
-# Renders the page (JS executes), dumps the post-JS DOM (assert on hydrated markup
-# view.js adds) and captures the page console stream to flag JS errors. A
-# screenshot is opt-in via UCSC_SHOT. On the dev Mac the browser is
-# Google Chrome.app; a Linux box with `chromium`/`chromium-browser` works too.
-# No login: drive public frontend pages (wp-admin needs a session headless can't supply).
-find_chrome() {
-  local c
-  for c in \
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-    "/Applications/Chromium.app/Contents/MacOS/Chromium" \
-    "$(command -v chromium 2>/dev/null)" \
-    "$(command -v chromium-browser 2>/dev/null)" \
-    "$(command -v google-chrome 2>/dev/null)"; do
-    [ -n "$c" ] && [ -x "$c" ] && { echo "$c"; return 0; }
-  done
-  return 1
-}
+# Shared across every environment driver (lib/drive.sh); MAP resolves this
+# stack's vanity host to localhost so the headless run doesn't depend on
+# /etc/hosts. No login: drives public frontend pages (wp-admin needs a
+# session headless can't supply).
+# shellcheck source=../lib/drive.sh
+source "$SCRIPT_DIR/../lib/drive.sh"
 
 do_drive() {
   local url="${1:-https://${APP_HOST}/}"
   echo "drive ($url)"
-  local chrome
-  chrome="$(find_chrome)" || { fail "no Chrome/Chromium found (install or set PATH)"; return; }
-  # MAP resolves the vanity host to localhost; ignore-certificate-errors for the
-  # repo's self-signed cert; virtual-time-budget lets DOMContentLoaded JS run.
-  # enable-logging=stderr surfaces page console messages and uncaught JS errors
-  # as grep-able `[...:CONSOLE(n)]` / `[...:ERROR:CONSOLE(n)]` lines (ADR-097), so
-  # the DOM dump + console capture are the primary checks and the screenshot is
-  # an opt-in visual fallback (set UCSC_SHOT) rather than a token-heavy default.
-  local common=( --headless=new --disable-gpu --no-sandbox
-    --ignore-certificate-errors
-    --host-resolver-rules="MAP ${APP_HOST} 127.0.0.1"
-    --enable-logging=stderr --v=1
-    --virtual-time-budget=6000 )
-
-  # Primary signal: post-JS DOM + console capture. This invocation's stderr is
-  # the page's console stream; grep it instead of reading a screenshot.
-  local console="${LOG}.console"
-  if "$chrome" "${common[@]}" --dump-dom "$url" >"${LOG}.dom" 2>"$console"; then
-    local nblocks
-    # Match both namespaces' wrapper classes: wp-block-ucsc-<name> (ucsc/*) and
-    # wp-block-ucscblocks-<name> (ucsc-gutenberg-blocks' ucscblocks/*). The looser
-    # 'ucsc[a-z-]+' covers both without a false FAIL on ucscblocks/* blocks.
-    nblocks=$(grep -oE 'wp-block-ucsc[a-z-]+' "${LOG}.dom" 2>/dev/null | sort -u | grep -c . || true)
-    [ "$nblocks" -gt 0 ] && pass "$nblocks ucsc block class(es) in rendered DOM" \
-                         || fail "no ucsc block classes in rendered DOM"
-    echo "  ...  DOM dump: ${LOG}.dom"
-  else
-    fail "dump-dom failed (see log)"
-  fi
-
-  # Flag page console errors / uncaught JS exceptions from the console capture.
-  # `ERROR:CONSOLE` is error-level (thrown exceptions, console.error); `:CONSOLE(`
-  # counts all page console messages for context.
-  local nerr nmsg
-  nerr=$(grep -c 'ERROR:CONSOLE' "$console" 2>/dev/null || true)
-  nmsg=$(grep -c ':CONSOLE(' "$console" 2>/dev/null || true)
-  if [ "${nerr:-0}" -gt 0 ]; then
-    fail "$nerr console error(s)/JS exception(s) — see ${console}"
-    grep 'ERROR:CONSOLE' "$console" 2>/dev/null | sed 's/^/  ...  /' | head -5
-  else
-    pass "no console errors (${nmsg:-0} console msg(s)); log: ${console}"
-  fi
-
-  # Screenshot is opt-in: a visual fallback, not the default (avoids image tokens).
-  if [ -n "${UCSC_SHOT:-}" ]; then
-    if "$chrome" "${common[@]}" --window-size=1100,900 --screenshot="$UCSC_SHOT" "$url" >>"$LOG" 2>&1 \
-       && [ -s "$UCSC_SHOT" ]; then
-      pass "screenshot written ($UCSC_SHOT)"
-    else
-      fail "screenshot failed (see log)"
-    fi
-  else
-    echo "  ...  screenshot skipped (set UCSC_SHOT=<path> for a visual capture)"
-  fi
+  drive_url "$url" "$LOG" "MAP ${APP_HOST} 127.0.0.1"
 }
 
 do_down() { echo "down"; dc down >>"$LOG" 2>&1 && pass "stack stopped" || fail "docker compose down (see log)"; }
@@ -282,7 +218,7 @@ do_down() { echo "down"; dc down >>"$LOG" 2>&1 && pass "stack stopped" || fail "
 do_blocks() {
   echo "blocks"
   local blocks nblocks
-  blocks=$(bash "$SCRIPT_DIR/list-blocks.sh" 2>>"$LOG" || true)
+  blocks=$(bash "$SCRIPT_DIR/../list-blocks.sh" 2>>"$LOG" || true)
   nblocks=$(printf '%s\n' "$blocks" | grep -c . || true)
   if [ "$nblocks" -gt 0 ]; then
     pass "$nblocks ucsc* block(s) registered (all plugins)"
@@ -297,7 +233,7 @@ do_blocks() {
 do_demo() {
   echo "demo"
   local url
-  url=$(bash "$SCRIPT_DIR/seed-demo-page.sh" 2>>"$LOG" | tr -d '\r' | grep -E '^https?://' | tail -n1)
+  url=$(bash "$SCRIPT_DIR/../seed-demo-page.sh" 2>>"$LOG" | tr -d '\r' | grep -E '^https?://' | tail -n1)
   if [ -n "$url" ]; then
     pass "demo page seeded ($url)"
     do_drive "$url"

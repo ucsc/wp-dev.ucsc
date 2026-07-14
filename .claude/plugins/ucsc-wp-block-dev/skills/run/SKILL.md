@@ -39,10 +39,22 @@ environment-specific driver:
 
 - [`drivers/wp-dev-ucsc.sh`](drivers/wp-dev-ucsc.sh) — full driver for the
   home-rolled Docker stack
+- [`drivers/wp-env.sh`](drivers/wp-env.sh) — full driver for `@wordpress/env`
+  (Phase 4a). Requires `.wp-env.json` at the repo root; copy
+  [`wp-env-example.json`](wp-env-example.json) to scaffold one. LDAP-dependent
+  blocks (Campus Directory) are not supported under wp-env — see
+  [`references/environments.md`](references/environments.md).
 - [`drivers/generic-byo.sh`](drivers/generic-byo.sh) — BYO: validates a
   reachable site and drives it
-- [`drivers/wp-env.sh`](drivers/wp-env.sh) / [`drivers/local.sh`](drivers/local.sh)
-  — Phase 1 stubs that route to BYO guidance
+- [`drivers/local.sh`](drivers/local.sh) — full driver for LocalWP (Phase 4b)
+  via the third-party `lwp` CLI (cartpauj/localwp-cli); Local has no
+  first-party scriptable CLI. Requires `UCSC_LOCAL_SITE=<name-or-id>` (see
+  `lwp list`) and the Local GUI app running. LDAP-dependent blocks (Campus
+  Directory) are not supported — see
+  [`references/environments.md`](references/environments.md).
+- [`lib/drive.sh`](lib/drive.sh) — shared headless-Chrome `drive` logic
+  (post-JS DOM + console capture); every driver above sources this instead of
+  duplicating it
 
 When a full driver is not present the BYO driver provides clear guidance to
 bring up your site and run the requested commands.
@@ -50,9 +62,11 @@ bring up your site and run the requested commands.
 See [`references/environments.md`](references/environments.md) for detection
 rules, supported probes, troubleshooting, and how to add a new driver. The
 router and driver behavior are covered by
-[`lib/test-detect-environment.sh`](lib/test-detect-environment.sh) and the
-[`test-regression-wp-dev-ucsc.sh`](test-regression-wp-dev-ucsc.sh) regression
-suite (maintainer-run; not part of a normal launch).
+[`lib/test-detect-environment.sh`](lib/test-detect-environment.sh), the
+[`test-regression-wp-dev-ucsc.sh`](test-regression-wp-dev-ucsc.sh),
+[`test-regression-wp-env.sh`](test-regression-wp-env.sh), and
+[`test-regression-local.sh`](test-regression-local.sh) regression suites
+(maintainer-run; not part of a normal launch).
 
 ## Launcher
 

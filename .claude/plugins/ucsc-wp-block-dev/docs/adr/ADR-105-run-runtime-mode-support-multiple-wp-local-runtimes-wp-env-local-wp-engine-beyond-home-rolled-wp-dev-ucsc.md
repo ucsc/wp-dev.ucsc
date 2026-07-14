@@ -38,52 +38,75 @@ containers and host. There is no abstraction over "how to bring the stack up,"
 
 ## Decision
 
-**Direction (not yet adopted):** introduce a small **runtime abstraction** so the
-block skills target a selectable WordPress local runtime instead of assuming
-`wp-dev.ucsc`. Sketch only — to be designed if/when prioritized:
+Introduce a small **runtime abstraction** so the block skills target a
+selectable WordPress local runtime instead of assuming `wp-dev.ucsc`. Adopted
+and implemented in phases:
 
-1. **Runtime profiles.** Define a named runtime (e.g. `wp-dev-ucsc` (default),
-   `wp-env`, `local`, `wp-engine`) that resolves the three things the skills
-   actually need:
+1. **Runtime profiles.** A named runtime (`wp-dev-ucsc` (default), `wp-env`,
+   `local`, `wpe`, `byo`) resolves the three things the skills actually need:
    - **lifecycle** — how to build/up/down the stack,
    - **WP-CLI invocation** — how to run `wp <command>`,
    - **base URL / host + credentials** — what to build/drive against.
-   Model it on the existing source-base resolver pattern (ADR-095) and the
-   "identify the target before driving" discipline (ADR-091), keeping the
-   default behavior identical to today.
+   Detection lives in `skills/run/lib/detect-environment.sh`; the profile
+   itself is a driver script in `skills/run/drivers/`.
 
-2. **Driver indirection.** `driver.sh` (and the validate/verify stack checks)
-   call the profile's lifecycle/CLI/URL hooks rather than hardcoded
-   `docker compose` + `wp-dev.ucsc`. The `wp-dev-ucsc` profile is the current
-   behavior verbatim.
+2. **Driver indirection.** `driver.sh` is a router: it resolves the runtime
+   (explicit or auto-detected) and dispatches to `drivers/<runtime>.sh`, which
+   exposes a common phase interface (`inspect`, `build`, `launch`, `smoke`,
+   `drive <URL>`, `down`, `all`). `drivers/wp-dev-ucsc.sh` carries the original
+   behavior verbatim — the default is unchanged. Shared, environment-agnostic
+   logic (the headless-Chrome `drive` implementation) lives in
+   `skills/run/lib/drive.sh` so drivers don't duplicate it.
 
-3. **Solve LDAP first (gating constraint).** Standardizing onto a portable
-   runtime is only viable once Campus Directory's LDAP need is met there — e.g. a
-   wp-env `.wp-env.json` with a custom PHP image / mappings that include the LDAP
-   extension and VPN reachability, or documented Local/WP Engine equivalents.
-   Until LDAP works in a candidate runtime, that runtime can only support
-   non-LDAP blocks. **This is the precondition for the whole effort.**
+3. **Solve LDAP first (gating constraint) — still open.** Campus Directory's
+   LDAP/VPN need is **not** solved in any alternate runtime yet. `wp-env` is
+   explicitly documented as unsupported for LDAP-dependent blocks; non-LDAP
+   blocks work. This remains the precondition for full parity on any runtime.
 
-4. **Opt-in, additive, default-unchanged.** Any runtime support is additive: the
-   default stays `wp-dev.ucsc`, and no existing workflow changes unless a user
-   explicitly selects another runtime.
+4. **Opt-in, additive, default-unchanged.** Runtime support is additive: the
+   default stays `wp-dev.ucsc` (auto-detection prefers it whenever this repo's
+   own `docker-compose.yml` + LDAP `Dockerfile` markers are present — i.e.
+   always, in this repo), and no existing workflow changes unless a developer
+   explicitly selects another runtime (`driver.sh wp-env ...`, `driver.sh local
+   ...`, `driver.sh byo ...`).
 
-**Not deciding now:** the profile schema, where it is configured (session value
-vs. file), or which runtime to support first. Those are deferred until this is
-prioritized.
+**Implementation status:**
+- Phase 1–3 (detection layer, router, `wp-dev-ucsc` driver extraction, BYO
+  fallback, multi-environment-aware `validate` scripts, portability docs): done.
+- Phase 4a (`wp-env` full driver — `inspect`/`build`/`launch`/`smoke`/`drive`/
+  `down` via the `wp-env` CLI, `.wp-env-example.json` scaffold): done.
+- Phase 4b (`local` / LocalWP full driver): **done**. Local has no first-party
+  scriptable CLI (the official `getflywheel/local-cli` is archived), so
+  `drivers/local.sh` shells out to the third-party `lwp`
+  (cartpauj/localwp-cli), which talks to Local's own local GraphQL API and
+  requires the Local GUI app to be installed and running at least once.
+  Requires `UCSC_LOCAL_SITE=<name-or-id>` (no sensible default — Local site
+  names are per-developer); the site URL is resolved from `lwp status <site>`,
+  overridable via `UCSC_LOCAL_URL`. Like `wp-env.sh`, the `build` phase runs
+  `npm` on the host, assuming the standard Local workflow of symlinking the
+  Local site's plugin directory to this repo's own checkout rather than a
+  second, disconnected copy. Covered by `test-regression-local.sh`.
+- `wpe` (WP Engine): still BYO-only, no dedicated driver.
+
+**Not decided:** whether WP Engine warrants a dedicated driver beyond BYO.
 
 ## Consequences
 
-- **Positive (if pursued):** unhardwires the skills from one bespoke stack;
-  lets developers use their preferred local runtime; creates a natural home for
-  solving LDAP portably and standardizing onto a maintained runtime; isolates
-  environment assumptions behind one abstraction instead of scattering them.
+- **Positive (realized for wp-env and Local, pending for WP Engine):**
+  unhardwires the skills from one bespoke stack for non-LDAP work; a developer
+  on `wp-env` or Local can now run the full lifecycle
+  (`inspect`/`build`/`launch`/`smoke`/`drive`/`down`) without touching
+  `wp-dev.ucsc`; isolates environment assumptions behind one abstraction
+  (`lib/detect-environment.sh` + `drivers/*.sh`) instead of scattering them.
 - **Negative / risks:** real complexity (each runtime has different lifecycle,
-  CLI, URL, and cert handling); the LDAP/VPN constraint may make full parity
-  impossible for Campus Directory on some runtimes; an abstraction adds
-  indirection and test surface. Because this is **Proposed**, none of that cost
-  is incurred yet — the risk today is only that the idea is forgotten, which this
-  ADR mitigates.
-- **Tracking:** revisit when a concrete need arises (a developer blocked on a
-  non-`wp-dev.ucsc` runtime, or a decision to standardize), and only after a
-  viable LDAP path exists in the candidate runtime.
+  CLI, URL, and cert handling) — now incurred for `wp-env` and `local`; the
+  Local driver additionally depends on a third-party CLI (`lwp`, not an
+  official Local project) and requires the Local GUI app running; the LDAP/VPN
+  constraint still makes full parity impossible for Campus Directory on
+  `wp-env` and `local` (and likely `wpe` too, until solved); the abstraction adds
+  indirection and test surface, mitigated by `drivers/wp-dev-ucsc.sh` preserving
+  the original behavior verbatim and a regression suite
+  (`skills/run/test-regression-wp-dev-ucsc.sh`).
+- **Tracking:** a dedicated `wpe` driver remains open; revisit when a
+  developer is blocked on it, or when LDAP-in-wp-env/LDAP-in-local becomes
+  worth solving.
