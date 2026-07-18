@@ -17,6 +17,7 @@ skill's complete `SKILL.md` before acting.
 
 | Skill | Use for |
 | --- | --- |
+| `audit` | This skill should be used when the user asks to "audit the repository", "audit the whole codebase", "do a top-down audit", or "run a full security audit" — existing code across the entire application, not a diff, branch, or PR (use review for those). Runs a phased, read-only audit of the whole repo (WordPress block plugin, theme, or any targeted repository) with parallel specialist subagents and reports prioritized, verified findings. |
 | `develop` | Add or modify block code (PHP, template, JS editor, REST, build).<br>- `develop feature` - Defining and implementing new behavior<br>- `develop fix` - Reproducing and repairing defects |
 | `feedback` | Report a bug or suggestion about the plugin's own skills. Collects a note plus session context and delivers it to a configured endpoint/email or saves locally; not for the WordPress feedback block. |
 | `hub` | List all available skills and commands. Use when unsure which skill applies. |
@@ -25,6 +26,7 @@ skill's complete `SKILL.md` before acting.
 | `run` | Launch and drive the plugin in wp-dev.ucsc to see a change working. |
 | `validate` | Create or run automated PHP, Jest, or e2e tests.<br>- `validate php` - Create or run PHP tests<br>- `validate jest` - Create or run Jest tests<br>- `validate e2e` - Create or run end-to-end tests<br>- `validate all` - Run all test suites sequentially in one battery, single-agent |
 | `verify` | Build and run the app to confirm a specific change in the editor or frontend without substituting tests. |
+| `wp7-pattern-lock` | Diagnose and remediate WordPress 7.0 pattern content-locking on CampusPress sites — pages whose blocks carry metadata.patternName stamps become content-only (structure uneditable, List View flattened). Trigger examples; "pages built from a pattern can't be edited", "left navigation pattern broken", "columns not selectable in the editor after the WP upgrade". |
 
 For block-specific work, resolve the target through
 `develop/references/targets.md` and read only the selected target reference.

@@ -38,6 +38,24 @@
       "contexts": ["public", "readme"]
     },
     {
+      "name": "audit",
+      "argument_hint": "[full|tools] [scope or emphasis]",
+      "short_description": "top-down read-only audit of the whole repository",
+      "contexts": ["public", "readme"],
+      "modes": [
+        {
+          "name": "full",
+          "argument_hint": "[scope or emphasis]",
+          "short_description": "phased top-down audit with specialist subagents"
+        },
+        {
+          "name": "tools",
+          "argument_hint": "[php|node|both] [target]",
+          "short_description": "run the local ucsc-php-review / ucsc-node-review runners"
+        }
+      ]
+    },
+    {
       "name": "run",
       "argument_hint": "[block] [change|URL]",
       "short_description": "launch and drive wp-dev.ucsc",
@@ -75,6 +93,12 @@
       "name": "verify",
       "argument_hint": "[block] [criterion]",
       "short_description": "confirm a change in the running app",
+      "contexts": ["public", "readme"]
+    },
+    {
+      "name": "wp7-pattern-lock",
+      "argument_hint": "[site-url] [pages]",
+      "short_description": "diagnose and fix WP 7.0 pattern-locked pages",
       "contexts": ["public", "readme"]
     },
     {

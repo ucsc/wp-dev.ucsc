@@ -86,3 +86,4 @@ Retired (superseded/deprecated/rejected) ADRs are listed in [adrs_retired.md](ad
 | [ADR-108](ADR-108-maintainer-plugin-npm-packages.md) | Plugin-scoped npm packages for test and lint tooling without polluting block package.json | Proposed | 2026-06-26 |
 | [ADR-109](ADR-109-maintainer-cross-link-guide-and-slides.md) | Cross-link guide and slides so readers can navigate between companion documents | Accepted | 2026-06-26 |
 | [ADR-110](ADR-110-maintainer-adr-mode-strict-prefix-naming.md) | Strict ADR filename prefix and lightweight retirement | Accepted | 2026-06-29 |
+| [ADR-111](ADR-111-audit-top-down-repo-audit.md) | Audit skill: comprehensive top-down repository audit | Accepted | 2026-07-17 |

@@ -1,15 +1,15 @@
 ---
 title: UCSC WordPress Block Development Plugin Guide
-generated: 2026-07-05
+generated: 2026-07-17
 version: 0.2.0
-git-commit: e7294b3991eb4632759ff3bebdc2ab97456f4f04
+git-commit: fa7c3243e0ae5fd0e3abbc3fd58d145e68f691dc
 source: README.md
-source-hash: b7a54239a48468e2aebab355b5cb394de83a87cd466ff113e920470d83b259b7
+source-hash: b524d3a84b5ead46b8c50a38274ca921754b24c9845522655d210616c6e23419
 ---
 
 # ucsc-wp-block-dev
 
-**Generated:** 2026-07-05 · **Plugin version:** 0.2.0 · **Git commit:** `e7294b3991eb`
+**Generated:** 2026-07-17 · **Plugin version:** 0.2.0 · **Git commit:** `fa7c3243e0ae`
 
 Claude Code plugin for developing the `ucsc-gutenberg-blocks` WordPress plugin at UCSC ITS.
 
@@ -124,7 +124,9 @@ Type `hub` (`:hub`) in Claude Code to list the available skills, or invoke one d
 * **`develop`** `[feature|fix] [block] [request]` — add or modify WordPress block code
 * **`feedback`** `[bug|idea|question] [note]` — report a bug or idea about the plugin skills
 * **`review`** `[target] [focus]` — review code for bugs, security, a11y, and tests
+* **`audit`** `[full|tools] [scope or emphasis]` — top-down read-only audit of the whole repository
 * **`run`** `[block] [change|URL]` — launch and drive wp-dev.ucsc
 * **`validate`** `[php|jest|e2e|all] [create|run] [target]` — create or run automated test suites
 * **`verify`** `[block] [criterion]` — confirm a change in the running app
+* **`wp7-pattern-lock`** `[site-url] [pages]` — diagnose and fix WP 7.0 pattern-locked pages
 * **`maintainer`** `[mode] [submode|target]` — maintain this plugin package

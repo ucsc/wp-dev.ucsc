@@ -1,5 +1,5 @@
-<!-- Generated: 2026-07-05 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
-<!-- source-hash: b7a54239a48468e2aebab355b5cb394de83a87cd466ff113e920470d83b259b7 -->
+<!-- Generated: 2026-07-17 from skills/maintainer/assets/ucsc-wp-block-dev-presentation.md -->
+<!-- source-hash: b524d3a84b5ead46b8c50a38274ca921754b24c9845522655d210616c6e23419 -->
 
 ---
 marp: true
@@ -48,7 +48,7 @@ AUTO markers — your edits will be overwritten on the next `docs` run.
 ### *A guided tour of the `ucsc-wp-block-dev` Claude Code plugin*
 
 **Slides** · **Presented by:** UCSC ITS<br />
-**Generated:** 2026-07-05<br />
+**Generated:** 2026-07-17<br />
 **Target Product:** `ucsc-gutenberg-blocks` · **Local Environment:** `wp-dev.ucsc`
 
 > Built for Claude Code; the same skills also run via natural-language invocation
@@ -127,6 +127,17 @@ Reviews a diff, branch, PR, or file for bugs, security, accessibility, and missi
 
 ---
 
+## Skill: `audit` &nbsp; `[full|tools] [scope or emphasis]`
+
+Audits the entire repository top-down — maps architecture and trust boundaries, fans out parallel specialist subagents, verifies every finding against real code, and delivers a prioritized read-only report; a tools mode runs the local ucsc-php-review / ucsc-node-review runners.
+
+**Modes:**
+
+* `full` — phased top-down audit with specialist subagents
+* `tools` — run the local ucsc-php-review / ucsc-node-review runners
+
+---
+
 ## Skill: `run` &nbsp; `[block] [change|URL]`
 
 Launches and drives the wp-dev.ucsc Docker stack through one token-frugal driver to see a change working.
@@ -149,6 +160,12 @@ Creates or runs the PHP, Jest, and e2e suites — `all` runs them sequentially i
 ## Skill: `verify` &nbsp; `[block] [criterion]`
 
 Confirms one acceptance criterion in the live editor or frontend — a behavioral gate, never a stand-in for tests.
+
+---
+
+## Skill: `wp7-pattern-lock` &nbsp; `[site-url] [pages]`
+
+Diagnoses and repairs WordPress 7.0 pattern content-locking — scans sites for patternName-stamped pages, proves the lock in the editor, and strips the stamps with backups and revisions.
 
 ---
 

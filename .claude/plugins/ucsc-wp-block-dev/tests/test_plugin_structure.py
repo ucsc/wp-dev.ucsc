@@ -19,6 +19,7 @@ PUBLISHER = PROJECT_ROOT / ".claude" / "scripts" / "publish_to_gdoc.py"
 PLUGIN_NAME = "ucsc-wp-block-dev"
 FORBIDDEN_PLUGIN_NAME = "ucsc-" + "wordpress-block-dev"
 EXPECTED_LIVE_SKILLS = {
+    "audit",
     "develop",
     "feedback",
     "hub",
@@ -27,6 +28,7 @@ EXPECTED_LIVE_SKILLS = {
     "run",
     "validate",
     "verify",
+    "wp7-pattern-lock",
    }
 EXPECTED_DEVELOP_MODES = {"feature", "fix"}
 EXPECTED_MAINTAINER_SUB_SKILLS = {"retrospective"}

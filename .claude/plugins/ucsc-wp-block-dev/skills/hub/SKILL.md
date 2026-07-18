@@ -42,19 +42,23 @@ nests public modes beneath their parent.
 
 ```text
 skills
-├─ hub       [block]                                   — list skills and set an optional session block target
-├─ develop   [feature|fix] [block] [request]           — add or modify WordPress block code
+├─ hub               [block]                                   — list skills and set an optional session block target
+├─ develop           [feature|fix] [block] [request]           — add or modify WordPress block code
 │  ├─ feature  [block] [request]  — implement planned block behavior
 │  └─ fix      [block] [problem]  — diagnose and repair a block defect
-├─ feedback  [bug|idea|question] [note]                — report a bug or idea about the plugin skills
-├─ review    [target] [focus]                          — review code for bugs, security, a11y, and tests
-├─ run       [block] [change|URL]                      — launch and drive wp-dev.ucsc
-├─ validate  [php|jest|e2e|all] [create|run] [target]  — create or run automated test suites
+├─ feedback          [bug|idea|question] [note]                — report a bug or idea about the plugin skills
+├─ review            [target] [focus]                          — review code for bugs, security, a11y, and tests
+├─ audit             [full|tools] [scope or emphasis]          — top-down read-only audit of the whole repository
+│  ├─ full   [scope or emphasis]       — phased top-down audit with specialist subagents
+│  └─ tools  [php|node|both] [target]  — run the local ucsc-php-review / ucsc-node-review runners
+├─ run               [block] [change|URL]                      — launch and drive wp-dev.ucsc
+├─ validate          [php|jest|e2e|all] [create|run] [target]  — create or run automated test suites
 │  ├─ php   [create|run] [target]  — create or run PHP tests
 │  ├─ jest  [create|run] [target]  — create or run Jest tests
 │  ├─ e2e   [create|run] [target]  — create or run browser-driven tests
 │  └─ all   [block]                — run PHP, Jest, and E2E sequentially
-└─ verify    [block] [criterion]                       — confirm a change in the running app
+├─ verify            [block] [criterion]                       — confirm a change in the running app
+└─ wp7-pattern-lock  [site-url] [pages]                        — diagnose and fix WP 7.0 pattern-locked pages
 ```
 
 The `[…]` syntax is a compact summary of the full `argument-hint` frontmatter,

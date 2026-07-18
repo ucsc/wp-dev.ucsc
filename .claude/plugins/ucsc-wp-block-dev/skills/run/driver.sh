@@ -63,6 +63,18 @@ esac
 
 # Resolve environment: explicit or auto-detect
 ENVIRONMENT="${1:-auto}"
+
+# Phase-first form (driver.sh all|inspect|build|launch|smoke|drive|down): a
+# phase word in $1 means the environment was omitted — auto-detect and keep
+# the phase in the arguments.
+PHASE_FIRST=0
+case "$ENVIRONMENT" in
+  inspect|build|launch|smoke|drive|down|all)
+    ENVIRONMENT="auto"
+    PHASE_FIRST=1
+    ;;
+esac
+
 if [ "$ENVIRONMENT" = "auto" ]; then
   SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
   
@@ -71,28 +83,27 @@ if [ "$ENVIRONMENT" = "auto" ]; then
   ENVIRONMENT="$DETECTED"
   
   if [ "$ENVIRONMENT" = "unknown" ]; then
-    echo "ERROR: Could not detect WordPress development environment"
-    echo ""
-    echo "Supported environments:"
-    echo "  - wp-dev-ucsc: home-rolled Docker (docker-compose.yml + Dockerfile)"
-    echo "  - wp-env: WordPress.org wp-env (wp-env.json)"
-    echo "  - local: LocalWP / Local by Flywheel"
-    echo "  - byo: Bring Your Own (WordPress already running)"
-    echo ""
-    echo "To specify environment explicitly:"
-    echo "  bash driver.sh wp-dev-ucsc all"
-    echo "  bash driver.sh byo drive http://localhost:8000/"
-    echo ""
-    echo "For more help:"
-    echo "  bash driver.sh help"
-    exit 1
+    # Default environment when detection is inconclusive.
+    ENVIRONMENT="wp-dev-ucsc"
+    echo "NOTE: could not detect environment — defaulting to wp-dev-ucsc"
   fi
-  
-  # Remove 'auto' from arguments
-  shift || true
+
+  # Remove 'auto' from arguments (phase-first form passed no environment)
+  if [ "$PHASE_FIRST" -eq 0 ]; then
+    shift || true
+  fi
 else
   # Remove explicit environment from arguments
   shift || true
+fi
+
+# The ucsc-gutenberg-blocks family (campus-directory, course-catalog,
+# class-schedule) depends on the custom wp-dev.ucsc image (PHP LDAP extension,
+# PeopleSoft/VPN reachability) and must not run under other environments.
+if [ "${UCSC_PLUGIN:-}" = "ucsc-gutenberg-blocks" ] && [ "$ENVIRONMENT" != "wp-dev-ucsc" ]; then
+  echo "ERROR: ucsc-gutenberg-blocks requires the wp-dev-ucsc environment (got: $ENVIRONMENT)" >&2
+  echo "Its blocks (campus-directory, course-catalog, class-schedule) need the custom Docker image." >&2
+  exit 2
 fi
 
 # Locate the driver

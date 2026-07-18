@@ -124,6 +124,17 @@ Reviews a diff, branch, PR, or file for bugs, security, accessibility, and missi
 
 ---
 
+## Skill: `audit` &nbsp; `[full|tools] [scope or emphasis]`
+
+Audits the entire repository top-down — maps architecture and trust boundaries, fans out parallel specialist subagents, verifies every finding against real code, and delivers a prioritized read-only report; a tools mode runs the local ucsc-php-review / ucsc-node-review runners.
+
+**Modes:**
+
+* `full` — phased top-down audit with specialist subagents
+* `tools` — run the local ucsc-php-review / ucsc-node-review runners
+
+---
+
 ## Skill: `run` &nbsp; `[block] [change|URL]`
 
 Launches and drives the wp-dev.ucsc Docker stack through one token-frugal driver to see a change working.
@@ -146,6 +157,12 @@ Creates or runs the PHP, Jest, and e2e suites — `all` runs them sequentially i
 ## Skill: `verify` &nbsp; `[block] [criterion]`
 
 Confirms one acceptance criterion in the live editor or frontend — a behavioral gate, never a stand-in for tests.
+
+---
+
+## Skill: `wp7-pattern-lock` &nbsp; `[site-url] [pages]`
+
+Diagnoses and repairs WordPress 7.0 pattern content-locking — scans sites for patternName-stamped pages, proves the lock in the editor, and strips the stamps with backups and revisions.
 
 ---
 
