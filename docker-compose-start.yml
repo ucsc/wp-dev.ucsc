@@ -11,7 +11,7 @@ services:
     platform: linux/amd64
   plugin_npm_start:
     container_name: ${NAME}-plugin-build
-    image: node:16.18.0-alpine3.15
+    image: node:22-alpine
     volumes:
       - "./public/:/var/www/html"
     working_dir: /var/www/html/wp-content/plugins/ucsc-gutenberg-blocks

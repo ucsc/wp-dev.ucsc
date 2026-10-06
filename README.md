@@ -32,6 +32,10 @@ docker compose up -d
 docker compose -f docker-compose.yml -f docker-compose-start.yml up -d
 ```
 
+Node versions are set by the compose images, not by the Node on your machine:
+the blocks plugin services (`plugin_npm_install`, `plugin_npm_start`) use
+`node:22-alpine`; the theme services still use `node:16.18.0-alpine3.15`.
+
 > [!IMPORTANT]
 > This Docker stack is the **local development environment only**. The real
 > WordPress site is production and is **not** this stack. Run all builds, tests,
