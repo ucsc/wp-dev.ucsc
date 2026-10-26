@@ -19,10 +19,12 @@ What's in the repo:
 | File | Role |
 | --- | --- |
 | `Dockerfile` | Builds the `wp` service from `wordpress:6.5.5-php8.1-apache`, adding the PHP **LDAP** extension and **Xdebug**. |
-| `docker-compose.yml` | Base stack: `server` (nginx 1.19), `db` (mysql 8.0), `wp` (built from `Dockerfile`), `wpcli` (`wordpress:cli-php8.1`). |
+| `docker-compose.yml` | Base stack: `server` (nginx 1.19), `db` (mysql 8.0), `wp` (built from `Dockerfile`), `wpcli` (`wordpress:cli-php8.1`), `toxiproxy` (fault injection, see [Outage scenarios](#outage-scenarios)). |
 | `docker-compose-start.yml` | Dev/watch overlay — adds the Node build/watch services for the theme and the blocks plugin. |
 | `docker-compose-install.yml` | One-shot bootstrap jobs: `theme_composer_install`, `theme_npm_install`, `plugin_npm_install`, `wordpress_install`. |
 | `setup.sh` | Clones the theme and product plugins into `public/wp-content/`. |
+| `bin/fault.sh` | Switches LDAP / campusdirectory.ucsc.edu outage scenarios on and off. |
+| `devtools/` | Toxiproxy config and the dev-only `ucsc-dev-faults` mu-plugin used by `bin/fault.sh`. |
 | `.env.example.txt` | Copied to `.env` during first-time setup. |
 
 ```bash
@@ -122,6 +124,22 @@ At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a brow
 > 
 > * You can run WP-CLI commands with `docker exec ${NAME}-cli wp <COMMAND>`
 > * `${NAME}` is what you used in your `.env` file
+
+## Campus Directory LDAP
+
+Campus Directory connects to LDAP exactly as production does: `ldaps://ldap-blue.ucsc.edu`, bound as `pantheon-webapps` with the `ldap_api_key` option. There is no anonymous dev mode. Put the key in `.env` as `LDAP_API_KEY` before running `wordpress_install`. On an existing install, set it once in **Settings > UCSC Gutenberg Block Settings** (or with `wp option update ldap_api_key`). You still need the UCSC VPN.
+
+## Outage scenarios
+
+The `wp` container always reaches `ldap-blue.ucsc.edu` and `campusdirectory.ucsc.edu` through the `toxiproxy` service, with the real hostnames and TLS, so a normal run and an outage run take the same path. Switch scenarios with `bin/fault.sh`. Each command clears the previous fault and flushes transients so cached results do not hide it.
+
+| Command | Effect |
+| --- | --- |
+| `bin/fault.sh ldap-stall` / `cd-stall` | Connection accepted, no reply ever arrives |
+| `bin/fault.sh ldap-down` / `cd-down` | Connection refused |
+| `bin/fault.sh cd-403` / `cd-html` / `cd-500` | campusdirectory answers with that page |
+| `bin/fault.sh status` | Show what is on |
+| `bin/fault.sh off` | Back to normal |
 
 ## Troubleshooting 
 

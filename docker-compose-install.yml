@@ -6,6 +6,7 @@ services:
       WORDPRESS_DB_USER: ${DB_USER}
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
+      LDAP_API_KEY: ${LDAP_API_KEY:-}
     command: >
       /bin/sh -c '
       wp core install --path="/var/www/html" --url="https://wp-dev.ucsc" --title="Local Wordpress with HTTPS & LDAP" --admin_user=admin --admin_password=password --admin_email=raknight@ucsc.edu;
@@ -13,6 +14,7 @@ services:
       wp plugin activate ucsc-gutenberg-blocks;
       wp plugin activate ucsc-custom-functionality;
       wp rewrite structure '/%year%/%monthnum%/%postname%/';
+      if [ -n "$$LDAP_API_KEY" ]; then wp option update ldap_api_key "$$LDAP_API_KEY"; fi;
       '
     volumes:
       - ./public/:/var/www/html

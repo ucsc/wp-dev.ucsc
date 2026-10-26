@@ -24,7 +24,13 @@ with a custom WordPress image and WP-CLI run inside a container.
 - `Dockerfile` — builds the `wp` service from `wordpress:6.5.5-php8.1-apache`,
   adding the PHP **LDAP** extension and **Xdebug** (port 9003).
 - `docker-compose.yml` — base stack: `server` (nginx), `db` (mysql 8.0), `wp`
-  (built from `Dockerfile`), `wpcli` (`wordpress:cli-php8.1`).
+  (built from `Dockerfile`), `wpcli` (`wordpress:cli-php8.1`), `toxiproxy`.
+  `wp` reaches `ldap-blue.ucsc.edu` and `campusdirectory.ucsc.edu` only through
+  `toxiproxy` (`extra_hosts`), and binds LDAP exactly as production does
+  (`ldaps://`, `pantheon-webapps`; no anonymous dev mode, WPM-234).
+- `bin/fault.sh` — outage scenarios for LDAP / campusdirectory
+  (`ldap-stall|ldap-down|cd-stall|cd-down|cd-403|cd-html|cd-500|status|off`).
+  Use it to reproduce outages instead of ad-hoc fake servers.
 - `docker-compose-start.yml` — dev/watch **overlay**: Node build/watch services
   for the theme and the blocks plugin (`plugin_npm_start`).
 - `docker-compose-install.yml` — one-shot **bootstrap** jobs

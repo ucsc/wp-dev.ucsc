@@ -1,0 +1,14 @@
+[
+  {
+    "name": "ldap",
+    "listen": "0.0.0.0:636",
+    "upstream": "ldap-blue.ucsc.edu:636",
+    "enabled": true
+  },
+  {
+    "name": "campusdirectory",
+    "listen": "0.0.0.0:443",
+    "upstream": "campusdirectory.ucsc.edu:443",
+    "enabled": true
+  }
+]

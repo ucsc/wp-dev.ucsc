@@ -35,6 +35,7 @@ services:
     container_name: ${NAME}-wp
     depends_on:
       - db
+      - toxiproxy
     build: .
     restart: always
     ports:
@@ -45,8 +46,17 @@ services:
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
       WORDPRESS_CONFIG_EXTRA: define('WP_ALLOW_MULTISITE', true);
-      DOCKER_DEV: docker_dev
-    volumes: [ './public/:/var/www/html' ]
+      # Campus Directory binds LDAP as production does (ldaps://, app bind);
+      # the image's ldap.conf names no CA bundle, so point libldap at it.
+      LDAPTLS_CACERT: /etc/ssl/certs/ca-certificates.crt
+    volumes:
+      - './public/:/var/www/html'
+      - './devtools/mu-plugins/ucsc-dev-faults.php:/var/www/html/wp-content/mu-plugins/ucsc-dev-faults.php:ro'
+    # Route LDAP and campusdirectory through toxiproxy at all times, so a
+    # normal run and a fault run take the same path (see bin/fault.sh).
+    extra_hosts:
+      - 'ldap-blue.ucsc.edu:172.31.234.10'
+      - 'campusdirectory.ucsc.edu:172.31.234.10'
     hostname: wp-dev.ucsc
     labels:
       com.ucsc.expose.domain: "wp-dev.ucsc"
@@ -56,6 +66,17 @@ services:
       wpsite:
         aliases:
           - wp-dev.ucsc
+      faults: {}
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    container_name: ${NAME}-toxiproxy
+    restart: always
+    command: ['-host=0.0.0.0', '-config=/config/toxiproxy.json']
+    volumes:
+      - './devtools/toxiproxy.json:/config/toxiproxy.json:ro'
+    networks:
+      faults:
+        ipv4_address: 172.31.234.10
   wpcli:
     platform: linux/amd64
     image: wordpress:cli-php8.1
@@ -76,6 +97,11 @@ services:
 networks:
   wpsite:
     driver: bridge
+  faults:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.234.0/24
 volumes:
   wp: null
   db: null
