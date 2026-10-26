@@ -24,7 +24,7 @@ What's in the repo:
 | `docker-compose-install.yml` | One-shot bootstrap jobs: `theme_composer_install`, `theme_npm_install`, `plugin_npm_install`, `wordpress_install`. |
 | `setup.sh` | Clones the theme and product plugins into `public/wp-content/`. |
 | `bin/fault.sh` | Switches LDAP / campusdirectory.ucsc.edu outage scenarios on and off. |
-| `devtools/` | Toxiproxy config and the dev-only `ucsc-dev-faults` mu-plugin used by `bin/fault.sh`. |
+| `devtools/` | Toxiproxy config (`devtools/toxiproxy/`) and the dev-only `ucsc-dev-faults` mu-plugin used by `bin/fault.sh`. |
 | `.env.example.txt` | Copied to `.env` during first-time setup. |
 
 ```bash

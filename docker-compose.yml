@@ -51,7 +51,9 @@ services:
       LDAPTLS_CACERT: /etc/ssl/certs/ca-certificates.crt
     volumes:
       - './public/:/var/www/html'
-      - './devtools/mu-plugins/ucsc-dev-faults.php:/var/www/html/wp-content/mu-plugins/ucsc-dev-faults.php:ro'
+      # Mount folders, not single files: git replaces files on checkout, which
+      # leaves a single-file bind mount pointing at the old, deleted file.
+      - './devtools/mu-plugins:/var/www/html/wp-content/mu-plugins:ro'
     # Route LDAP and campusdirectory through toxiproxy at all times, so a
     # normal run and a fault run take the same path (see bin/fault.sh).
     extra_hosts:
@@ -73,7 +75,7 @@ services:
     restart: always
     command: ['-host=0.0.0.0', '-config=/config/toxiproxy.json']
     volumes:
-      - './devtools/toxiproxy.json:/config/toxiproxy.json:ro'
+      - './devtools/toxiproxy:/config:ro'
     networks:
       faults:
         ipv4_address: 172.31.234.10
