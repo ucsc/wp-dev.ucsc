@@ -125,6 +125,15 @@ At this point you should be able to visit https://wp-dev.ucsc/wp-admin in a brow
 > * You can run WP-CLI commands with `docker exec ${NAME}-cli wp <COMMAND>`
 > * `${NAME}` is what you used in your `.env` file
 
+## Accessibility checking (Editoria11y)
+
+`wordpress_install` installs and activates the
+[Editoria11y Accessibility Checker](https://wordpress.org/plugins/editoria11y-accessibility-checker/)
+plugin. While you are logged in, it checks each page you view (and the block
+editor) and shows a panel of issues, such as skipped heading levels or
+suspicious alt text. On an existing install, add it once with
+`docker compose exec wpcli wp plugin install editoria11y-accessibility-checker --activate`.
+
 ## Campus Directory LDAP
 
 Campus Directory connects to LDAP exactly as production does: `ldaps://ldap-blue.ucsc.edu`, bound as `pantheon-webapps` with the `ldap_api_key` option. There is no anonymous dev mode. Put the key in `.env` as `LDAP_API_KEY` before running `wordpress_install`. On an existing install, set it once in **Settings > UCSC Gutenberg Block Settings** (or with `wp option update ldap_api_key`). You still need the UCSC VPN.
